@@ -30,6 +30,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         label.translatesAutoresizingMaskIntoConstraints = false
         label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.textColor = .black
+        
         return label
     }()
     
@@ -39,6 +40,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .black
+        
         return label
     }()
     
@@ -48,6 +50,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .black
+        
         return label
     }()
     
@@ -58,6 +61,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         label.translatesAutoresizingMaskIntoConstraints = false
         label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
         label.textColor = .black
+        
         return label
     }()
     
@@ -66,6 +70,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
         imageView.image = UIImage(named: "loadingPic")
+        
         return imageView
     }()
 }

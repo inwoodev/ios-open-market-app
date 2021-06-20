@@ -32,6 +32,7 @@ class OpenMarketItemViewController: UIViewController {
         label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.translatesAutoresizingMaskIntoConstraints = false
+        
         return label
     }()
     
@@ -42,6 +43,7 @@ class OpenMarketItemViewController: UIViewController {
         textView.textColor = .lightGray
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.delegate = self
+        
         return textView
     }()
     
@@ -51,6 +53,7 @@ class OpenMarketItemViewController: UIViewController {
         pickerView.dataSource = self
         pickerView.delegate = self
         pickerView.translatesAutoresizingMaskIntoConstraints = false
+        
         return pickerView
     }()
     
@@ -66,6 +69,7 @@ class OpenMarketItemViewController: UIViewController {
         
         toolbar.setItems([doneButton, cancelButton], animated: true)
         toolbar.isUserInteractionEnabled = true
+        
         return toolbar
     }()
     
@@ -75,6 +79,7 @@ class OpenMarketItemViewController: UIViewController {
         button.setImage(uploadImage, for: .normal)
         button.addTarget(self, action: #selector(didTapUploadPhoto(_:)), for: .touchUpInside)
         button.translatesAutoresizingMaskIntoConstraints = false
+        
         return button
     }()
     
@@ -90,6 +95,7 @@ class OpenMarketItemViewController: UIViewController {
         collectionView.delegate = self
         collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        
         return collectionView
     }()
     
@@ -98,6 +104,7 @@ class OpenMarketItemViewController: UIViewController {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.distribution = .fillEqually
         stackView.axis = .horizontal
+        
         return stackView
     }()
     
@@ -106,6 +113,7 @@ class OpenMarketItemViewController: UIViewController {
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
+        
         return stackView
     }()
     
