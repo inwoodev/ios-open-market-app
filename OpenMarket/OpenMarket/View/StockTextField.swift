@@ -33,6 +33,6 @@ extension StockTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.stock, textField)
+        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.stock, textField.text)
     }
 }

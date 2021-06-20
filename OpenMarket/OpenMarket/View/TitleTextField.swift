@@ -30,6 +30,6 @@ extension TitleTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.title, textField)
+        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.title, textField.text)
     }
 }

@@ -31,6 +31,6 @@ extension PasswordTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertPasswordTextFieldToDictionary(OpenMarketItemToPost.password, textField)
+        textFieldDelegate?.convertPasswordTextFieldToDictionary(OpenMarketItemToPost.password, textField.text)
     }
 }

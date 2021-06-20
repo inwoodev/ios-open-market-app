@@ -10,7 +10,7 @@ import Foundation
 enum OpenMarketItemToPost {
     case title, price, currency, stock, discountedPrice, password
     
-    var placeholder: CustomStringConvertible {
+    var placeholder: String {
         switch self {
         case .title:
             return "상품명"

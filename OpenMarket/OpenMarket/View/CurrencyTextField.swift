@@ -30,6 +30,6 @@ extension CurrencyTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.currency, textField)
+        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.currency, textField.text)
     }
 }

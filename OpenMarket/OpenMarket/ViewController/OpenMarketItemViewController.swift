@@ -282,13 +282,13 @@ extension OpenMarketItemViewController: TextFieldConvertible {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    func convertPasswordTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ textField: UITextField) {
-        itemInformation.updateValue(textField.text, forKey: itemToPost.key)
+    func convertPasswordTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
+        itemInformation.updateValue(text, forKey: itemToPost.key)
         let alertController = UIAlertController(title: "비밀번호 설정", message: "비밀번호를 영문, 숫자를 사용해서 입력 해 주세요", preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         alertController.addAction(action)
         
-        guard let text = textField.text,
+        guard let text = text,
               Int(text) == nil,
               !text.isEmpty else {
             alertInvalidTextField(alertController)
@@ -298,16 +298,16 @@ extension OpenMarketItemViewController: TextFieldConvertible {
         itemInformation.updateValue(text, forKey: itemToPost.key)
     }
     
-    func convertOptionalTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ textField: UITextField) {
+    func convertOptionalTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
         
-        guard let text = textField.text,
+        guard let text = text,
               let number = Int(text) else { return }
         itemInformation.updateValue(number, forKey: itemToPost.key)
     }
     
-    func convertTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ textField: UITextField) {
+    func convertTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
        
-        guard let text = textField.text else { return }
+        guard let text = text else { return }
         if let number = Int(text) {
             itemInformation.updateValue(number, forKey: itemToPost.key)
             

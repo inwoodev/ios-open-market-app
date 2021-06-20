@@ -31,7 +31,7 @@ extension PriceTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.price, textField)
+        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.price, textField.text)
     }
 }
 
