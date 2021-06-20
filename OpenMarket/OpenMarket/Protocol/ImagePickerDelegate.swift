@@ -2,7 +2,7 @@
 //  ImagePickerDelegate.swift
 //  OpenMarket
 //
-//  Created by 황인우 on 2021/06/15.
+//  Created by James on 2021/06/15.
 //
 
 import Foundation

@@ -8,9 +8,8 @@
 import UIKit
 
 class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable {
+    var networkManager: NetworkManageable = NetworkManager()
     static let identifier: String = "OpenMarketListCollectionViewCell"
-    
-    var imageDataTask: URLSessionDataTask?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -45,7 +44,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
     lazy var itemDiscountedPriceLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.numberOfLines = 0
+        label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
         label.textColor = .black
         return label
@@ -124,14 +123,14 @@ extension OpenMarketListCollectionViewCell {
         configureStockLabel(openMarketItems, indexPath: indexPath)
         
         DispatchQueue.global().async { [weak self] in
-            self?.imageDataTask = self?.requestThumbnail(openMarketItems, indexPath: indexPath)
-            self?.imageDataTask?.resume()
+            self?.networkManager.dataTask = self?.applyRequestedImage(openMarketItems, indexPath: indexPath)
+            self?.networkManager.dataTask?.resume()
         }
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        imageDataTask?.cancel()
+        self.networkManager.dataTask?.cancel()
         self.itemThumbnail.image = UIImage(named: "loadingPic")
         self.itemTitleLabel.text = nil
         self.itemPriceLabel.text = nil

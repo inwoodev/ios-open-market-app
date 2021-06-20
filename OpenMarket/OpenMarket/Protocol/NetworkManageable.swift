@@ -5,9 +5,10 @@
 //  Created by James on 2021/06/01.
 //
 
-import Foundation
+import UIKit
 
 protocol NetworkManageable {
+    var dataTask: URLSessionDataTask? { get set}
     var urlSession: URLSessionProtocol { get }
     var isReadyToPaginate: Bool { get set }
     var boundary: String { get }
@@ -81,6 +82,19 @@ extension NetworkManageable {
             return .failure(NetworkResponseError.outdated.description)
         default:
             return .failure(NetworkResponseError.failed.description)
+        }
+    }
+}
+
+// MARK: - Cell image download Task
+
+extension NetworkManageable {
+
+    func imageDownloadDataTask(url: URL, completionHandler: @escaping (UIImage) -> Void) -> URLSessionDataTask {
+        return URLSession.shared.dataTask(with: url) { data, response, error in
+            guard let completeData = data,
+                  let imageData = UIImage(data: completeData) else { return }
+            completionHandler(imageData)
         }
     }
 }

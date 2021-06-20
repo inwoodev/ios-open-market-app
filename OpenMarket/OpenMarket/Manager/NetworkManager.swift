@@ -8,6 +8,7 @@
 import Foundation
 
 final class NetworkManager: NetworkManageable {
+    var dataTask: URLSessionDataTask?
     var boundary = "Boundary-\(UUID().uuidString)"
     var isReadyToPaginate: Bool = false
     let urlSession: URLSessionProtocol
