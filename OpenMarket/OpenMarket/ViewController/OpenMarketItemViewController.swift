@@ -15,9 +15,11 @@ class OpenMarketItemViewController: UIViewController {
     private let imagePicker = UIImagePickerController()
     private var itemThumbnails: [UIImage] = []
     private var itemInformation: [String: Any?] = [:]
+    private var textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
+    private let networkManager: NetworkManageable = NetworkManager()
     
     // MARK: - Views
-    
+
     private var titleTextField = TitleTextField()
     private var priceTextField = PriceTextField()
     private var discountedPriceTextField = DiscountedPriceTextField()
@@ -39,7 +41,7 @@ class OpenMarketItemViewController: UIViewController {
     private lazy var detailedInformationTextView: UITextView = {
         let textView = UITextView()
         textView.font = UIFont.preferredFont(forTextStyle: .body)
-        textView.text = "상품 정보를 입력 해 주세요."
+        textView.text = textViewDefaultMessage
         textView.textColor = .lightGray
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.delegate = self
@@ -148,8 +150,30 @@ extension OpenMarketItemViewController {
     
     // MARK: - Method: Send Information to Server
     
-    @objc private func didTapDoneButton(_ sender: UIBarButtonItem) {
+    func examineRequiredInformation() {
+        let alertController = UIAlertController(title: "입력 오류", message: "상품 사진 포함 필수항목을 모두 입력 해 주세요.", preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         
+        alertController.addAction(action)
+        
+        [titleTextField, passwordTextField, priceTextField, stockTextField, currencyTextField].forEach { [weak self] textField in
+            guard let text = textField.text else { return }
+            if text.isEmpty && self?.presentedViewController == nil {
+                self?.present(alertController, animated: true, completion: nil)
+            }
+        }
+        
+        guard let detailedText = detailedInformationTextView.text else { return }
+        if (detailedText.isEmpty || detailedText == textViewDefaultMessage) && self.presentedViewController == nil {
+            self.present(alertController, animated: true, completion: nil)
+        } else if itemThumbnails.count < 1 && self.presentedViewController == nil {
+            self.present(alertController, animated: true, completion: nil)
+        }
+        
+    }
+    
+    @objc private func didTapDoneButton(_ sender: UIBarButtonItem) {
+        examineRequiredInformation()
     }
     
     // MARK: - Method: hide keyboard when tapped around
@@ -193,7 +217,7 @@ extension OpenMarketItemViewController {
             titleTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
             titleTextField.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
             
-            passwordTextField.topAnchor.constraint(lessThanOrEqualTo: titleTextField.bottomAnchor, constant: 20),
+            passwordTextField.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 20),
             passwordTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
             passwordTextField.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
             
@@ -251,7 +275,7 @@ extension OpenMarketItemViewController: UIPickerViewDelegate, UIPickerViewDataSo
 
 extension OpenMarketItemViewController: UITextViewDelegate {
     func textViewDidBeginEditing(_ textView: UITextView) {
-        if textView.text == "상품 정보를 입력 해 주세요." {
+        if textView.text == textViewDefaultMessage {
             textView.text = nil
             textView.textColor = .black
         }
@@ -259,9 +283,12 @@ extension OpenMarketItemViewController: UITextViewDelegate {
     
     func textViewDidEndEditing(_ textView: UITextView) {
         if textView.text.isEmpty {
-            textView.text = "상품 정보를 입력 해 주세요."
+            textView.text = textViewDefaultMessage
             textView.textColor = .lightGray
         }
+        
+        guard let text = textView.text else { return }
+        itemInformation.updateValue(text, forKey: OpenMarketItemToPost.descriptions.key)
     }
 }
 

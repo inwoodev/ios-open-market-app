@@ -8,7 +8,7 @@
 import Foundation
 
 enum OpenMarketItemToPost {
-    case title, price, currency, stock, discountedPrice, password
+    case title, price, currency, stock, discountedPrice, password, descriptions, images
     
     var placeholder: String {
         switch self {
@@ -24,6 +24,8 @@ enum OpenMarketItemToPost {
             return "수량"
         case .password:
             return "비밀번호"
+        default:
+            return ""
         }
     }
     
@@ -41,6 +43,10 @@ enum OpenMarketItemToPost {
             return "stock"
         case .password:
             return "password"
+        case .descriptions:
+            return "descriptions"
+        case .images:
+            return "images"
         }
     }
 }
