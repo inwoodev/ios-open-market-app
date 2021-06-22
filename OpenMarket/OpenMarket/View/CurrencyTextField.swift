@@ -16,6 +16,7 @@ class CurrencyTextField: UITextField {
         self.placeholder = OpenMarketItemToPost.currency.placeholder.description
         self.textColor = .black
         self.font = UIFont.preferredFont(forTextStyle: .title3)
+        self.tintColor = .clear
         self.translatesAutoresizingMaskIntoConstraints = false
         self.delegate = self
     }
