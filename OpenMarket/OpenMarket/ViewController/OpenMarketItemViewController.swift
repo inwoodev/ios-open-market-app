@@ -191,6 +191,7 @@ extension OpenMarketItemViewController {
     }
     
     @objc private func didTapDoneButton(_ sender: UIBarButtonItem) {
+        self.view.endEditing(true)
         examineRequiredInformation()
         alertConfirmationToUser()
     }
