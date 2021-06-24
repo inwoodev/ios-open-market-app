@@ -5,7 +5,7 @@
 //  Created by James on 2021/05/31.
 //
 
-import Foundation
+import UIKit
 
 final class NetworkManager: NetworkManageable {
     var dataTask: URLSessionDataTask?
@@ -57,5 +57,66 @@ final class NetworkManager: NetworkManageable {
                 }
             }
         }.resume()
+    }
+    
+    private func openMarketItemDataTask(url: String, texts: [String : Any?], imageList: [UIImage], completionHandler: @escaping (Bool) -> Void) -> URLSessionDataTask? {
+        
+        guard let validURL = URL(string: url) else {
+            return nil
+            
+        }
+        
+        var request = URLRequest(url: validURL)
+        request.httpMethod = HTTPMethods.post.rawValue
+        request.httpBody = buildMultipartFormData(texts, imageList)
+        
+        request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
+        
+        // MARK: - Request Log
+        
+        print("------------")
+        print(request.allHTTPHeaderFields)
+        print("------------")
+        print(request.httpMethod)
+        print("------------")
+        print(String(decoding: request.httpBody!, as: UTF8.self))
+        
+        return urlSession.dataTask(with: request) { data, response, error in
+            if let error = error {
+                print(error.localizedDescription)
+                completionHandler(false)
+            }
+            
+            guard let successfulResponse = response as? HTTPURLResponse,
+                  (200...299).contains(successfulResponse.statusCode) else {
+                let failedResponse = response as? HTTPURLResponse
+                
+                // MARK: - Response Log
+                
+                print(failedResponse?.statusCode)
+                
+                completionHandler(false)
+                return
+            }
+            
+            if let mimeType = successfulResponse.mimeType,
+               mimeType == "multipart/form-data",
+               let _ = data {
+                completionHandler(true)
+            }
+        }
+    }
+    
+    func postSingleItem(url: String, texts: [String : Any?], imageList: [UIImage], completionHandler: @escaping (URLSessionDataTask) -> Void) {
+        dataTask = openMarketItemDataTask(url: OpenMarketAPI.urlForSingleItem.description, texts: texts, imageList: imageList) { bool in
+            switch bool {
+            case true:
+                print("data can be sent to server")
+                
+            case false:
+                print("data has unknown error, and thus cannot be sent to server")
+            }
+        }
+        dataTask?.resume()
     }
 }
