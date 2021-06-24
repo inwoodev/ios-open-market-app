@@ -16,10 +16,10 @@ class OpenMarketItemViewController: UIViewController {
     private var itemThumbnails: [UIImage] = []
     private var itemInformation: [String: Any?] = [:]
     private var textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
-    private let networkManager: NetworkManageable = NetworkManager()
+    private var networkManager: NetworkManageable = NetworkManager()
     
     // MARK: - Views
-
+    
     private var titleTextField = TitleTextField()
     private var priceTextField = PriceTextField()
     private var discountedPriceTextField = DiscountedPriceTextField()
@@ -150,7 +150,7 @@ extension OpenMarketItemViewController {
     
     // MARK: - Method: Send Information to Server
     
-    func examineRequiredInformation() {
+    private func examineRequiredInformation() {
         let alertController = UIAlertController(title: "입력 오류", message: "상품 사진 포함 필수항목을 모두 입력 해 주세요.", preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         
@@ -172,8 +172,27 @@ extension OpenMarketItemViewController {
         
     }
     
+    private func alertConfirmationToUser() {
+        let alertController = UIAlertController(title: "작성 완료", message: "틀린 내용이 없는지 꼼꼼히 확인 해 주세요. 정말로 상품을 마켓에 올리시겠습니까?", preferredStyle: .alert)
+        let okButton = UIAlertAction(title: "OK", style: .default) { [weak self] action in
+            
+            guard let self = self else { return }
+            
+            self.networkManager.postSingleItem(url: OpenMarketAPI.urlForSingleItem.description, texts: self.itemInformation, imageList: self.itemThumbnails, completionHandler: { task in
+            })
+            
+        }
+        let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        alertController.addAction(cancelButton)
+        alertController.addAction(okButton)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     @objc private func didTapDoneButton(_ sender: UIBarButtonItem) {
         examineRequiredInformation()
+        alertConfirmationToUser()
     }
     
     // MARK: - Method: hide keyboard when tapped around
@@ -321,7 +340,7 @@ extension OpenMarketItemViewController: TextFieldConvertible {
             alertInvalidTextField(alertController)
             return
         }
-
+        
         itemInformation.updateValue(text, forKey: itemToPost.key)
     }
     
@@ -333,7 +352,7 @@ extension OpenMarketItemViewController: TextFieldConvertible {
     }
     
     func convertTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
-       
+        
         guard let text = text else { return }
         if let number = Int(text) {
             itemInformation.updateValue(number, forKey: itemToPost.key)
@@ -350,7 +369,8 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
     func imagePickerController(_ picker: UIImagePickerController, didFinishPickingMediaWithInfo info: [UIImagePickerController.InfoKey : Any]) {
         
         guard let selectedImage: UIImage = info[.originalImage] as? UIImage else { return }
-        selectedImage.jpegData(compressionQuality: 0.75)
+        
+        selectedImage.jpegData(compressionQuality: 0.1)
         self.itemThumbnails.append(selectedImage)
         thumbnailCollectionView.reloadData()
         picker.dismiss(animated: true, completion: nil)
