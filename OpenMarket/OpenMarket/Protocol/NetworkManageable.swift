@@ -42,7 +42,7 @@ extension NetworkManageable {
             }
         }.resume()
     }
-
+    
     func examineNetworkRequest(page: Int, completionHandler: @escaping (_ result: Result <URLRequest, Error>) -> Void) {
         guard let url = URL(string: "\(OpenMarketAPI.urlForItemList)\(page)") else {
             return completionHandler(.failure(NetworkResponseError.badRequest))
@@ -89,7 +89,7 @@ extension NetworkManageable {
 // MARK: - Cell image download Task
 
 extension NetworkManageable {
-
+    
     func imageDownloadDataTask(url: URL, completionHandler: @escaping (UIImage) -> Void) -> URLSessionDataTask {
         return URLSession.shared.dataTask(with: url) { data, response, error in
             guard let completeData = data,
@@ -102,24 +102,52 @@ extension NetworkManageable {
 // MARK: - Multipart/form-data
 
 extension NetworkManageable {
-    func convertTextField(key: String, value: String, boundary: String) -> String {
+    private func convertTextField(key: String, value: String, boundary: String) -> String {
         var fieldString = "--\(boundary)\r\n"
-          fieldString += "Content-Disposition: form-data; name=\"\(key)\"\r\n"
-          fieldString += "\r\n"
-          fieldString += "\(value)\r\n"
-
-          return fieldString
+        fieldString += "Content-Disposition: form-data; name=\"\(key)\"\r\n"
+        fieldString += "\r\n"
+        fieldString += "\(value)\r\n"
+        
+        return fieldString
     }
     
-    func convertFileData(key: String, fileName: String, mimeType: String, fileData: Data, using boundary: String) -> Data {
-      let data = NSMutableData()
-
-      data.appendString("--\(boundary)\r\n")
-      data.appendString("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(fileName)\"\r\n")
-      data.appendString("Content-Type: \(mimeType)\r\n\r\n")
-      data.append(fileData)
-      data.appendString("\r\n")
-
-      return data as Data
+    private func convertFileData(key: String, fileName: String, mimeType: String, fileData: Data, using boundary: String) -> Data {
+        let data = NSMutableData()
+        
+        data.appendString("--\(boundary)\r\n")
+        data.appendString("Content-Disposition: form-data; name=\"\(key)\"; filename=\"\(fileName)\"\r\n")
+        data.appendString("Content-Type: \(mimeType)\r\n\r\n")
+        data.append(fileData)
+        data.appendString("\r\n")
+        
+        return data as Data
+    }
+    
+    func buildMultipartFormData(_ texts: [String: Any?], _ imageList: [UIImage]) -> Data {
+        let httpBody = NSMutableData()
+        
+        for (key, value) in texts {
+            if let validValue = value {
+                let convertedValue = String(describing: validValue)
+                httpBody.appendString(convertTextField(key: key, value: convertedValue, boundary: boundary))
+            }
+            
+        }
+        
+        for image in imageList {
+            
+            guard let imageData = image.jpegData(compressionQuality: 1) else {
+                return Data()
+                
+            }
+            
+            let convertedImage = imageData.base64EncodedData()
+            let stringData = String(bytes: convertedImage, encoding: .utf8)
+            print("이미지데이터: \(imageData)")
+            let finalData = Data(base64Encoded: stringData!)
+            httpBody.append(convertFileData(key: OpenMarketItemToPost.images.key, fileName: "\(Date().timeIntervalSince1970)_photo.jpeg", mimeType: "image/jpeg", fileData: finalData!, using: boundary))
+        }
+        httpBody.appendString("--\(boundary)--")
+        return httpBody as Data
     }
 }
