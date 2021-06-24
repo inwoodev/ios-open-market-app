@@ -75,27 +75,27 @@ extension ImagePickerCollectionViewCell {
     
     // MARK: - UI Constraint
     
-        private func setUpUIConstraint() {
-            NSLayoutConstraint.activate([
-                containerView.topAnchor.constraint(equalTo: self.contentView.topAnchor),
-                containerView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
-                containerView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor),
-                containerView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor),
-                
-                thumbnailImageView.heightAnchor.constraint(greaterThanOrEqualToConstant: containerView.frame.height),
-                thumbnailImageView.widthAnchor.constraint(greaterThanOrEqualToConstant: containerView.frame.width),
-                thumbnailImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5),
-                thumbnailImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-                thumbnailImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-                thumbnailImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -5),
-                
-                removeButton.topAnchor.constraint(equalTo: containerView.topAnchor),
-                removeButton.bottomAnchor.constraint(lessThanOrEqualTo: containerView.bottomAnchor, constant: -20),
-                removeButton.leadingAnchor.constraint(greaterThanOrEqualTo: containerView.leadingAnchor, constant: 20),
-                removeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
-            ])
-        }
+    private func setUpUIConstraint() {
+        NSLayoutConstraint.activate([
+            containerView.topAnchor.constraint(equalTo: self.contentView.topAnchor),
+            containerView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
+            containerView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor),
+            containerView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor),
+            
+            thumbnailImageView.heightAnchor.constraint(greaterThanOrEqualToConstant: containerView.frame.height),
+            thumbnailImageView.widthAnchor.constraint(greaterThanOrEqualToConstant: containerView.frame.width),
+            thumbnailImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5),
+            thumbnailImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            thumbnailImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            thumbnailImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -5),
+            
+            removeButton.topAnchor.constraint(equalTo: containerView.topAnchor),
+            removeButton.bottomAnchor.constraint(lessThanOrEqualTo: containerView.bottomAnchor, constant: -20),
+            removeButton.leadingAnchor.constraint(greaterThanOrEqualTo: containerView.leadingAnchor, constant: 20),
+            removeButton.trailingAnchor.constraint(equalTo: containerView.trailingAnchor)
+        ])
     }
+}
 
 // MARK: - ImagePickerDelegate
 

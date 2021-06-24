@@ -39,7 +39,7 @@ class OpenMarketViewController: UIViewController {
         let addItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapAddButton))
         return addItem
     }()
-
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpCollectionView()

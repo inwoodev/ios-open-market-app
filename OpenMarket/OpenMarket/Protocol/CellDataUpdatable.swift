@@ -17,7 +17,7 @@ protocol CellDataUpdatable: AnyObject {
     var networkManager: NetworkManageable { get }
 }
 extension CellDataUpdatable {
-
+    
     func configureDiscountedPriceLabel(_ openMarketItems: [OpenMarketItem], indexPath: Int) {
         if let discountedPrice = (openMarketItems[indexPath].discountedPrice) {
             itemPriceLabel.textColor = .red
