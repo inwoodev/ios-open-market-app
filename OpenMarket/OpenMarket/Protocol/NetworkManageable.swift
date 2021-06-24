@@ -14,6 +14,8 @@ protocol NetworkManageable {
     var boundary: String { get }
     
     func getItemList(page: Int, loadingFinished: Bool, completionHandler: @escaping (_ result: Result <OpenMarketItemList, Error>) -> Void)
+    
+    func postSingleItem(url: String, texts: [String : Any?], imageList: [UIImage], completionHandler: @escaping (URLSessionDataTask) -> Void)
 }
 extension NetworkManageable {
     func examineNetworkResponse(page: Int, completionHandler: @escaping (_ result: Result <HTTPURLResponse, Error>) -> Void) {
