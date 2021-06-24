@@ -38,7 +38,7 @@ enum OpenMarketItemToPost {
         case .price:
             return "price"
         case .discountedPrice:
-            return "discountedPrice"
+            return "discounted_price"
         case .stock:
             return "stock"
         case .password:
@@ -46,7 +46,7 @@ enum OpenMarketItemToPost {
         case .descriptions:
             return "descriptions"
         case .images:
-            return "images"
+            return "images[]"
         }
     }
 }
