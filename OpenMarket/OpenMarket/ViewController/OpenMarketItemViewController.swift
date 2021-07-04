@@ -371,10 +371,14 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
         
         guard let selectedImage: UIImage = info[.originalImage] as? UIImage else { return }
         
-        selectedImage.jpegData(compressionQuality: 0.1)
-        self.itemThumbnails.append(selectedImage)
-        thumbnailCollectionView.reloadData()
-        picker.dismiss(animated: true, completion: nil)
+        ImageCompressor.compress(image: selectedImage, maxByte: 300000) { image in
+            self.itemThumbnails.append(image ?? selectedImage)
+            
+            DispatchQueue.main.async {
+                self.thumbnailCollectionView.reloadData()
+                picker.dismiss(animated: true, completion: nil)
+            }
+        }
     }
     
     @objc func didTapUploadPhoto(_ sender: UIButton) {
