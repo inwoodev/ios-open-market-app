@@ -180,7 +180,10 @@ extension OpenMarketItemViewController {
             
             self.networkManager.postSingleItem(url: OpenMarketAPI.urlForSingleItem.description, texts: self.itemInformation, imageList: self.itemThumbnails, completionHandler: { task in
             })
-            
+            self.dismissCurrentViewController()
+//            DispatchQueue.main.async {
+//                
+//            }
         }
         let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
@@ -194,6 +197,13 @@ extension OpenMarketItemViewController {
         self.view.endEditing(true)
         examineRequiredInformation()
         alertConfirmationToUser()
+    }
+    
+    private func dismissCurrentViewController() {
+        self.navigationController?.popViewController(animated: true)
+//        if self.presentedViewController == nil {
+//
+//        }
     }
     
     // MARK: - Method: hide keyboard when tapped around
