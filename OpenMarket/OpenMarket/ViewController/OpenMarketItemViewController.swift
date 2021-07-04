@@ -180,10 +180,10 @@ extension OpenMarketItemViewController {
             
             self.networkManager.postSingleItem(url: OpenMarketAPI.urlForSingleItem.description, texts: self.itemInformation, imageList: self.itemThumbnails, completionHandler: { task in
             })
-            self.dismissCurrentViewController()
-//            DispatchQueue.main.async {
-//                
-//            }
+            
+            DispatchQueue.main.async {
+                self.dismissCurrentViewController()
+            }
         }
         let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
@@ -298,6 +298,8 @@ extension OpenMarketItemViewController: UIPickerViewDelegate, UIPickerViewDataSo
     
     @objc private func donePicker() {
         currencyTextField.resignFirstResponder()
+        let row = currencyPickerView.selectedRow(inComponent: 0)
+        pickerView(currencyPickerView, didSelectRow: row, inComponent: 0)
     }
 }
 
