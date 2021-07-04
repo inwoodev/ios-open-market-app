@@ -2,7 +2,7 @@
 //  CurrencyTextField.swift
 //  OpenMarket
 //
-//  Created by 황인우 on 2021/06/18.
+//  Created by James on 2021/06/18.
 //
 
 import UIKit
