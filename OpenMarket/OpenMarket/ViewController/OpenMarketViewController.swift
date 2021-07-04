@@ -15,6 +15,13 @@ class OpenMarketViewController: UIViewController {
     
     // MARK: - Views
     
+    private lazy var activityIndicator: UIActivityIndicatorView = {
+        let activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
+        activityIndicator.center = self.view.center
+        activityIndicator.startAnimating()
+        return activityIndicator
+    }()
+    
     private lazy var openMarketCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .vertical
@@ -53,6 +60,7 @@ class OpenMarketViewController: UIViewController {
     
     private func setUpCollectionView() {
         self.view.addSubview(openMarketCollectionView)
+        self.view.addSubview(activityIndicator)
     }
     
     private func setUpNavigationItems() {
@@ -92,6 +100,7 @@ class OpenMarketViewController: UIViewController {
                 DispatchQueue.main.async {
                     guard let self = self else { return }
                     self.openMarketCollectionView.reloadData()
+                    self.activityIndicator.stopAnimating()
                     self.networkManager.isReadyToPaginate = true
                 }
             case .failure(let error):
