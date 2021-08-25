@@ -177,7 +177,7 @@ extension OpenMarketViewController: UICollectionViewDelegateFlowLayout {
         switch layoutType {
         case .list:
             let cellWidth = collectionView.frame.width
-            let cellHeight = collectionView.frame.height / 12
+            let cellHeight = collectionView.frame.height / 9
             return CGSize(width: cellWidth, height: cellHeight)
         case .grid:
             let cellWidth = collectionView.bounds.width / 2

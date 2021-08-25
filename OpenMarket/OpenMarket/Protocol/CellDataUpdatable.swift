@@ -33,7 +33,13 @@ extension CellDataUpdatable {
         if openMarketItems[indexPath].stock == 0 {
             itemStockLabel.textColor = .orange
             itemStockLabel.text = "품절"
-        } else {
+        }
+        else if openMarketItems[indexPath].stock > 999 {
+            itemStockLabel.textColor = .black
+            itemStockLabel.text = "잔여수량 : 999+"
+        }
+        else {
+            itemStockLabel.textColor = .black
             itemStockLabel.text = "잔여수량 : \(openMarketItems[indexPath].stock)"
         }
     }

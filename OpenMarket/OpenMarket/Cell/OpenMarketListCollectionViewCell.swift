@@ -27,7 +27,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         label.font = UIFont.preferredFont(forTextStyle: .title3)
         label.numberOfLines = 1
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
+        label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         label.textColor = .black
         return label
     }()
@@ -54,8 +54,9 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
+        label.textAlignment = .right
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.setContentCompressionResistancePriority(.defaultHigh, for: .horizontal)
+        label.setContentCompressionResistancePriority(.required, for: .horizontal)
         label.textColor = .black
         return label
     }()
@@ -65,7 +66,17 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
         imageView.image = UIImage(named: "loadingPic")
+        imageView.setContentCompressionResistancePriority(.required, for: .horizontal)
         return imageView
+    }()
+    
+    lazy var titleAndStockLabels: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [itemTitleLabel, itemStockLabel])
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .horizontal
+        stackView.distribution = .fill
+        stackView.spacing = 10
+        return stackView
     }()
 }
 extension OpenMarketListCollectionViewCell {
@@ -74,7 +85,7 @@ extension OpenMarketListCollectionViewCell {
     
     private func setUpUIConstraints() {
         
-        [itemTitleLabel, itemPriceLabel, itemDiscountedPriceLabel, itemStockLabel, itemThumbnail, itemStockLabel].forEach {
+        [ titleAndStockLabels, itemPriceLabel, itemDiscountedPriceLabel, itemThumbnail, ].forEach {
             contentView.addSubview($0)
         }
         
@@ -82,17 +93,17 @@ extension OpenMarketListCollectionViewCell {
         self.contentView.layer.borderWidth = 1
         
         NSLayoutConstraint.activate([
-            itemThumbnail.heightAnchor.constraint(greaterThanOrEqualToConstant: (self.contentView.frame.height) - 10),
+            itemThumbnail.heightAnchor.constraint(equalToConstant: self.contentView.frame.height),
             itemThumbnail.widthAnchor.constraint(lessThanOrEqualToConstant: (self.contentView.frame.width) / 5),
-            itemThumbnail.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
-            itemThumbnail.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
-            itemThumbnail.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -5),
+            itemThumbnail.topAnchor.constraint(equalTo: self.contentView.topAnchor),
+            itemThumbnail.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
+            itemThumbnail.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor),
+
+            titleAndStockLabels.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
+            titleAndStockLabels.leadingAnchor.constraint(equalTo: itemThumbnail.trailingAnchor, constant: 5),
+            titleAndStockLabels.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5),
             
-            itemTitleLabel.topAnchor.constraint(equalTo: self.itemThumbnail.topAnchor),
-            itemTitleLabel.leadingAnchor.constraint(equalTo: itemThumbnail.trailingAnchor, constant: 5),
-            itemTitleLabel.bottomAnchor.constraint(lessThanOrEqualTo: itemPriceLabel.topAnchor, constant: -5 ),
-            
-            itemPriceLabel.topAnchor.constraint(equalTo: itemTitleLabel.bottomAnchor, constant: 5),
+            itemPriceLabel.topAnchor.constraint(equalTo: titleAndStockLabels.bottomAnchor, constant: 5),
             itemPriceLabel.leadingAnchor.constraint(equalTo: itemThumbnail.trailingAnchor, constant: 5),
             itemPriceLabel.bottomAnchor.constraint(equalTo: itemThumbnail.bottomAnchor),
             
@@ -100,12 +111,6 @@ extension OpenMarketListCollectionViewCell {
             itemDiscountedPriceLabel.leadingAnchor.constraint(equalTo: itemPriceLabel.trailingAnchor, constant: 5),
             itemDiscountedPriceLabel.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -5),
             itemDiscountedPriceLabel.trailingAnchor.constraint(lessThanOrEqualTo: self.contentView.trailingAnchor, constant: -7),
-            
-            itemStockLabel.topAnchor.constraint(equalTo: itemTitleLabel.topAnchor),
-            itemStockLabel.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5),
-            itemStockLabel.leadingAnchor.constraint(greaterThanOrEqualTo: itemTitleLabel.trailingAnchor, constant: 5),
-            itemStockLabel.bottomAnchor.constraint(equalTo: itemTitleLabel.bottomAnchor)
-            
         ])
         
     }
