@@ -135,14 +135,10 @@
 		C70FB0F925BEF61C00C9924E /* OpenMarket */ = {
 			isa = PBXGroup;
 			children = (
+				EAB785672664CCC10090C7FC /* Model */,
 				EAC6ED3A267C9E22006DDA78 /* View */,
 				EA8E9681266E4769001280CF /* Utility */,
-				EAEF60EE2678D46800D82B73 /* Cell */,
 				EAB78593266765D70090C7FC /* ViewController */,
-				EAB7857F2665D92C0090C7FC /* Protocol */,
-				EAB7856A2664D0BE0090C7FC /* Manager */,
-				EAB785672664CCC10090C7FC /* Model */,
-				EAB785642664C95D0090C7FC /* Network */,
 				C70FB0FA25BEF61C00C9924E /* AppDelegate.swift */,
 				C70FB0FC25BEF61C00C9924E /* SceneDelegate.swift */,
 				C70FB10325BEF61D00C9924E /* Assets.xcassets */,
@@ -164,6 +160,7 @@
 		EAB785642664C95D0090C7FC /* Network */ = {
 			isa = PBXGroup;
 			children = (
+				EAB78585266613910090C7FC /* URLSessionProtocol.swift */,
 				EAB785652664C9760090C7FC /* HTTPMethods.swift */,
 				EAB7856D2664D1CE0090C7FC /* OpenMarketAPI.swift */,
 				EAB7856F2664E6980090C7FC /* DataError.swift */,
@@ -175,6 +172,8 @@
 		EAB785672664CCC10090C7FC /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				EAB785642664C95D0090C7FC /* Network */,
+				EAB7856A2664D0BE0090C7FC /* Manager */,
 				EAB785682664CCEF0090C7FC /* OpenMarketItemList.swift */,
 				EA8E967D266DF913001280CF /* CellLayout.swift */,
 				EAC6ED38267C8004006DDA78 /* OpenMarketItemToPost.swift */,
@@ -185,6 +184,7 @@
 		EAB7856A2664D0BE0090C7FC /* Manager */ = {
 			isa = PBXGroup;
 			children = (
+				EAB78591266639780090C7FC /* NetworkManageable.swift */,
 				EAB7856B2664D0CF0090C7FC /* NetworkManager.swift */,
 				EAC8F7D226915ABA002A07C2 /* ImageCompressor.swift */,
 			);
@@ -205,9 +205,6 @@
 		EAB7857F2665D92C0090C7FC /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
-				EAB78585266613910090C7FC /* URLSessionProtocol.swift */,
-				EAB78591266639780090C7FC /* NetworkManageable.swift */,
-				EA8E967F266E4085001280CF /* CellDataUpdatable.swift */,
 				EAEF60EA2678C16000D82B73 /* ImagePickerDelegate.swift */,
 				EAEF60EC2678C31900D82B73 /* RemoveDelegate.swift */,
 				EAC6ED3D267CA66C006DDA78 /* TextFieldConvertible.swift */,
@@ -218,6 +215,7 @@
 		EAB78593266765D70090C7FC /* ViewController */ = {
 			isa = PBXGroup;
 			children = (
+				EAB7857F2665D92C0090C7FC /* Protocol */,
 				C70FB0FE25BEF61C00C9924E /* OpenMarketViewController.swift */,
 				EAEF60E426774DD900D82B73 /* OpenMarketItemViewController.swift */,
 			);
@@ -227,6 +225,7 @@
 		EAC6ED3A267C9E22006DDA78 /* View */ = {
 			isa = PBXGroup;
 			children = (
+				EAEF60EE2678D46800D82B73 /* Cell */,
 				EAC6ED3B267C9E52006DDA78 /* TitleTextField.swift */,
 				EAC6ED3F267CCC78006DDA78 /* PriceTextField.swift */,
 				EAC6ED41267CCDBC006DDA78 /* DiscountedPriceTextField.swift */,
@@ -240,6 +239,7 @@
 		EAEF60EE2678D46800D82B73 /* Cell */ = {
 			isa = PBXGroup;
 			children = (
+				EA8E967F266E4085001280CF /* CellDataUpdatable.swift */,
 				EAB78596266766130090C7FC /* OpenMarketListCollectionViewCell.swift */,
 				EA8E967B266DE472001280CF /* OpenMarketGridCollectionViewCell.swift */,
 				EAEF60E8267892D200D82B73 /* ImagePickerCollectionViewCell.swift */,
