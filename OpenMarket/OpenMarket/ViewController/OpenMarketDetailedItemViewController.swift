@@ -8,26 +8,34 @@
 import UIKit
 
 class OpenMarketDetailedItemViewController: UIViewController {
+    
+    var sliderImages = [UIImage]()
 
-    private var imageSliderView: UICollectionView = {
-        let height = UIScreen.main.bounds.height * 0.4
+    private var imageSliderCollectionView: UICollectionView = {
+        let height = CGFloat(200)
         let width = UIScreen.main.bounds.width
         let layout = UICollectionViewFlowLayout()
         
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: width, height: height)
+        layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
+        layout.minimumLineSpacing = 0
+        layout.minimumInteritemSpacing = 0
         
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(ImageSliderCollectionViewCell.self, forCellWithReuseIdentifier: ImageSliderCollectionViewCell.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.showsHorizontalScrollIndicator = false
+        
         return collectionView
     }()
     
-    private var imageSlider: UIPageControl = {
-        let viewSize = CGSize(width: 50, height: UIScreen.main.bounds.width * 0.8)
+    private lazy var imageSlider: UIPageControl = {
+        let viewSize = CGSize(width: UIScreen.main.bounds.width, height: 50)
         let viewFrame = CGRect(origin: .zero, size: viewSize)
         let pageControl = UIPageControl(frame: viewFrame)
         pageControl.translatesAutoresizingMaskIntoConstraints = false
+        pageControl.numberOfPages = sliderImages.count
         return pageControl
     }()
     
