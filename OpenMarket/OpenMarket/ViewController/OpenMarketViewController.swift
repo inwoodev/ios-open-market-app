@@ -192,6 +192,29 @@ extension OpenMarketViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailedItemViewController = OpenMarketDetailedItemViewController()
         navigationController?.pushViewController(detailedItemViewController, animated: false)
+        self.sendImages(openMarketItems, index: indexPath.item) { images in
+            detailedItemViewController.sliderImages = images
+        }
+    }
+    
+    private func sendImages(_ items: [OpenMarketItem], index: Int, completion: @escaping ([UIImage]) -> ()) {
+        var downloadedImages: [UIImage] = []
+        
+        let downloadedImageURLStrings = items[index].thumbnails
+        
+        downloadedImageURLStrings.forEach { string in
+            guard let imageURL = URL(string: string) else { return }
+            let downloadedimage = downloadImage(url: imageURL)
+            downloadedImages.append(downloadedimage)
+        }
+        completion(downloadedImages)
+    }
+    
+    private func downloadImage(url: URL) -> UIImage {
+        guard let data = try? Data(contentsOf: url),
+              let image = UIImage(data: data) else { return UIImage() }
+        return image
+        
     }
 }
 
