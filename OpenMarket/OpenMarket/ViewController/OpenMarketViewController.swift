@@ -23,8 +23,6 @@ class OpenMarketViewController: UIViewController {
     }()
     
     private lazy var openMarketCollectionView: UICollectionView = {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
         collectionView.register(OpenMarketListCollectionViewCell.self, forCellWithReuseIdentifier: OpenMarketListCollectionViewCell.identifier)
         collectionView.register(OpenMarketGridCollectionViewCell.self, forCellWithReuseIdentifier: OpenMarketGridCollectionViewCell.identifier)
@@ -185,6 +183,15 @@ extension OpenMarketViewController: UICollectionViewDelegateFlowLayout {
             return CGSize(width: cellWidth, height: cellHeight)
         }
         
+    }
+}
+
+// MARK: - UICollectionViewDelegate
+
+extension OpenMarketViewController: UICollectionViewDelegate {
+    func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
+        let detailedItemViewController = OpenMarketDetailedItemViewController()
+        navigationController?.pushViewController(detailedItemViewController, animated: false)
     }
 }
 

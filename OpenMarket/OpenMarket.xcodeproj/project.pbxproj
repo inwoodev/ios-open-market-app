@@ -37,6 +37,8 @@
 		EAC6ED46267CD18B006DDA78 /* PasswordTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC6ED45267CD18B006DDA78 /* PasswordTextField.swift */; };
 		EAC6ED48267CD789006DDA78 /* CurrencyTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC6ED47267CD789006DDA78 /* CurrencyTextField.swift */; };
 		EAC8F7D326915ABA002A07C2 /* ImageCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC8F7D226915ABA002A07C2 /* ImageCompressor.swift */; };
+		EAD0EB2226D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD0EB2126D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift */; };
+		EAD0EB2426D685B10029BE6C /* ImageSliderCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD0EB2326D685B10029BE6C /* ImageSliderCollectionViewCell.swift */; };
 		EAEF60E526774DD900D82B73 /* OpenMarketItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF60E426774DD900D82B73 /* OpenMarketItemViewController.swift */; };
 		EAEF60E9267892D200D82B73 /* ImagePickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF60E8267892D200D82B73 /* ImagePickerCollectionViewCell.swift */; };
 		EAEF60EB2678C16000D82B73 /* ImagePickerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF60EA2678C16000D82B73 /* ImagePickerDelegate.swift */; };
@@ -89,6 +91,8 @@
 		EAC6ED45267CD18B006DDA78 /* PasswordTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = PasswordTextField.swift; sourceTree = "<group>"; };
 		EAC6ED47267CD789006DDA78 /* CurrencyTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyTextField.swift; sourceTree = "<group>"; };
 		EAC8F7D226915ABA002A07C2 /* ImageCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressor.swift; sourceTree = "<group>"; };
+		EAD0EB2126D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketDetailedItemViewController.swift; sourceTree = "<group>"; };
+		EAD0EB2326D685B10029BE6C /* ImageSliderCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageSliderCollectionViewCell.swift; sourceTree = "<group>"; };
 		EAEF60E426774DD900D82B73 /* OpenMarketItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemViewController.swift; sourceTree = "<group>"; };
 		EAEF60E8267892D200D82B73 /* ImagePickerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerCollectionViewCell.swift; sourceTree = "<group>"; };
 		EAEF60EA2678C16000D82B73 /* ImagePickerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerDelegate.swift; sourceTree = "<group>"; };
@@ -218,6 +222,7 @@
 				EAB7857F2665D92C0090C7FC /* Protocol */,
 				C70FB0FE25BEF61C00C9924E /* OpenMarketViewController.swift */,
 				EAEF60E426774DD900D82B73 /* OpenMarketItemViewController.swift */,
+				EAD0EB2126D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift */,
 			);
 			path = ViewController;
 			sourceTree = "<group>";
@@ -243,6 +248,7 @@
 				EAB78596266766130090C7FC /* OpenMarketListCollectionViewCell.swift */,
 				EA8E967B266DE472001280CF /* OpenMarketGridCollectionViewCell.swift */,
 				EAEF60E8267892D200D82B73 /* ImagePickerCollectionViewCell.swift */,
+				EAD0EB2326D685B10029BE6C /* ImageSliderCollectionViewCell.swift */,
 			);
 			path = Cell;
 			sourceTree = "<group>";
@@ -349,6 +355,7 @@
 				EAB78586266613910090C7FC /* URLSessionProtocol.swift in Sources */,
 				EA8E9683266E478A001280CF /* String+Extension.swift in Sources */,
 				EAC6ED46267CD18B006DDA78 /* PasswordTextField.swift in Sources */,
+				EAD0EB2426D685B10029BE6C /* ImageSliderCollectionViewCell.swift in Sources */,
 				EAB7856C2664D0CF0090C7FC /* NetworkManager.swift in Sources */,
 				EAB785702664E6980090C7FC /* DataError.swift in Sources */,
 				EAEF60F0267B76D800D82B73 /* NSMutableData + Extension.swift in Sources */,
@@ -359,6 +366,7 @@
 				EAB7856E2664D1CE0090C7FC /* OpenMarketAPI.swift in Sources */,
 				EAB78592266639780090C7FC /* NetworkManageable.swift in Sources */,
 				EAEF60E526774DD900D82B73 /* OpenMarketItemViewController.swift in Sources */,
+				EAD0EB2226D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift in Sources */,
 				EAB785662664C9760090C7FC /* HTTPMethods.swift in Sources */,
 				EAEF60ED2678C31900D82B73 /* RemoveDelegate.swift in Sources */,
 				EAC6ED39267C8004006DDA78 /* OpenMarketItemToPost.swift in Sources */,

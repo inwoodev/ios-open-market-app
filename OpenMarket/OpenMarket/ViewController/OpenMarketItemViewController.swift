@@ -201,9 +201,6 @@ extension OpenMarketItemViewController {
     
     private func dismissCurrentViewController() {
         self.navigationController?.popViewController(animated: true)
-//        if self.presentedViewController == nil {
-//
-//        }
     }
     
     // MARK: - Method: hide keyboard when tapped around
