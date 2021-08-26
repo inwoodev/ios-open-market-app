@@ -33,20 +33,25 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        imageSliderView.delegate = self
-        imageSliderView.dataSource = self
+        imageSliderCollectionView.dataSource = self
+        setUpUIConstraint()
     }
-}
-
-// MARK: - UICollectionViewDelegateFlowLayout
-
-extension OpenMarketDetailedItemViewController: UICollectionViewDelegateFlowLayout {
-    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let cellWidth = collectionView.frame.width
-        let cellHeight = collectionView.frame.height
+    
+    private func setUpUIConstraint() {
+        self.view.addSubview(imageSlider)
+        self.view.addSubview(imageSliderCollectionView)
         
-        return CGSize(width: cellWidth, height: cellHeight)
         
+        NSLayoutConstraint.activate([
+            imageSliderCollectionView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            imageSliderCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            imageSliderCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+            imageSliderCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -200),
+            
+            imageSlider.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 40),
+            imageSlider.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -40),
+            imageSlider.bottomAnchor.constraint(equalTo: imageSliderCollectionView.bottomAnchor, constant: -20)
+        ])
     }
 }
 
@@ -54,11 +59,15 @@ extension OpenMarketDetailedItemViewController: UICollectionViewDelegateFlowLayo
 
 extension OpenMarketDetailedItemViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        <#code#>
+        sliderImages.count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
-        <#code#>
+        guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImageSliderCollectionViewCell.identifier, for: indexPath) as? ImageSliderCollectionViewCell else {
+            return UICollectionViewCell()
+        }
+        cell.setUpImage(sliderImages.first)
+        return cell
     }
     
     

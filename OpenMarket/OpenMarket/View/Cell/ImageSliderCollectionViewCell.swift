@@ -35,4 +35,8 @@ class ImageSliderCollectionViewCell: UICollectionViewCell {
             detailedImageView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor)
         ])
     }
+    
+    func setUpImage(_ image: UIImage?) {
+        detailedImageView.image = image
+    }
 }
