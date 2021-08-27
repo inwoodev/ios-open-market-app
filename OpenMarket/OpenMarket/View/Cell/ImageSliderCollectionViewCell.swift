@@ -36,7 +36,7 @@ class ImageSliderCollectionViewCell: UICollectionViewCell {
         ])
     }
     
-    func setUpImage(_ image: UIImage?) {
-        detailedImageView.image = image
+    func setUpImage(_ images: [UIImage], index: Int) {
+        detailedImageView.image = images[index]
     }
 }

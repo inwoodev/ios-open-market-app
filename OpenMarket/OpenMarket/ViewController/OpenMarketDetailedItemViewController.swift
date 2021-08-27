@@ -74,7 +74,7 @@ extension OpenMarketDetailedItemViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImageSliderCollectionViewCell.identifier, for: indexPath) as? ImageSliderCollectionViewCell else {
             return UICollectionViewCell()
         }
-        cell.setUpImage(sliderImages.first)
+        cell.setUpImage(sliderImages, index: indexPath.item)
         return cell
     }
     
