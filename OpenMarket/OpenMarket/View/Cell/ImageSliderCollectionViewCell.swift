@@ -13,7 +13,7 @@ class ImageSliderCollectionViewCell: UICollectionViewCell {
     private var detailedImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
-        imageView.contentMode = .scaleAspectFit
+        imageView.contentMode = .scaleAspectFill
         return imageView
     }()
     

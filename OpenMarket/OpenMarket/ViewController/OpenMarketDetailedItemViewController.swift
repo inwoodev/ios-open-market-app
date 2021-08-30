@@ -26,39 +26,43 @@ class OpenMarketDetailedItemViewController: UIViewController {
         collectionView.register(ImageSliderCollectionViewCell.self, forCellWithReuseIdentifier: ImageSliderCollectionViewCell.identifier)
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         collectionView.showsHorizontalScrollIndicator = false
-        
+        collectionView.backgroundColor = .white
+        collectionView.isPagingEnabled = true
         return collectionView
     }()
     
     private lazy var imageSlider: UIPageControl = {
-        let viewSize = CGSize(width: UIScreen.main.bounds.width, height: 50)
-        let viewFrame = CGRect(origin: .zero, size: viewSize)
-        let pageControl = UIPageControl(frame: viewFrame)
+        let pageControl = UIPageControl()
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         pageControl.numberOfPages = sliderImages.count
+        pageControl.hidesForSinglePage = true
+        pageControl.currentPageIndicatorTintColor = .systemGray
+        pageControl.pageIndicatorTintColor = .systemGray3
         return pageControl
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
         imageSliderCollectionView.dataSource = self
+        imageSliderCollectionView.delegate = self
         setUpUIConstraint()
+        self.view.backgroundColor = .white
     }
     
     private func setUpUIConstraint() {
-        self.view.addSubview(imageSlider)
         self.view.addSubview(imageSliderCollectionView)
-        
+        self.view.addSubview(imageSlider)
         
         NSLayoutConstraint.activate([
-            imageSliderCollectionView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            imageSliderCollectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
             imageSliderCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
             imageSliderCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
             imageSliderCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -200),
             
+            imageSlider.widthAnchor.constraint(greaterThanOrEqualToConstant: 100),
             imageSlider.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 40),
             imageSlider.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -40),
-            imageSlider.bottomAnchor.constraint(equalTo: imageSliderCollectionView.bottomAnchor, constant: -20)
+            imageSlider.topAnchor.constraint(equalTo: imageSliderCollectionView.bottomAnchor)
         ])
     }
 }
@@ -77,6 +81,16 @@ extension OpenMarketDetailedItemViewController: UICollectionViewDataSource {
         cell.setUpImage(sliderImages, index: indexPath.item)
         return cell
     }
+}
+
+// MARK: - UIcollectionViewDelegate
+
+extension OpenMarketDetailedItemViewController: UICollectionViewDelegate {
     
+    func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
+        let nextPage = Int(targetContentOffset.pointee.x / self.view.frame.width)
+        self.imageSlider.currentPage = nextPage
+        
+    }
     
 }
