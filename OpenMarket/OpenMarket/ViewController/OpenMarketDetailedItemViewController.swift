@@ -10,6 +10,7 @@ import UIKit
 class OpenMarketDetailedItemViewController: UIViewController {
     
     var sliderImages = [UIImage]()
+    private var bottomConstraint: NSLayoutConstraint?
 
     private var imageSliderCollectionView: UICollectionView = {
         let height = CGFloat(200)
@@ -58,22 +59,39 @@ class OpenMarketDetailedItemViewController: UIViewController {
         return label
     }()
     
-    private var discountedPriceLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.textColor = .systemRed
-        label.translatesAutoresizingMaskIntoConstraints = false
-        return label
-    }()
-    
-    private var priceLabel: UILabel = {
+    private var itemDiscountedPriceLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
         return label
+    }()
+    
+    private var itemPriceLabel: UILabel = {
+        let label = UILabel()
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private lazy var labelStackView: UIStackView = {
+        let stackView = UIStackView(arrangedSubviews: [itemStockLabel, itemPriceLabel, itemDiscountedPriceLabel])
+        stackView.axis = .vertical
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.distribution = .fillEqually
+        return stackView
+    }()
+    
+    private var itemDetailedDescriptionTextView: UITextView = {
+        let textView = UITextView()
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.textAlignment = .natural
+        textView.autocapitalizationType = .none
+        textView.autocorrectionType = .no
+        return textView
     }()
     
     override func viewDidLoad() {
@@ -85,20 +103,33 @@ class OpenMarketDetailedItemViewController: UIViewController {
     }
     
     private func setUpUIConstraint() {
-        self.view.addSubview(imageSliderCollectionView)
-        self.view.addSubview(imageSlider)
+        [imageSliderCollectionView, imageSlider, itemTitleLabel, labelStackView, itemDetailedDescriptionTextView].forEach { view in
+            self.view.addSubview(view)
+        }
         
         NSLayoutConstraint.activate([
             imageSliderCollectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
             imageSliderCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
             imageSliderCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
-            imageSliderCollectionView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -200),
             
             imageSlider.widthAnchor.constraint(greaterThanOrEqualToConstant: 100),
             imageSlider.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 40),
             imageSlider.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -40),
-            imageSlider.topAnchor.constraint(equalTo: imageSliderCollectionView.bottomAnchor)
+            imageSlider.topAnchor.constraint(equalTo: imageSliderCollectionView.bottomAnchor),
+            
+            itemTitleLabel.topAnchor.constraint(equalTo: imageSlider.bottomAnchor, constant: 5),
+            itemTitleLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 5),
+            
+            labelStackView.topAnchor.constraint(equalTo: itemTitleLabel.topAnchor),
+            labelStackView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -5),
+            
+            itemDetailedDescriptionTextView.topAnchor.constraint(equalTo: labelStackView.bottomAnchor, constant: 5),
+            itemDetailedDescriptionTextView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            itemDetailedDescriptionTextView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -5)
+            
         ])
+        bottomConstraint = itemDetailedDescriptionTextView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -5)
+        bottomConstraint?.isActive = true
     }
 }
 
