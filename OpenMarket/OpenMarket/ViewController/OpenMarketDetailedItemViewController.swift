@@ -41,6 +41,41 @@ class OpenMarketDetailedItemViewController: UIViewController {
         return pageControl
     }()
     
+    private var itemTitleLabel: UILabel = {
+        let label = UILabel()
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .title3)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private var itemStockLabel: UILabel = {
+        let label = UILabel()
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.textColor = .systemGray2
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private var discountedPriceLabel: UILabel = {
+        let label = UILabel()
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.textColor = .systemRed
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
+    private var priceLabel: UILabel = {
+        let label = UILabel()
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+    }()
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         imageSliderCollectionView.dataSource = self
