@@ -93,8 +93,7 @@ extension OpenMarketListCollectionViewCell {
         self.contentView.layer.borderWidth = 1
         
         NSLayoutConstraint.activate([
-            itemThumbnail.heightAnchor.constraint(equalToConstant: self.contentView.frame.height),
-            itemThumbnail.widthAnchor.constraint(lessThanOrEqualToConstant: (self.contentView.frame.width) / 5),
+            itemThumbnail.widthAnchor.constraint(equalToConstant: (self.contentView.frame.width) / 5),
             itemThumbnail.topAnchor.constraint(equalTo: self.contentView.topAnchor),
             itemThumbnail.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor),
             itemThumbnail.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor),

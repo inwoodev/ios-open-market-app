@@ -78,13 +78,9 @@ class OpenMarketViewController: UIViewController {
     
     private func createCollectionViewLayout() -> UICollectionViewLayout {
         let layout = UICollectionViewFlowLayout()
-        let width = (UIScreen.main.bounds.width)
-        let height = (UIScreen.main.bounds.height)
-        
         layout.scrollDirection = .vertical
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
-        layout.itemSize = CGSize(width: width, height: height)
         return layout
     }
     
@@ -174,13 +170,28 @@ extension OpenMarketViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
         switch layoutType {
         case .list:
-            let cellWidth = collectionView.frame.width
-            let cellHeight = collectionView.frame.height / 9
-            return CGSize(width: cellWidth, height: cellHeight)
+            
+            if UIDevice.current.orientation.isLandscape {
+                let cellWidth = collectionView.frame.width
+                let cellHeight = collectionView.frame.height / 3
+                return CGSize(width: cellWidth, height: cellHeight)
+                
+            } else {
+                let cellWidth = collectionView.frame.width
+                let cellHeight = collectionView.frame.height / 9
+                return CGSize(width: cellWidth, height: cellHeight)
+            }
+            
         case .grid:
-            let cellWidth = collectionView.bounds.width / 2
-            let cellHeight = collectionView.bounds.height / 3
-            return CGSize(width: cellWidth, height: cellHeight)
+            if UIDevice.current.orientation.isLandscape {
+                let cellWidth = collectionView.frame.width / 3
+                let cellHeight = collectionView.frame.height
+                return CGSize(width: cellWidth, height: cellHeight)
+            } else {
+                let cellWidth = collectionView.frame.width / 2
+                let cellHeight = collectionView.frame.height / 3
+                return CGSize(width: cellWidth, height: cellHeight)
+            }
         }
         
     }
