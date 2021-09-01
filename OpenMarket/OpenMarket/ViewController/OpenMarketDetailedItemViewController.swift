@@ -9,33 +9,36 @@ import UIKit
 
 class OpenMarketDetailedItemViewController: UIViewController {
     
+    let networkManager: NetworkManageable = NetworkManager()
+    var itemID: Int = 0
     var sliderImages = [UIImage]()
     private var bottomConstraint: NSLayoutConstraint?
-
-    private var imageSliderCollectionView: UICollectionView = {
-        let height = CGFloat(200)
-        let width = UIScreen.main.bounds.width
+    
+    private lazy var imageSliderCollectionView: UICollectionView = {
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
+        collectionView.register(ImageSliderCollectionViewCell.self, forCellWithReuseIdentifier: ImageSliderCollectionViewCell.identifier)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.isPagingEnabled = true
+        return collectionView
+    }()
+    
+    private func createLayout() -> UICollectionViewFlowLayout {
+        let height = self.view.frame.height * 0.6
+        let width = self.view.frame.width
         let layout = UICollectionViewFlowLayout()
-        
+
         layout.scrollDirection = .horizontal
         layout.itemSize = CGSize(width: width, height: height)
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
-        
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
-        collectionView.register(ImageSliderCollectionViewCell.self, forCellWithReuseIdentifier: ImageSliderCollectionViewCell.identifier)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.backgroundColor = .white
-        collectionView.isPagingEnabled = true
-        return collectionView
-    }()
+        return layout
+    }
     
-    private lazy var imageSlider: UIPageControl = {
+    private var imageSlider: UIPageControl = {
         let pageControl = UIPageControl()
         pageControl.translatesAutoresizingMaskIntoConstraints = false
-        pageControl.numberOfPages = sliderImages.count
         pageControl.hidesForSinglePage = true
         pageControl.currentPageIndicatorTintColor = .systemGray
         pageControl.pageIndicatorTintColor = .systemGray3
@@ -47,6 +50,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .title3)
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
         return label
     }()
     
@@ -77,11 +81,25 @@ class OpenMarketDetailedItemViewController: UIViewController {
         return label
     }()
     
-    private lazy var labelStackView: UIStackView = {
+    private var itemRegistrationDateLabel: UILabel {
+        let label = UILabel()
+        label.adjustsFontForContentSizeCategory = true
+        label.translatesAutoresizingMaskIntoConstraints = false
+        return label
+            
+    }
+    
+    private lazy var rightlabelsStackView: UIStackView = {
         let stackView = UIStackView(arrangedSubviews: [itemStockLabel, itemPriceLabel, itemDiscountedPriceLabel])
         stackView.axis = .vertical
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.distribution = .fillEqually
+        return stackView
+    }()
+    
+    private var leftlabelsStackView: UIStackView = {
+        let stackView = UIStackView()
+        
         return stackView
     }()
     
@@ -96,6 +114,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        getOpenMarketItem()
         imageSliderCollectionView.dataSource = self
         imageSliderCollectionView.delegate = self
         setUpUIConstraint()
@@ -103,7 +122,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
     }
     
     private func setUpUIConstraint() {
-        [imageSliderCollectionView, imageSlider, itemTitleLabel, labelStackView, itemDetailedDescriptionTextView].forEach { view in
+        [imageSliderCollectionView, imageSlider, itemTitleLabel, rightlabelsStackView, itemDetailedDescriptionTextView].forEach { view in
             self.view.addSubview(view)
         }
         
@@ -115,16 +134,19 @@ class OpenMarketDetailedItemViewController: UIViewController {
             imageSlider.widthAnchor.constraint(greaterThanOrEqualToConstant: 100),
             imageSlider.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 40),
             imageSlider.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -40),
-            imageSlider.topAnchor.constraint(equalTo: imageSliderCollectionView.bottomAnchor),
+            imageSlider.bottomAnchor.constraint(equalTo: imageSliderCollectionView.bottomAnchor),
             
             itemTitleLabel.topAnchor.constraint(equalTo: imageSlider.bottomAnchor, constant: 5),
             itemTitleLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 5),
             
-            labelStackView.topAnchor.constraint(equalTo: itemTitleLabel.topAnchor),
-            labelStackView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -5),
+            rightlabelsStackView.topAnchor.constraint(equalTo: itemTitleLabel.topAnchor),
+            rightlabelsStackView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -5),
+            rightlabelsStackView.leadingAnchor.constraint(equalTo: itemTitleLabel.trailingAnchor, constant: 40),
             
-            itemDetailedDescriptionTextView.topAnchor.constraint(equalTo: labelStackView.bottomAnchor, constant: 5),
-            itemDetailedDescriptionTextView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
+            itemDetailedDescriptionTextView.heightAnchor.constraint(equalToConstant: self.view.frame.height / 2),
+            itemDetailedDescriptionTextView.widthAnchor.constraint(equalToConstant: self.view.frame.width - 10),
+            itemDetailedDescriptionTextView.topAnchor.constraint(equalTo: rightlabelsStackView.bottomAnchor, constant: 5),
+            itemDetailedDescriptionTextView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 5),
             itemDetailedDescriptionTextView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -5)
             
         ])
@@ -149,7 +171,7 @@ extension OpenMarketDetailedItemViewController: UICollectionViewDataSource {
     }
 }
 
-// MARK: - UIcollectionViewDelegate
+// MARK: - UICollectionViewDelegate
 
 extension OpenMarketDetailedItemViewController: UICollectionViewDelegate {
     

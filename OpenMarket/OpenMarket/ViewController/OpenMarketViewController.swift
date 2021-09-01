@@ -15,32 +15,34 @@ class OpenMarketViewController: UIViewController {
     
     // MARK: - Views
     
-    private lazy var activityIndicator: UIActivityIndicatorView = {
+    private var activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
-        activityIndicator.center = self.view.center
         activityIndicator.startAnimating()
         return activityIndicator
     }()
     
-    private lazy var openMarketCollectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createCollectionViewLayout())
+    private var openMarketCollectionView: UICollectionView = {
+        let flowlayout = UICollectionViewFlowLayout()
+        flowlayout.scrollDirection = .vertical
+        flowlayout.minimumLineSpacing = 0
+        flowlayout.minimumInteritemSpacing = 0
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: flowlayout)
         collectionView.register(OpenMarketListCollectionViewCell.self, forCellWithReuseIdentifier: OpenMarketListCollectionViewCell.identifier)
         collectionView.register(OpenMarketGridCollectionViewCell.self, forCellWithReuseIdentifier: OpenMarketGridCollectionViewCell.identifier)
         collectionView.backgroundColor = .white
-        collectionView.delegate = self
-        collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
         return collectionView
     }()
     
-    private lazy var segmentedController: UISegmentedControl = {
+    private var segmentedController: UISegmentedControl = {
         let segmentedControl = UISegmentedControl(items: ["LIST", "GRID"])
         segmentedControl.sizeToFit()
         segmentedControl.selectedSegmentIndex = 0
         return segmentedControl
     }()
     
-    private lazy var UIRightBarButtonItem: UIBarButtonItem = {
+    private var UIRightBarButtonItem: UIBarButtonItem = {
         let addItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapAddButton))
         return addItem
     }()
@@ -48,6 +50,7 @@ class OpenMarketViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         setUpCollectionView()
+        setUpActivityIndicator()
         setUpNavigationItems()
         configureCollectionViewConstraint()
         fetchOpenMarketItems()
@@ -58,7 +61,13 @@ class OpenMarketViewController: UIViewController {
     
     private func setUpCollectionView() {
         self.view.addSubview(openMarketCollectionView)
+        openMarketCollectionView.delegate = self
+        openMarketCollectionView.dataSource = self
+    }
+    
+    private func setUpActivityIndicator() {
         self.view.addSubview(activityIndicator)
+        activityIndicator.center = self.view.center
     }
     
     private func setUpNavigationItems() {
@@ -74,14 +83,6 @@ class OpenMarketViewController: UIViewController {
         openMarketCollectionView.trailingAnchor.constraint(equalTo: margins.trailingAnchor).isActive = true
         openMarketCollectionView.topAnchor.constraint(equalTo: margins.topAnchor).isActive = true
         openMarketCollectionView.bottomAnchor.constraint(equalTo: margins.bottomAnchor).isActive = true
-    }
-    
-    private func createCollectionViewLayout() -> UICollectionViewLayout {
-        let layout = UICollectionViewFlowLayout()
-        layout.scrollDirection = .vertical
-        layout.minimumLineSpacing = 0
-        layout.minimumInteritemSpacing = 0
-        return layout
     }
     
     // MARK: - Initial Data fetching

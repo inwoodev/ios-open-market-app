@@ -22,7 +22,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
     
     // MARK: - Properties
     
-    lazy var itemTitleLabel: UILabel = {
+    var itemTitleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .title3)
         label.numberOfLines = 1
@@ -32,7 +32,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return label
     }()
     
-    lazy var itemPriceLabel: UILabel = {
+    var itemPriceLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
@@ -41,7 +41,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return label
     }()
     
-    lazy var itemDiscountedPriceLabel: UILabel = {
+    var itemDiscountedPriceLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
@@ -50,7 +50,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return label
     }()
     
-    lazy var itemStockLabel: UILabel = {
+    var itemStockLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.numberOfLines = 1
@@ -61,7 +61,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return label
     }()
     
-    lazy var itemThumbnail: UIImageView = {
+    var itemThumbnail: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
@@ -70,8 +70,8 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return imageView
     }()
     
-    lazy var titleAndStockLabels: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [itemTitleLabel, itemStockLabel])
+    var titleAndStockLabels: UIStackView = {
+        let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
         stackView.distribution = .fill

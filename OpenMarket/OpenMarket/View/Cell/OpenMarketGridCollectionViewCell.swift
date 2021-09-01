@@ -22,7 +22,7 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
     
     // MARK: - Properties
     
-    lazy var itemTitleLabel: UILabel = {
+    var itemTitleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .title3)
         label.textAlignment = .center
@@ -33,7 +33,7 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return label
     }()
     
-    lazy var itemPriceLabel: UILabel = {
+    var itemPriceLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textAlignment = .center
@@ -43,7 +43,7 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return label
     }()
     
-    lazy var itemDiscountedPriceLabel: UILabel = {
+    var itemDiscountedPriceLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textAlignment = .center
@@ -53,7 +53,7 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return label
     }()
     
-    lazy var itemStockLabel: UILabel = {
+    var itemStockLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textAlignment = .center
@@ -64,7 +64,7 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return label
     }()
     
-    lazy var itemThumbnail: UIImageView = {
+    var itemThumbnail: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
@@ -72,8 +72,8 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         return imageView
     }()
     
-    lazy var itemPricesStack: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [itemPriceLabel, itemDiscountedPriceLabel])
+    var itemPricesStack: UIStackView = {
+        let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.distribution = .fillProportionally
