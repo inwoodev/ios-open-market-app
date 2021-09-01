@@ -15,13 +15,13 @@ class OpenMarketViewController: UIViewController {
     
     // MARK: - Views
     
-    private var activityIndicator: UIActivityIndicatorView = {
+    private let activityIndicator: UIActivityIndicatorView = {
         let activityIndicator = UIActivityIndicatorView(frame: CGRect(x: 0, y: 0, width: 50, height: 50))
         activityIndicator.startAnimating()
         return activityIndicator
     }()
     
-    private var openMarketCollectionView: UICollectionView = {
+    private let openMarketCollectionView: UICollectionView = {
         let flowlayout = UICollectionViewFlowLayout()
         flowlayout.scrollDirection = .vertical
         flowlayout.minimumLineSpacing = 0
@@ -35,14 +35,14 @@ class OpenMarketViewController: UIViewController {
         return collectionView
     }()
     
-    private var segmentedController: UISegmentedControl = {
+    private let segmentedController: UISegmentedControl = {
         let segmentedControl = UISegmentedControl(items: ["LIST", "GRID"])
         segmentedControl.sizeToFit()
         segmentedControl.selectedSegmentIndex = 0
         return segmentedControl
     }()
     
-    private var UIRightBarButtonItem: UIBarButtonItem = {
+    private lazy var UIRightBarButtonItem: UIBarButtonItem = {
         let addItem = UIBarButtonItem(barButtonSystemItem: .add, target: self, action: #selector(didTapAddButton))
         return addItem
     }()
