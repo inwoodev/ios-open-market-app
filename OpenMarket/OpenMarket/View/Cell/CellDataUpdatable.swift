@@ -22,6 +22,7 @@ extension CellDataUpdatable {
         if let discountedPrice = (openMarketItems[indexPath].discountedPrice) {
             itemPriceLabel.textColor = .red
             itemPriceLabel.attributedText = itemPriceLabel.text?.strikeThrough()
+            itemDiscountedPriceLabel.textColor = .black
             itemDiscountedPriceLabel.text = "\(openMarketItems[indexPath].currency) \(discountedPrice)"
         } else {
             itemDiscountedPriceLabel.text = nil
