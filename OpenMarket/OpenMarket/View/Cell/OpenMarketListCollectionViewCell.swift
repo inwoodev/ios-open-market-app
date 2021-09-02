@@ -66,6 +66,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
         imageView.image = UIImage(named: "loadingPic")
+        imageView.contentMode = .scaleAspectFit
         imageView.setContentCompressionResistancePriority(.required, for: .horizontal)
         return imageView
     }()

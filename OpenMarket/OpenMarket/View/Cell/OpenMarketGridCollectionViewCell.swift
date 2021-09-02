@@ -68,15 +68,24 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
+        imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "loadingPic")
         return imageView
     }()
     
-    var itemPricesStack: UIStackView = {
+    private let itemPricesStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.distribution = .fillProportionally
+        return stackView
+    }()
+    
+    private let itemInformationStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.distribution = .fillEqually
         return stackView
     }()
 }
@@ -85,32 +94,29 @@ extension OpenMarketGridCollectionViewCell {
     // MARK: - setup UI Constraints
     
     private func setUpUIConstraints() {
-        self.contentView.addSubview(itemTitleLabel)
-        self.contentView.addSubview(itemPricesStack)
-        self.contentView.addSubview(itemStockLabel)
+        itemPricesStackView.addArrangedSubview(itemPriceLabel)
+        itemPricesStackView.addArrangedSubview(itemDiscountedPriceLabel)
+        
+        itemInformationStackView.addArrangedSubview(itemTitleLabel)
+        itemInformationStackView.addArrangedSubview(itemPricesStackView)
+        itemInformationStackView.addArrangedSubview(itemStockLabel)
+        
         self.contentView.addSubview(itemThumbnail)
+        self.contentView.addSubview(itemInformationStackView)
         
         self.contentView.layer.cornerRadius = 10
         self.contentView.layer.borderWidth = 1
         
         NSLayoutConstraint.activate([
-            itemThumbnail.heightAnchor.constraint(equalToConstant: self.contentView.bounds.height / 2),
-            itemThumbnail.widthAnchor.constraint(equalToConstant: self.contentView.bounds.width * 0.8),
+            itemThumbnail.heightAnchor.constraint(equalToConstant: self.contentView.frame.height / 2),
+            itemThumbnail.widthAnchor.constraint(equalToConstant: self.contentView.frame.width * 0.8),
             itemThumbnail.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
             itemThumbnail.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
             
-            itemTitleLabel.topAnchor.constraint(equalTo: itemThumbnail.bottomAnchor, constant: 5),
-            itemTitleLabel.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
-            itemTitleLabel.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5),
-            
-            itemPricesStack.topAnchor.constraint(equalTo: itemTitleLabel.bottomAnchor, constant: 5),
-            itemPricesStack.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
-            itemPricesStack.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5),
-            
-            itemStockLabel.topAnchor.constraint(greaterThanOrEqualTo: itemPricesStack.bottomAnchor, constant: 5),
-            itemStockLabel.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
-            itemStockLabel.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5),
-            itemStockLabel.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -5 )
+            itemInformationStackView.topAnchor.constraint(equalTo: itemThumbnail.bottomAnchor, constant: 5),
+            itemInformationStackView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
+            itemInformationStackView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5),
+            itemInformationStackView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -5)
         ])
     }
 }
