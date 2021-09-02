@@ -153,6 +153,66 @@ class OpenMarketDetailedItemViewController: UIViewController {
         bottomConstraint = itemDetailedDescriptionTextView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -5)
         bottomConstraint?.isActive = true
     }
+    
+    private func getOpenMarketItem() {
+        networkManager.getSingleItem(itemURL: OpenMarketAPI.urlForSingleItem, id: itemID) { [weak self] result in
+            switch result {
+            case .success(let item):
+                DispatchQueue.main.async {
+                    self?.imageSliderCollectionView.reloadData()
+                    self?.applyUI(item)
+                }
+            case .failure(let error):
+                return NSLog(error.description)
+            }
+        }
+    }
+    
+    private func applyUI(_ item: OpenMarketItemToGet) {
+        self.itemTitleLabel.text = item.title
+        self.itemStockLabel.text = "남은 수량 : \(item.stock)"
+        self.itemPriceLabel.text = "\(item.currency)\(item.price)"
+        self.itemDiscountedPriceLabel.text = applyDiscountedPrice(item)
+        self.itemDetailedDescriptionTextView.text = item.descriptions
+        self.applyImages(item) { [weak self] images in
+            self?.sliderImages = images
+        }
+        self.setUpImageSliderPageControl()
+    }
+    
+    private func applyDiscountedPrice(_ item: OpenMarketItemToGet) -> String? {
+        if let discountedPrice = item.discountedPrice {
+            itemPriceLabel.textColor = .red
+            itemPriceLabel.attributedText = itemPriceLabel.text?.strikeThrough()
+            return "\(item.currency)\(discountedPrice)"
+        } else {
+            return nil
+        }
+    }
+    
+    private func applyImages(_ item: OpenMarketItemToGet, completion: @escaping ([UIImage]) -> ()) {
+        var downloadedImages: [UIImage] = []
+        
+        let downloadedImageURLStrings = item.thumbnails
+        
+        downloadedImageURLStrings.forEach { string in
+            guard let imageURL = URL(string: string) else { return }
+            let downloadedimage = downloadImage(url: imageURL)
+            downloadedImages.append(downloadedimage)
+        }
+        completion(downloadedImages)
+    }
+    
+    private func downloadImage(url: URL) -> UIImage {
+        guard let data = try? Data(contentsOf: url),
+              let image = UIImage(data: data) else { return UIImage() }
+        return image
+        
+    }
+    
+    private func setUpImageSliderPageControl() {
+        imageSlider.numberOfPages = sliderImages.count
+    }
 }
 
 // MARK: - UICollectionViewDataSource
