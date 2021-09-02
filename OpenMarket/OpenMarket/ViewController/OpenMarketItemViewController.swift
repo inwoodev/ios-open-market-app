@@ -13,48 +13,43 @@ class OpenMarketItemViewController: UIViewController {
     
     private let currencyList = ["KRW", "USD", "BTC", "JPY", "EUR", "GBP", "CNY"]
     private let imagePicker = UIImagePickerController()
+    private let textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
+    private let networkManager: NetworkManageable = NetworkManager()
     private var itemThumbnails: [UIImage] = []
     private var itemInformation: [String: Any?] = [:]
-    private var textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
-    private var networkManager: NetworkManageable = NetworkManager()
     
     // MARK: - Views
     
-    private var titleTextField = TitleTextField()
-    private var priceTextField = PriceTextField()
-    private var discountedPriceTextField = DiscountedPriceTextField()
-    private var stockTextField = StockTextField()
-    private var passwordTextField = PasswordTextField()
-    private var currencyTextField = CurrencyTextField()
+    private let titleTextField = TitleTextField()
+    private let priceTextField = PriceTextField()
+    private let discountedPriceTextField = DiscountedPriceTextField()
+    private let stockTextField = StockTextField()
+    private let passwordTextField = PasswordTextField()
+    private let currencyTextField = CurrencyTextField()
     
-    private lazy var stockLabel: UILabel = {
+    private let stockLabel: UILabel = {
         let label = UILabel()
         label.text = "개"
         label.textColor = .lightGray
-        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
     }()
     
-    private lazy var detailedInformationTextView: UITextView = {
+    private let detailedInformationTextView: UITextView = {
         let textView = UITextView()
         textView.font = UIFont.preferredFont(forTextStyle: .body)
-        textView.text = textViewDefaultMessage
+        textView.text = "상품 정보를 입력 해 주세요."
         textView.textColor = .lightGray
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.delegate = self
         
         return textView
     }()
     
-    private lazy var currencyPickerView: UIPickerView = {
-        let pickerView = UIPickerView(frame: CGRect(x: 0, y: 200, width: view.frame.width, height: 300))
+    private let currencyPickerView: UIPickerView = {
+        let pickerView = UIPickerView()
         pickerView.backgroundColor = UIColor.white
-        pickerView.dataSource = self
-        pickerView.delegate = self
-        pickerView.translatesAutoresizingMaskIntoConstraints = false
         
         return pickerView
     }()
@@ -67,7 +62,7 @@ class OpenMarketItemViewController: UIViewController {
         toolbar.sizeToFit()
         
         let doneButton = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(self.donePicker))
-        let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(self.donePicker))
+        let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(self.cancelPicker))
         
         toolbar.setItems([doneButton, cancelButton], animated: true)
         toolbar.isUserInteractionEnabled = true
@@ -85,37 +80,52 @@ class OpenMarketItemViewController: UIViewController {
         return button
     }()
     
-    private lazy var thumbnailCollectionView: UICollectionView = {
+    private let thumbnailCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        let viewWidth = self.view.frame.width / 2
-        let viewHeight = self.view.frame.height / 5
-        layout.itemSize = CGSize(width: viewWidth, height: viewHeight)
         layout.scrollDirection = .horizontal
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(ImagePickerCollectionViewCell.self, forCellWithReuseIdentifier: ImagePickerCollectionViewCell.identifier)
         collectionView.backgroundColor = .white
-        collectionView.delegate = self
-        collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.showsHorizontalScrollIndicator = false
         
         return collectionView
     }()
     
-    private lazy var uploadImageStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [uploadImageButton, thumbnailCollectionView])
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.distribution = .fillEqually
-        stackView.axis = .horizontal
-        
-        return stackView
-    }()
-    
-    private lazy var pricesStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [priceTextField, discountedPriceTextField])
+    private let pricesStackView: UIStackView = {
+        let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
         
+        return stackView
+    }()
+    
+    private let currencyAndPricesStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .horizontal
+        stackView.distribution = .fillProportionally
+        stackView.spacing = 10
+        return stackView
+    }()
+    
+    private let stockStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .horizontal
+        stackView.distribution = .fill
+        stackView.alignment = .leading
+        stackView.spacing = 5
+        return stackView
+    }()
+    
+    private let itemRegistrationInformationStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.distribution = .fill
+        stackView.spacing = 10
         return stackView
     }()
     
@@ -132,11 +142,7 @@ class OpenMarketItemViewController: UIViewController {
         setUpNavigationItems()
         addSubviews()
         setUpUIConstraints()
-        titleTextField.textFieldDelegate = self
-        priceTextField.textFieldDelegate = self
-        discountedPriceTextField.textFieldDelegate = self
-        stockTextField.textFieldDelegate = self
-        passwordTextField.textFieldDelegate = self
+        setDelegates()
         applyCurrencyTextField()
     }
     
@@ -144,6 +150,21 @@ class OpenMarketItemViewController: UIViewController {
         currencyTextField.textFieldDelegate = self
         currencyTextField.inputView = currencyPickerView
         currencyTextField.inputAccessoryView = currencyPickerViewToolbar
+    }
+    
+    // MARK: - assign Delegates
+    
+    private func setDelegates() {
+        titleTextField.textFieldDelegate = self
+        priceTextField.textFieldDelegate = self
+        discountedPriceTextField.textFieldDelegate = self
+        stockTextField.textFieldDelegate = self
+        passwordTextField.textFieldDelegate = self
+        detailedInformationTextView.delegate = self
+        currencyPickerView.dataSource = self
+        currencyPickerView.delegate = self
+        thumbnailCollectionView.delegate = self
+        thumbnailCollectionView.dataSource = self
     }
 }
 extension OpenMarketItemViewController {
@@ -221,9 +242,23 @@ extension OpenMarketItemViewController {
     // MARK: - setUp UI Constraints
     
     private func addSubviews() {
-        [titleTextField, passwordTextField, currencyTextField, pricesStackView, stockTextField, stockLabel, detailedInformationTextView, uploadImageButton, thumbnailCollectionView].forEach {
-            self.view.addSubview($0)
+        
+        pricesStackView.addArrangedSubview(priceTextField)
+        pricesStackView.addArrangedSubview(discountedPriceTextField)
+        
+        currencyAndPricesStackView.addArrangedSubview(currencyTextField)
+        currencyAndPricesStackView.addArrangedSubview(pricesStackView)
+        
+        stockStackView.addArrangedSubview(stockTextField)
+        stockStackView.addArrangedSubview(stockLabel)
+        
+        [titleTextField, passwordTextField, currencyAndPricesStackView, stockStackView].forEach { view in
+            itemRegistrationInformationStackView.addArrangedSubview(view)
         }
+        self.view.addSubview(uploadImageButton)
+        self.view.addSubview(thumbnailCollectionView)
+        self.view.addSubview(itemRegistrationInformationStackView)
+        self.view.addSubview(detailedInformationTextView)
     }
     
     private func setUpUIConstraints() {
@@ -235,40 +270,18 @@ extension OpenMarketItemViewController {
             uploadImageButton.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor),
             
             thumbnailCollectionView.heightAnchor.constraint(lessThanOrEqualToConstant: self.view.frame.height / 10),
-            thumbnailCollectionView.widthAnchor.constraint(equalToConstant: self.view.frame.width - 10),
             thumbnailCollectionView.topAnchor.constraint(equalTo: uploadImageButton.bottomAnchor, constant: 5),
             thumbnailCollectionView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
             thumbnailCollectionView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
             
-            titleTextField.topAnchor.constraint(equalTo: thumbnailCollectionView.bottomAnchor, constant: 20),
-            titleTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            titleTextField.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            itemRegistrationInformationStackView.topAnchor.constraint(equalTo: thumbnailCollectionView.bottomAnchor, constant: 5),
+            itemRegistrationInformationStackView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
+            itemRegistrationInformationStackView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            itemRegistrationInformationStackView.bottomAnchor.constraint(equalTo: detailedInformationTextView.topAnchor, constant: -5),
             
-            passwordTextField.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 20),
-            passwordTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            passwordTextField.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            
-            currencyTextField.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 20),
-            currencyTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            
-            pricesStackView.topAnchor.constraint(equalTo: currencyTextField.topAnchor),
-            pricesStackView.leadingAnchor.constraint(equalTo: currencyTextField.trailingAnchor, constant: 20),
-            pricesStackView.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            pricesStackView.bottomAnchor.constraint(equalTo: currencyTextField.bottomAnchor),
-            
-            stockTextField.topAnchor.constraint(equalTo: currencyTextField.bottomAnchor, constant: 20),
-            stockTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            
-            stockLabel.topAnchor.constraint(equalTo: stockTextField.topAnchor),
-            stockLabel.leadingAnchor.constraint(equalTo: stockTextField.trailingAnchor, constant: 5),
-            stockLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -200),
-            stockLabel.bottomAnchor.constraint(equalTo: stockTextField.bottomAnchor),
-            
-            detailedInformationTextView.topAnchor.constraint(equalTo: stockTextField.bottomAnchor, constant: 20),
-            detailedInformationTextView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            detailedInformationTextView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            detailedInformationTextView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -10)
-            
+            detailedInformationTextView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 10),
+            detailedInformationTextView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -10),
+            detailedInformationTextView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -5)
         ])
     }
 }
@@ -297,6 +310,12 @@ extension OpenMarketItemViewController: UIPickerViewDelegate, UIPickerViewDataSo
         currencyTextField.resignFirstResponder()
         let row = currencyPickerView.selectedRow(inComponent: 0)
         pickerView(currencyPickerView, didSelectRow: row, inComponent: 0)
+    }
+    
+    @objc private func cancelPicker() {
+        currencyTextField.resignFirstResponder()
+        currencyTextField.text = nil
+        currencyPickerView.selectRow(0, inComponent: 0, animated: true)
     }
 }
 
@@ -443,9 +462,21 @@ extension OpenMarketItemViewController: UICollectionViewDelegateFlowLayout {
     // MARK: - Cell Size
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let cellWidth = collectionView.frame.width / 5
-        let cellHeight = collectionView.frame.height
-        return CGSize(width: cellWidth, height: cellHeight)
+        
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              windowScene.activationState == .foregroundActive else {
+            return CGSize(width: 0, height: 0)
+        }
+        
+        if windowScene.interfaceOrientation.isLandscape {
+            let cellWidth = collectionView.frame.width / 5
+            let cellHeight = collectionView.frame.height
+            return CGSize(width: cellWidth, height: cellHeight)
+        } else {
+            let cellWidth = collectionView.frame.width / 3
+            let cellHeight = collectionView.frame.height
+            return CGSize(width: cellWidth, height: cellHeight)
+        }
     }
 }
 

@@ -68,7 +68,6 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
-        imageView.contentMode = .scaleAspectFit
         imageView.image = UIImage(named: "loadingPic")
         return imageView
     }()

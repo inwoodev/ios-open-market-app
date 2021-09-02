@@ -25,6 +25,10 @@ class CurrencyTextField: UITextField {
     }
 }
 extension CurrencyTextField: UITextFieldDelegate {
+    func textFieldDidBeginEditing(_ textField: UITextField) {
+        textField.text = "KRW"
+    }
+    
     func textFieldShouldReturn(_ textField: UITextField) -> Bool {
         textField.resignFirstResponder()
         return true

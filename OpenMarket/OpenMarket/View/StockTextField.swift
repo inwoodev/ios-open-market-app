@@ -21,6 +21,7 @@ class StockTextField: UITextField {
         self.textAlignment = .right
         self.keyboardType = .numberPad
         self.delegate = self
+        self.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     }
     required init?(coder: NSCoder) {
         super.init(coder: coder)
