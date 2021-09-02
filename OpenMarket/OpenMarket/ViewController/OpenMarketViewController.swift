@@ -169,22 +169,28 @@ extension OpenMarketViewController: UICollectionViewDelegateFlowLayout {
     // MARK: - Cell Size
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              windowScene.activationState == .foregroundActive else {
+            return CGSize(width: 0, height: 0)
+        }
+        
         switch layoutType {
         case .list:
             
-            if UIDevice.current.orientation.isLandscape {
+            if windowScene.interfaceOrientation.isLandscape {
                 let cellWidth = collectionView.frame.width
                 let cellHeight = collectionView.frame.height / 3
                 return CGSize(width: cellWidth, height: cellHeight)
-                
+
             } else {
                 let cellWidth = collectionView.frame.width
                 let cellHeight = collectionView.frame.height / 9
                 return CGSize(width: cellWidth, height: cellHeight)
             }
-            
+
         case .grid:
-            if UIDevice.current.orientation.isLandscape {
+            if windowScene.interfaceOrientation.isLandscape {
                 let cellWidth = collectionView.frame.width / 3
                 let cellHeight = collectionView.frame.height
                 return CGSize(width: cellWidth, height: cellHeight)
@@ -194,7 +200,6 @@ extension OpenMarketViewController: UICollectionViewDelegateFlowLayout {
                 return CGSize(width: cellWidth, height: cellHeight)
             }
         }
-        
     }
 }
 
