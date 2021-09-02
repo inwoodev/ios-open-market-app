@@ -113,7 +113,7 @@ extension OpenMarketListCollectionViewCell {
             itemThumbnail.widthAnchor.constraint(equalToConstant: (self.contentView.frame.width) / 5),
             itemThumbnail.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
             itemThumbnail.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
-            itemThumbnail.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: 5),
+            itemThumbnail.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -5),
             
             titleAndStockStackView.leadingAnchor.constraint(equalTo: itemThumbnail.trailingAnchor, constant: 5),
             titleAndStockStackView.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
