@@ -119,4 +119,37 @@ final class NetworkManager: NetworkManageable {
         }
         dataTask?.resume()
     }
+    
+    func getSingleItem(itemURL: String, id: Int, completion: @escaping (_ result: Result <OpenMarketItemToGet, NetworkResponseError>) -> Void) {
+        
+        guard let url = URL(string: "\(itemURL)/\(id)") else { return }
+        
+        var request = URLRequest(url: url)
+        
+        request.httpMethod = HTTPMethods.get.rawValue
+        
+        dataTask = urlSession.dataTask(with: request) { data, response, error in
+            if let networkError = error {
+                completion(.failure(NetworkResponseError.noData))
+                NSLog(networkError.localizedDescription)
+            }
+            
+            if let httpURLResponse = response as? HTTPURLResponse {
+                let result = self.handleNetworkResponseError(httpURLResponse)
+                switch result {
+                case .success:
+                    guard let completeData = data,
+                          let singleItem = try? JSONDecoder().decode(OpenMarketItemToGet.self, from: completeData) else {
+                        return completion(.failure(NetworkResponseError.noData))
+                    }
+                    completion(.success(singleItem))
+                case .failure(let description):
+                    NSLog(description)
+                    completion(.failure(NetworkResponseError.badRequest))
+                }
+            }
+        }
+        dataTask?.resume()
+        
+    }
 }
