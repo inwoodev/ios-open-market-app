@@ -85,7 +85,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
         stackView.spacing = 5
-        stackView.distribution = .fill
+        stackView.distribution = .equalSpacing
         stackView.alignment = .leading
         return stackView
     }()
@@ -122,7 +122,7 @@ extension OpenMarketListCollectionViewCell {
             itemPricesStackView.topAnchor.constraint(equalTo: titleAndStockStackView.bottomAnchor, constant: 5),
     
             itemPricesStackView.leadingAnchor.constraint(equalTo: itemThumbnail.trailingAnchor, constant: 5),
-            itemPricesStackView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5)
+            itemPricesStackView.trailingAnchor.constraint(lessThanOrEqualTo: self.contentView.trailingAnchor, constant: -5)
 ])
         
     }
@@ -150,7 +150,7 @@ extension OpenMarketListCollectionViewCell {
         self.networkManager.dataTask?.cancel()
         self.itemThumbnail.image = UIImage(named: "loadingPic")
         self.itemTitleLabel.text = nil
-        self.itemPriceLabel.text = nil
+        self.itemPriceLabel.attributedText = .none
         self.itemStockLabel.text = nil
         self.itemDiscountedPriceLabel.text = nil
     }

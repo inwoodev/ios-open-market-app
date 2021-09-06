@@ -141,7 +141,7 @@ extension OpenMarketGridCollectionViewCell {
         self.networkManager.dataTask?.cancel()
         self.itemThumbnail.image = UIImage(named: "loadingPic")
         self.itemTitleLabel.text = nil
-        self.itemPriceLabel.text = nil
+        self.itemPriceLabel.attributedText = .none
         self.itemStockLabel.text = nil
         self.itemDiscountedPriceLabel.text = nil
     }
