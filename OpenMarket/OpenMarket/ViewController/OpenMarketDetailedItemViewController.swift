@@ -278,9 +278,21 @@ extension OpenMarketDetailedItemViewController: UICollectionViewDataSource {
 extension OpenMarketDetailedItemViewController: UICollectionViewDelegate {
     
     func scrollViewWillEndDragging(_ scrollView: UIScrollView, withVelocity velocity: CGPoint, targetContentOffset: UnsafeMutablePointer<CGPoint>) {
-        let nextPage = Int(targetContentOffset.pointee.x / self.view.frame.width)
+        let nextPage = Int(targetContentOffset.pointee.x / imageSliderCollectionView.frame.width)
         self.imageSlider.currentPage = nextPage
-        
     }
     
 }
+
+// MARK: - UICollectionViewDelegateFlowLayout
+
+extension OpenMarketDetailedItemViewController: UICollectionViewDelegateFlowLayout {
+    func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        let height = collectionView.frame.height
+        let width = collectionView.frame.width
+        
+        return CGSize(width: width, height: height)
+    }
+}
+
+
