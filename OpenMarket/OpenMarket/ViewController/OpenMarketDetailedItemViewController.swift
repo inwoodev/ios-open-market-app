@@ -14,143 +14,184 @@ class OpenMarketDetailedItemViewController: UIViewController {
     var sliderImages = [UIImage]()
     private var bottomConstraint: NSLayoutConstraint?
     
-    private lazy var imageSliderCollectionView: UICollectionView = {
-        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: createLayout())
-        collectionView.register(ImageSliderCollectionViewCell.self, forCellWithReuseIdentifier: ImageSliderCollectionViewCell.identifier)
-        collectionView.translatesAutoresizingMaskIntoConstraints = false
-        collectionView.showsHorizontalScrollIndicator = false
-        collectionView.isPagingEnabled = true
-        return collectionView
-    }()
-    
-    private func createLayout() -> UICollectionViewFlowLayout {
-        let height = self.view.frame.height * 0.6
-        let width = self.view.frame.width
+    private let imageSliderCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-
         layout.scrollDirection = .horizontal
-        layout.itemSize = CGSize(width: width, height: height)
         layout.sectionInset = UIEdgeInsets(top: 0, left: 0, bottom: 0, right: 0)
         layout.minimumLineSpacing = 0
         layout.minimumInteritemSpacing = 0
-        return layout
-    }
+        
+        let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
+        collectionView.register(ImageSliderCollectionViewCell.self, forCellWithReuseIdentifier: ImageSliderCollectionViewCell.identifier)
+        collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.backgroundColor = .white
+        collectionView.showsHorizontalScrollIndicator = false
+        collectionView.isPagingEnabled = true
+        
+        return collectionView
+    }()
     
-    private var imageSlider: UIPageControl = {
+    private let imageSlider: UIPageControl = {
         let pageControl = UIPageControl()
         pageControl.translatesAutoresizingMaskIntoConstraints = false
         pageControl.hidesForSinglePage = true
         pageControl.currentPageIndicatorTintColor = .systemGray
         pageControl.pageIndicatorTintColor = .systemGray3
+        
         return pageControl
     }()
     
-    private var itemTitleLabel: UILabel = {
+    private let itemTitleLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .title3)
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 0
+        
         return label
     }()
     
-    private var itemStockLabel: UILabel = {
+    private let itemStockLabel: UILabel = {
         let label = UILabel()
+        label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textColor = .systemGray2
         label.translatesAutoresizingMaskIntoConstraints = false
+        
         return label
     }()
     
-    private var itemDiscountedPriceLabel: UILabel = {
+    private let itemDiscountedPriceLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
+        
         return label
     }()
     
-    private var itemPriceLabel: UILabel = {
+    private let itemPriceLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textColor = .black
         label.translatesAutoresizingMaskIntoConstraints = false
+        
         return label
     }()
     
-    private var itemRegistrationDateLabel: UILabel {
+    private let itemRegistrationDateLabel: UILabel = {
         let label = UILabel()
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.numberOfLines = 0
+        
         return label
-            
-    }
-    
-    private lazy var rightlabelsStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [itemStockLabel, itemPriceLabel, itemDiscountedPriceLabel])
-        stackView.axis = .vertical
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.distribution = .fillEqually
-        return stackView
     }()
     
-    private var leftlabelsStackView: UIStackView = {
+    private let itemDetailedDescriptionTextView: UITextView = {
+        let textView = UITextView()
+        textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.adjustsFontForContentSizeCategory = false
+        textView.textAlignment = .natural
+        textView.autocapitalizationType = .none
+        textView.autocorrectionType = .no
+        textView.isEditable = false
+        
+        return textView
+    }()
+    
+    private let rightlabelsStackView: UIStackView = {
         let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.alignment = .trailing
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.distribution = .fill
+        stackView.spacing = 5
+        stackView.setContentCompressionResistancePriority(.required, for: .horizontal)
         
         return stackView
     }()
     
-    private var itemDetailedDescriptionTextView: UITextView = {
-        let textView = UITextView()
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.textAlignment = .natural
-        textView.autocapitalizationType = .none
-        textView.autocorrectionType = .no
-        return textView
+    private let leftlabelsStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.distribution = .fillEqually
+        stackView.spacing = 10
+        stackView.alignment = .leading
+        
+        return stackView
+    }()
+    
+    private let middleLabelsStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .horizontal
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.distribution = .fillEqually
+        stackView.spacing = 30
+        
+        return stackView
+    }()
+    
+    private let itemDetailedInformationStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.distribution = .fill
+        stackView.spacing = 5
+        
+        return stackView
     }()
     
     override func viewDidLoad() {
         super.viewDidLoad()
+        overrideUserInterfaceStyle = .light
         getOpenMarketItem()
         imageSliderCollectionView.dataSource = self
         imageSliderCollectionView.delegate = self
+        addSubviews()
         setUpUIConstraint()
         self.view.backgroundColor = .white
     }
     
-    private func setUpUIConstraint() {
-        [imageSliderCollectionView, imageSlider, itemTitleLabel, rightlabelsStackView, itemDetailedDescriptionTextView].forEach { view in
-            self.view.addSubview(view)
+    private func addSubviews() {
+        rightlabelsStackView.addArrangedSubview(itemStockLabel)
+        rightlabelsStackView.addArrangedSubview(itemPriceLabel)
+        rightlabelsStackView.addArrangedSubview(itemDiscountedPriceLabel)
+        
+        leftlabelsStackView.addArrangedSubview(itemTitleLabel)
+        leftlabelsStackView.addArrangedSubview(itemRegistrationDateLabel)
+        
+        middleLabelsStackView.addArrangedSubview(leftlabelsStackView)
+        middleLabelsStackView.addArrangedSubview(rightlabelsStackView)
+        
+        
+        [imageSliderCollectionView, imageSlider, middleLabelsStackView].forEach { view in
+            self.itemDetailedInformationStackView.addArrangedSubview(view)
         }
         
+        self.view.addSubview(itemDetailedInformationStackView)
+        self.view.addSubview(itemDetailedDescriptionTextView)
+    }
+    
+    private func setUpUIConstraint() {
         NSLayoutConstraint.activate([
-            imageSliderCollectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
-            imageSliderCollectionView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor),
-            imageSliderCollectionView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor),
+            itemDetailedInformationStackView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 5),
+            itemDetailedInformationStackView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
+            itemDetailedInformationStackView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+            itemDetailedInformationStackView.bottomAnchor.constraint(equalTo: itemDetailedDescriptionTextView.topAnchor, constant: -5),
             
-            imageSlider.widthAnchor.constraint(greaterThanOrEqualToConstant: 100),
-            imageSlider.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 40),
-            imageSlider.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -40),
-            imageSlider.bottomAnchor.constraint(equalTo: imageSliderCollectionView.bottomAnchor),
-            
-            itemTitleLabel.topAnchor.constraint(equalTo: imageSlider.bottomAnchor, constant: 5),
-            itemTitleLabel.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 5),
-            
-            rightlabelsStackView.topAnchor.constraint(equalTo: itemTitleLabel.topAnchor),
-            rightlabelsStackView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -5),
-            rightlabelsStackView.leadingAnchor.constraint(equalTo: itemTitleLabel.trailingAnchor, constant: 40),
-            
-            itemDetailedDescriptionTextView.heightAnchor.constraint(equalToConstant: self.view.frame.height / 2),
-            itemDetailedDescriptionTextView.widthAnchor.constraint(equalToConstant: self.view.frame.width - 10),
-            itemDetailedDescriptionTextView.topAnchor.constraint(equalTo: rightlabelsStackView.bottomAnchor, constant: 5),
-            itemDetailedDescriptionTextView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 5),
-            itemDetailedDescriptionTextView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -5)
+            itemDetailedDescriptionTextView.heightAnchor.constraint(equalToConstant: self.view.frame.height / 3),
+
+            itemDetailedDescriptionTextView.topAnchor.constraint(equalTo: middleLabelsStackView.bottomAnchor, constant: 5),
+            itemDetailedDescriptionTextView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+            itemDetailedDescriptionTextView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
             
         ])
-        bottomConstraint = itemDetailedDescriptionTextView.bottomAnchor.constraint(equalTo: self.view.bottomAnchor, constant: -5)
+        bottomConstraint = itemDetailedDescriptionTextView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -5)
         bottomConstraint?.isActive = true
     }
     
@@ -174,6 +215,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         self.itemPriceLabel.text = "\(item.currency)\(item.price)"
         self.itemDiscountedPriceLabel.text = applyDiscountedPrice(item)
         self.itemDetailedDescriptionTextView.text = item.descriptions
+        self.itemRegistrationDateLabel.text = Date(timeIntervalSince1970: item.registrationDate).formattedString
         self.applyImages(item) { [weak self] images in
             self?.sliderImages = images
         }
