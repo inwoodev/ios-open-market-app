@@ -46,6 +46,7 @@ class ImagePickerCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         addSubviews()
         setUpUIConstraint()
+        self.imagePickerDelegate = self
     }
     
     required init?(coder: NSCoder) {
