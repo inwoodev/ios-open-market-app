@@ -9,10 +9,11 @@ import UIKit
 
 class OpenMarketDetailedItemViewController: UIViewController {
     
-    let networkManager: NetworkManageable = NetworkManager()
-    var itemID: Int = 0
-    var sliderImages = [UIImage]()
+    private let networkManager: NetworkManageable = NetworkManager()
+    private var itemInformation: [String: Any?] = [:]
     private var bottomConstraint: NSLayoutConstraint?
+    var sliderImages = [UIImage]()
+    var itemID: Int = 0
     
     private let imageSliderCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -41,45 +42,74 @@ class OpenMarketDetailedItemViewController: UIViewController {
         return pageControl
     }()
     
-    private let itemTitleLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .title3)
-        label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
-        
-        return label
-    }()
+    private let itemTitleTextView = DetailedItemTitleTextView()
     
     private let itemStockLabel: UILabel = {
         let label = UILabel()
-        label.numberOfLines = 0
+        label.text = "재고: "
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textColor = .systemGray2
         label.translatesAutoresizingMaskIntoConstraints = false
-        
         return label
     }()
     
-    private let itemDiscountedPriceLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
+    private let itemStockTextField: UITextField = {
+        let textField = UITextField()
+        textField.adjustsFontForContentSizeCategory = true
+        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.textColor = .systemGray2
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
+        textField.isUserInteractionEnabled = false
         
-        return label
+        return textField
     }()
     
-    private let itemPriceLabel: UILabel = {
-        let label = UILabel()
-        label.adjustsFontForContentSizeCategory = true
-        label.font = UIFont.preferredFont(forTextStyle: .body)
-        label.textColor = .black
-        label.translatesAutoresizingMaskIntoConstraints = false
+    private let itemPriceCurrencyTextField: UITextField = {
+        let textField = UITextField()
+        textField.adjustsFontForContentSizeCategory = true
+        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.textColor = .black
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.placeholder = OpenMarketItemToPostOrPatch.currency.placeholder
+        textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
+        textField.isUserInteractionEnabled = false
+        textField.contentVerticalAlignment = .top
         
-        return label
+        return textField
+    }()
+    
+    private let itemPriceTextField: UITextField = {
+        let textField = UITextField()
+        textField.adjustsFontForContentSizeCategory = true
+        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.textColor = .black
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.placeholder = OpenMarketItemToPostOrPatch.price.placeholder
+        textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
+        textField.isUserInteractionEnabled = false
+        textField.keyboardType = .numberPad
+        
+        return textField
+    }()
+    
+    private let itemDiscountedPriceTextField: UITextField = {
+        let textField = UITextField()
+        textField.adjustsFontForContentSizeCategory = true
+        textField.font = UIFont.preferredFont(forTextStyle: .body)
+        textField.textColor = .black
+        textField.translatesAutoresizingMaskIntoConstraints = false
+        textField.placeholder = OpenMarketItemToPostOrPatch.discountedPrice.placeholder
+        textField.autocapitalizationType = .none
+        textField.autocorrectionType = .no
+        textField.isUserInteractionEnabled = false
+        textField.keyboardType = .numberPad
+        
+        return textField
     }()
     
     private let itemRegistrationDateLabel: UILabel = {
@@ -87,6 +117,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
         label.numberOfLines = 0
+        label.textAlignment = .left
         
         return label
     }()
@@ -99,6 +130,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         textView.autocapitalizationType = .none
         textView.autocorrectionType = .no
         textView.isEditable = false
+        textView.isScrollEnabled = false
         
         return textView
     }()
@@ -149,9 +181,9 @@ class OpenMarketDetailedItemViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         overrideUserInterfaceStyle = .light
+        setUpNavigationItems()
         getOpenMarketItem()
-        imageSliderCollectionView.dataSource = self
-        imageSliderCollectionView.delegate = self
+        assignDelegates()
         addSubviews()
         setUpUIConstraint()
         self.view.backgroundColor = .white
@@ -195,12 +227,17 @@ class OpenMarketDetailedItemViewController: UIViewController {
         bottomConstraint?.isActive = true
     }
     
+    private func setUpNavigationItems() {
+        self.navigationItem.rightBarButtonItem = rightBarButtonItem
+    }
+    
     private func getOpenMarketItem() {
         networkManager.getSingleItem(itemURL: OpenMarketAPI.urlForSingleItem, id: itemID) { [weak self] result in
             switch result {
             case .success(let item):
                 DispatchQueue.main.async {
                     self?.imageSliderCollectionView.reloadData()
+                    self?.navigationItem.title = item.title
                     self?.applyUI(item)
                 }
             case .failure(let error):
@@ -210,25 +247,45 @@ class OpenMarketDetailedItemViewController: UIViewController {
     }
     
     private func applyUI(_ item: OpenMarketItemToGet) {
-        self.itemTitleLabel.text = item.title
-        self.itemStockLabel.text = "남은 수량 : \(item.stock)"
-        self.itemPriceLabel.text = "\(item.currency)\(item.price)"
-        self.itemDiscountedPriceLabel.text = applyDiscountedPrice(item)
-        self.itemDetailedDescriptionTextView.text = item.descriptions
+        self.itemTitleTextView.text = item.title
+        applyStockTextField(item)
+        applyPriceTextField(item)
         self.itemRegistrationDateLabel.text = Date(timeIntervalSince1970: item.registrationDate).formattedString
+        self.itemDetailedDescriptionTextView.text = item.descriptions
         self.applyImages(item) { [weak self] images in
             self?.sliderImages = images
         }
         self.setUpImageSliderPageControl()
     }
     
-    private func applyDiscountedPrice(_ item: OpenMarketItemToGet) -> String? {
-        if let discountedPrice = item.discountedPrice {
-            itemPriceLabel.textColor = .red
-            itemPriceLabel.attributedText = itemPriceLabel.text?.strikeThrough()
-            return "\(item.currency)\(discountedPrice)"
+    private func assignDelegates() {
+        imageSliderCollectionView.dataSource = self
+        imageSliderCollectionView.delegate = self
+        itemTitleTextView.titleViewDelegate = self
+    }
+    
+    private func applyStockTextField(_ item: OpenMarketItemToGet) {
+        if item.stock > 999 {
+            self.itemStockTextField.text = "999"
         } else {
-            return nil
+            self.itemStockTextField.text = String(item.stock)
+        }
+    }
+    
+    private func applyPriceTextField(_ item: OpenMarketItemToGet){
+        if let discountedPrice = item.discountedPrice {
+            itemPriceCurrencyTextField.text = item.currency
+            
+            itemPriceTextField.textColor = .red
+            itemPriceTextField.text = String(item.price)
+            itemPriceTextField.attributedText = itemPriceTextField.text?.strikeThrough()
+            
+            itemDiscountedPriceTextField.text = String(discountedPrice)
+        } else {
+            itemDiscountedPriceTextField.text = nil
+            
+            itemPriceCurrencyTextField.text = item.currency
+            itemPriceTextField.text = String(item.price)
         }
     }
     
@@ -254,6 +311,18 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     private func setUpImageSliderPageControl() {
         imageSlider.numberOfPages = sliderImages.count
+    }
+    
+//    private func alertEditOrDeleteItem() {
+//        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
+//        let editAction = UIAlertAction(title: "수정", style: .default) { alertAction in
+//
+//        }
+        
+//    }
+    
+    @objc private func didTapActionButton(_ sender: UIBarButtonItem) {
+
     }
 }
 
@@ -295,4 +364,12 @@ extension OpenMarketDetailedItemViewController: UICollectionViewDelegateFlowLayo
     }
 }
 
-
+extension OpenMarketDetailedItemViewController: PatchingTextConvertible {
+    func convertPasswordTextToDictionary(_ key: OpenMarketItemToPostOrPatch, _ text: String?) {
+        print("hi")
+    }
+    
+    func convertOptionalTextToDictionary(_ key: OpenMarketItemToPostOrPatch, _ text: String?) {
+        itemInformation.updateValue(itemTitleTextView.text, forKey: OpenMarketItemToPostOrPatch.title.key)
+    }
+}
