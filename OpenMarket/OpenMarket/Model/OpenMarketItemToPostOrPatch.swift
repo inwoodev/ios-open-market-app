@@ -7,7 +7,7 @@
 
 import Foundation
 
-enum OpenMarketItemToPost {
+enum OpenMarketItemToPostOrPatch {
     case title, price, currency, stock, discountedPrice, password, descriptions, images
     
     var placeholder: String {

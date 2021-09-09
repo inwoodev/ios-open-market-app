@@ -9,14 +9,16 @@ import UIKit
 
 class TitleTextField: UITextField {
     
-    weak var textFieldDelegate: TextFieldConvertible?
+    weak var textFieldDelegate: PostingTextConvertible?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.placeholder = OpenMarketItemToPost.title.placeholder.description
+        self.placeholder = OpenMarketItemToPostOrPatch.title.placeholder.description
         self.textColor = .black
         self.font = UIFont.preferredFont(forTextStyle: .body)
         self.translatesAutoresizingMaskIntoConstraints = false
+        self.autocapitalizationType = .none
+        self.autocorrectionType = .no
         self.delegate = self
     }
     required init?(coder: NSCoder) {
@@ -30,6 +32,6 @@ extension TitleTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.title, textField.text)
+        textFieldDelegate?.convertRequiredTextToDictionary(OpenMarketItemToPostOrPatch.title, textField.text)
     }
 }

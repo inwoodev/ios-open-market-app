@@ -9,11 +9,11 @@ import UIKit
 
 class CurrencyTextField: UITextField {
 
-    weak var textFieldDelegate: TextFieldConvertible?
+    weak var textFieldDelegate: PostingTextConvertible?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.placeholder = OpenMarketItemToPost.currency.placeholder.description
+        self.placeholder = OpenMarketItemToPostOrPatch.currency.placeholder.description
         self.textColor = .black
         self.font = UIFont.preferredFont(forTextStyle: .title3)
         self.tintColor = .clear
@@ -35,6 +35,6 @@ extension CurrencyTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.currency, textField.text)
+        textFieldDelegate?.convertRequiredTextToDictionary(OpenMarketItemToPostOrPatch.currency, textField.text)
     }
 }

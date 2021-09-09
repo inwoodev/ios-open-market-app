@@ -9,15 +9,17 @@ import UIKit
 
 class PasswordTextField: UITextField {
 
-    weak var textFieldDelegate: TextFieldConvertible?
+    weak var textFieldDelegate: PostingTextConvertible?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.placeholder = OpenMarketItemToPost.password.placeholder.description
+        self.placeholder = OpenMarketItemToPostOrPatch.password.placeholder.description
         self.textColor = .black
         self.font = UIFont.preferredFont(forTextStyle: .body)
         self.translatesAutoresizingMaskIntoConstraints = false
         self.isSecureTextEntry = true
+        self.autocapitalizationType = .none
+        self.autocorrectionType = .no
         self.delegate = self
     }
     required init?(coder: NSCoder) {
@@ -31,6 +33,6 @@ extension PasswordTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertPasswordTextFieldToDictionary(OpenMarketItemToPost.password, textField.text)
+        textFieldDelegate?.convertPasswordTextToDictionary(OpenMarketItemToPostOrPatch.password, textField.text)
     }
 }
