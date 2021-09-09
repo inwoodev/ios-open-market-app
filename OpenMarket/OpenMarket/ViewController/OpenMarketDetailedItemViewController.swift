@@ -9,11 +9,15 @@ import UIKit
 
 class OpenMarketDetailedItemViewController: UIViewController {
     
+    // MARK: - Properties
+    
     private let networkManager: NetworkManageable = NetworkManager()
     private var itemInformation: [String: Any?] = [:]
     private var bottomConstraint: NSLayoutConstraint?
     var sliderImages = [UIImage]()
     var itemID: Int = 0
+    
+    // MARK: - Views
     
     private let imageSliderCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
@@ -135,6 +139,8 @@ class OpenMarketDetailedItemViewController: UIViewController {
         return textView
     }()
     
+    // MARK: - StackViews
+    
     private let rightlabelsStackView: UIStackView = {
         let stackView = UIStackView()
         stackView.axis = .vertical
@@ -178,10 +184,14 @@ class OpenMarketDetailedItemViewController: UIViewController {
         return stackView
     }()
     
+    // MARK: - Buttons
+    
     private lazy var rightBarButtonItem: UIBarButtonItem = {
         let barButtonItem = UIBarButtonItem(barButtonSystemItem: .action, target: self, action: #selector(didTapActionButton))
         return barButtonItem
     }()
+    
+    // MARK: - Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
