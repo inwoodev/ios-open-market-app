@@ -8,6 +8,10 @@
 import UIKit
 
 final class NetworkManager: NetworkManageable {
+//    func editSingleItem(url: String, texts: [String? : Any?], imageList: [UIImage], completionHandler: @escaping (URLSessionDataTask) -> Void) {
+//        <#code#>
+//    }
+    
     var dataTask: URLSessionDataTask?
     var boundary = "Boundary-\(UUID().uuidString)"
     var isReadyToPaginate: Bool = false
@@ -111,10 +115,10 @@ final class NetworkManager: NetworkManageable {
         dataTask = openMarketItemDataTask(url: OpenMarketAPI.urlForSingleItem.description, texts: texts, imageList: imageList) { bool in
             switch bool {
             case true:
-                print("data can be sent to server")
+                NSLog("data can be sent to server")
                 
             case false:
-                print("data has unknown error, and thus cannot be sent to server")
+                NSLog("data has unknown error, and thus cannot be sent to server")
             }
         }
         dataTask?.resume()

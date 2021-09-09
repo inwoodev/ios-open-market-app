@@ -19,6 +19,8 @@ protocol NetworkManageable {
     
     func postSingleItem(url: String, texts: [String : Any?], imageList: [UIImage], completionHandler: @escaping (URLSessionDataTask) -> Void)
     
+//    func editSingleItem(url: String, texts: [String? : Any?], imageList: [UIImage], completionHandler: @escaping(URLSessionDataTask) -> Void)
+    
 }
 extension NetworkManageable {
     func examineNetworkResponse(page: Int, completionHandler: @escaping (_ result: Result <HTTPURLResponse, Error>) -> Void) {
@@ -148,9 +150,8 @@ extension NetworkManageable {
             
             let convertedImage = imageData.base64EncodedData()
             let stringData = String(bytes: convertedImage, encoding: .utf8)
-            print("이미지데이터: \(imageData)")
             let finalData = Data(base64Encoded: stringData!)
-            httpBody.append(convertFileData(key: OpenMarketItemToPost.images.key, fileName: "\(Date().timeIntervalSince1970)_photo.jpeg", mimeType: "image/jpeg", fileData: finalData!, using: boundary))
+            httpBody.append(convertFileData(key: OpenMarketItemToPostOrPatch.images.key, fileName: "\(Date().timeIntervalSince1970)_photo.jpeg", mimeType: "image/jpeg", fileData: finalData!, using: boundary))
         }
         httpBody.appendString("--\(boundary)--")
         return httpBody as Data

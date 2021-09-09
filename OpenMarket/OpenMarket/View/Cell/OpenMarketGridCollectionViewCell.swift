@@ -69,6 +69,7 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
         imageView.image = UIImage(named: "loadingPic")
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
     
@@ -107,10 +108,11 @@ extension OpenMarketGridCollectionViewCell {
         self.contentView.layer.borderWidth = 1
         
         NSLayoutConstraint.activate([
-            itemThumbnail.heightAnchor.constraint(equalToConstant: self.contentView.frame.height / 2),
-            itemThumbnail.widthAnchor.constraint(equalToConstant: self.contentView.frame.width * 0.8),
-            itemThumbnail.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
+            itemThumbnail.widthAnchor.constraint(equalTo: itemThumbnail.heightAnchor),
+
             itemThumbnail.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
+            itemThumbnail.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
+            itemThumbnail.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5),
             
             itemInformationStackView.topAnchor.constraint(equalTo: itemThumbnail.bottomAnchor, constant: 5),
             itemInformationStackView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
