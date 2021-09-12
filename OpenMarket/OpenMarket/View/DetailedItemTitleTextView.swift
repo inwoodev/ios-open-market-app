@@ -20,9 +20,9 @@ final class DetailedItemTitleTextView: UITextView {
         self.translatesAutoresizingMaskIntoConstraints = false
         self.autocapitalizationType = .none
         self.autocorrectionType = .no
-        self.isUserInteractionEnabled = false
         self.delegate = self
         self.isScrollEnabled = false
+        self.isEditable = false
     }
     
     required init?(coder: NSCoder) {
@@ -41,5 +41,11 @@ extension DetailedItemTitleTextView: UITextViewDelegate {
               textView.text.isEmpty else { return }
         
         titleViewDelegate?.convertOptionalTextToDictionary(OpenMarketItemToPostOrPatch.title, textView.text)
+    }
+    
+    func textViewDidBeginEditing(_ textView: UITextView) {
+        if textView.text == defaultMessage {
+            textView.text = nil
+        }
     }
 }

@@ -9,29 +9,28 @@ import UIKit
 
 class ImagePickerCollectionViewCell: UICollectionViewCell {
     static let identifier: String = "ImagePickerCollectionViewCell"
-    private var thumbnailList: [UIImage] = []
     var indexPath: IndexPath?
     
     // MARK: - Delegate
     
     weak var removeCellDelegate: RemoveDelegate?
-    weak var imagePickerDelegate: ImagePickerDelegate?
     
-    // MARK: - Properties
+    // MARK: - Views
     
-    private let thumbnailImageView: UIImageView = {
+    private let itemImageView: UIImageView = {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
+        imageView.contentMode = .scaleAspectFit
         return imageView
     }()
-    private lazy var removeButton: UIButton = {
+    private lazy var removeImageButton: UIButton = {
         let button = UIButton()
         button.setImage(UIImage(systemName: "x.circle.fill"), for: .normal)
-        button.imageView?.tintColor = .darkGray
+        button.imageView?.tintColor = .black
         button.backgroundColor = .clear
         button.layer.cornerRadius = 10
         button.translatesAutoresizingMaskIntoConstraints = false
-        button.addTarget(self, action: #selector(clickToRemoveThumbnail), for: .touchDown)
+        button.addTarget(self, action: #selector(clickToRemoveImage), for: .touchDown)
         return button
     }()
     private let containerView: UIView = {
@@ -46,7 +45,6 @@ class ImagePickerCollectionViewCell: UICollectionViewCell {
         super.init(frame: frame)
         addSubviews()
         setUpUIConstraint()
-        self.imagePickerDelegate = self
     }
     
     required init?(coder: NSCoder) {
@@ -55,22 +53,26 @@ class ImagePickerCollectionViewCell: UICollectionViewCell {
     
     // MARK: - Methods
     
-    @objc private func clickToRemoveThumbnail() {
-        imagePickerDelegate?.clickButton()
+    @objc private func clickToRemoveImage() {
+        guard let validIndexPath = indexPath else { return }
+        removeCellDelegate?.removeCell(validIndexPath)
     }
 }
 extension ImagePickerCollectionViewCell {
     
     // MARK: - configure UI
     
-    func configureThumbnail(_ thumbnails: [UIImage]) {
-        guard let validIndexPath = indexPath else { return }
-        thumbnailImageView.image = thumbnails[validIndexPath.row]
+    func configureImage(_ images: [UIImage], indexPath: IndexPath) {
+        itemImageView.image = images[indexPath.item]
+    }
+    
+    func isRemoveImageButtonHidden(_ bool: Bool) {
+        removeImageButton.isHidden = bool
     }
     
     private func addSubviews() {
-        containerView.addSubview(thumbnailImageView)
-        containerView.addSubview(removeButton)
+        containerView.addSubview(itemImageView)
+        containerView.addSubview(removeImageButton)
         self.contentView.addSubview(containerView)
     }
     
@@ -83,22 +85,14 @@ extension ImagePickerCollectionViewCell {
             containerView.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor),
             containerView.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor),
             
-            thumbnailImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5),
-            thumbnailImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
-            thumbnailImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
-            thumbnailImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -5),
+            itemImageView.topAnchor.constraint(equalTo: containerView.topAnchor, constant: 5),
+            itemImageView.bottomAnchor.constraint(equalTo: containerView.bottomAnchor),
+            itemImageView.leadingAnchor.constraint(equalTo: containerView.leadingAnchor),
+            itemImageView.trailingAnchor.constraint(equalTo: containerView.trailingAnchor, constant: -5),
             
-            removeButton.topAnchor.constraint(equalTo: thumbnailImageView.topAnchor, constant: -5),
-            removeButton.trailingAnchor.constraint(equalTo: thumbnailImageView.trailingAnchor, constant: 5)
+            removeImageButton.topAnchor.constraint(equalTo: itemImageView.topAnchor, constant: -5),
+            removeImageButton.trailingAnchor.constraint(equalTo: itemImageView.trailingAnchor, constant: 5),
+            removeImageButton.heightAnchor.constraint(equalTo: removeImageButton.widthAnchor)
         ])
-    }
-}
-
-// MARK: - ImagePickerDelegate
-
-extension ImagePickerCollectionViewCell: ImagePickerDelegate {
-    func clickButton() {
-        guard let validIndexPath = indexPath else { return }
-        removeCellDelegate?.removeCell(validIndexPath)
     }
 }

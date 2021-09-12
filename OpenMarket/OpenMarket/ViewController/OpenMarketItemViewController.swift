@@ -452,7 +452,7 @@ extension OpenMarketItemViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         cell.indexPath = indexPath
-        cell.configureThumbnail(itemThumbnails)
+        cell.configureImage(itemThumbnails, indexPath: indexPath)
         cell.removeCellDelegate = self
         return cell
     }
