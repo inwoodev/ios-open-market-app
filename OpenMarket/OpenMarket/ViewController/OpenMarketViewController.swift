@@ -57,6 +57,11 @@ class OpenMarketViewController: UIViewController {
         segmentedController.addTarget(self, action: #selector(didTapSegmentedControl(_:)), for: .valueChanged)
     }
     
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        openMarketCollectionView.collectionViewLayout.invalidateLayout()
+    }
+    
     // MARK: - Setup CollectionView
     
     private func setUpCollectionView() {
@@ -196,7 +201,7 @@ extension OpenMarketViewController: UICollectionViewDelegateFlowLayout {
                 return CGSize(width: cellWidth, height: cellHeight)
             } else {
                 let cellWidth = collectionView.frame.width / 2
-                let cellHeight = collectionView.frame.height / 3
+                let cellHeight = collectionView.frame.height / 2
                 return CGSize(width: cellWidth, height: cellHeight)
             }
         }

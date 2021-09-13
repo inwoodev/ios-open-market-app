@@ -85,7 +85,7 @@ class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
-        stackView.distribution = .fillEqually
+        stackView.distribution = .fillProportionally
         return stackView
     }()
 }
@@ -109,10 +109,9 @@ extension OpenMarketGridCollectionViewCell {
         
         NSLayoutConstraint.activate([
             itemThumbnail.widthAnchor.constraint(equalTo: itemThumbnail.heightAnchor),
-
+            itemThumbnail.heightAnchor.constraint(equalToConstant: self.contentView.frame.height / 2),
+            itemThumbnail.centerXAnchor.constraint(equalTo: self.contentView.centerXAnchor),
             itemThumbnail.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
-            itemThumbnail.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
-            itemThumbnail.trailingAnchor.constraint(equalTo: self.contentView.trailingAnchor, constant: -5),
             
             itemInformationStackView.topAnchor.constraint(equalTo: itemThumbnail.bottomAnchor, constant: 5),
             itemInformationStackView.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
