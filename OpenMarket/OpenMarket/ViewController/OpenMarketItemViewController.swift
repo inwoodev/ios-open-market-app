@@ -129,7 +129,7 @@ class OpenMarketItemViewController: UIViewController {
         return stackView
     }()
     
-    private lazy var rightBarButtonItem: UIBarButtonItem = {
+    private lazy var UIRightBarButtonItem: UIBarButtonItem = {
         let sendItem = UIBarButtonItem(barButtonSystemItem: .done, target: self, action: #selector(didTapDoneButton))
         return sendItem
     }()
@@ -236,7 +236,7 @@ extension OpenMarketItemViewController {
     
     private func setUpNavigationItems() {
         self.navigationItem.title = "상품등록"
-        self.navigationItem.rightBarButtonItem = rightBarButtonItem
+        self.navigationItem.rightBarButtonItem = UIRightBarButtonItem
     }
     
     
@@ -337,7 +337,7 @@ extension OpenMarketItemViewController: UITextViewDelegate {
         }
         
         guard let text = textView.text else { return }
-        itemInformation.updateValue(text, forKey: OpenMarketItemToPostOrPatch.descriptions.key)
+        itemInformation.updateValue(text, forKey: OpenMarketItemToPost.descriptions.key)
     }
 }
 
@@ -352,13 +352,13 @@ extension OpenMarketItemViewController: UITextFieldDelegate {
 
 // MARK: - TextFieldConvertible
 
-extension OpenMarketItemViewController: PostingTextConvertible {
+extension OpenMarketItemViewController: TextFieldConvertible {
     
     func alertInvalidTextField(_ alertController: UIAlertController) {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    func convertPasswordTextToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
+    func convertPasswordTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
         itemInformation.updateValue(text, forKey: itemToPost.key)
         let alertController = UIAlertController(title: "비밀번호 설정", message: "비밀번호를 영문, 숫자를 사용해서 입력 해 주세요", preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
@@ -374,14 +374,14 @@ extension OpenMarketItemViewController: PostingTextConvertible {
         itemInformation.updateValue(text, forKey: itemToPost.key)
     }
     
-    func convertOptionalTextToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
+    func convertOptionalTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
         
         guard let text = text,
               let number = Int(text) else { return }
         itemInformation.updateValue(number, forKey: itemToPost.key)
     }
     
-    func convertRequiredTextToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
+    func convertTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
         
         guard let text = text else { return }
         if let number = Int(text) {
@@ -452,7 +452,8 @@ extension OpenMarketItemViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         cell.indexPath = indexPath
-        cell.configureImage(itemThumbnails, indexPath: indexPath)
+        cell.configureThumbnail(itemThumbnails)
+        cell.imagePickerDelegate = cell
         cell.removeCellDelegate = self
         return cell
     }

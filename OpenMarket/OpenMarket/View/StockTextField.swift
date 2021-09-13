@@ -9,11 +9,11 @@ import UIKit
 
 class StockTextField: UITextField {
 
-    weak var textFieldDelegate: PostingTextConvertible?
+    weak var textFieldDelegate: TextFieldConvertible?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.placeholder = OpenMarketItemToPostOrPatch.stock.placeholder.description
+        self.placeholder = OpenMarketItemToPost.stock.placeholder.description
         self.layer.borderWidth = 0.3
         self.textColor = .black
         self.font = UIFont.preferredFont(forTextStyle: .body)
@@ -34,6 +34,6 @@ extension StockTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertRequiredTextToDictionary(OpenMarketItemToPostOrPatch.stock, textField.text)
+        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.stock, textField.text)
     }
 }

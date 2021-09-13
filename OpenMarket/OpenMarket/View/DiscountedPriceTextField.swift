@@ -9,11 +9,11 @@ import UIKit
 
 class DiscountedPriceTextField: UITextField {
 
-    weak var textFieldDelegate: PostingTextConvertible?
+    weak var textFieldDelegate: TextFieldConvertible?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.placeholder = OpenMarketItemToPostOrPatch.discountedPrice.placeholder.description
+        self.placeholder = OpenMarketItemToPost.discountedPrice.placeholder.description
         self.textColor = .black
         self.font = UIFont.preferredFont(forTextStyle: .body)
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -31,6 +31,6 @@ extension DiscountedPriceTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertOptionalTextToDictionary(OpenMarketItemToPostOrPatch.discountedPrice, textField.text)
+        textFieldDelegate?.convertOptionalTextFieldToDictionary(OpenMarketItemToPost.discountedPrice, textField.text)
     }
 }

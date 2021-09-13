@@ -67,7 +67,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell, CellDataUpdatable 
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
         imageView.image = UIImage(named: "loadingPic")
         imageView.contentMode = .scaleAspectFit
-        imageView.setContentHuggingPriority(.defaultHigh, for: .horizontal)
+        imageView.setContentCompressionResistancePriority(.required, for: .horizontal)
         return imageView
     }()
     
@@ -110,7 +110,7 @@ extension OpenMarketListCollectionViewCell {
         self.contentView.layer.borderWidth = 1
         
         NSLayoutConstraint.activate([
-            itemThumbnail.widthAnchor.constraint(equalTo: itemThumbnail.heightAnchor),
+            itemThumbnail.widthAnchor.constraint(equalToConstant: (self.contentView.frame.width) / 5),
             itemThumbnail.topAnchor.constraint(equalTo: self.contentView.topAnchor, constant: 5),
             itemThumbnail.leadingAnchor.constraint(equalTo: self.contentView.leadingAnchor, constant: 5),
             itemThumbnail.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -5),
