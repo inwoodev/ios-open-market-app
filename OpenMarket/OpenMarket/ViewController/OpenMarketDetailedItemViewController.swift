@@ -12,7 +12,6 @@ class OpenMarketDetailedItemViewController: UIViewController {
     // MARK: - Properties
     
     private let networkManager: NetworkManageable = NetworkManager()
-    private var itemInformation: [String: Any?] = [:]
     private var bottomConstraint: NSLayoutConstraint?
     var sliderImages = [UIImage]()
     var itemID: Int = 0
@@ -46,7 +45,16 @@ class OpenMarketDetailedItemViewController: UIViewController {
         return pageControl
     }()
     
-    private let itemTitleTextView = DetailedItemTitleTextView()
+    private let itemTitleLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.adjustsFontSizeToFitWidth = true
+        label.font = UIFont.preferredFont(forTextStyle: .title3)
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .left
+        
+        return label
+    }()
     
     private let itemStockLabel: UILabel = {
         let label = UILabel()
@@ -58,84 +66,69 @@ class OpenMarketDetailedItemViewController: UIViewController {
         return label
     }()
     
-    private let itemStockTextField: UITextField = {
-        let textField = UITextField()
-        textField.adjustsFontForContentSizeCategory = true
-        textField.font = UIFont.preferredFont(forTextStyle: .body)
-        textField.textColor = .systemGray2
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.autocapitalizationType = .none
-        textField.autocorrectionType = .no
-        textField.isUserInteractionEnabled = false
+    private let itemStockTextLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.textColor = .systemGray2
+        label.translatesAutoresizingMaskIntoConstraints = false
         
-        return textField
+        return label
     }()
     
-    private let itemPriceCurrencyTextField: UITextField = {
-        let textField = UITextField()
-        textField.adjustsFontForContentSizeCategory = true
-        textField.font = UIFont.preferredFont(forTextStyle: .body)
-        textField.textColor = .black
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.autocapitalizationType = .none
-        textField.autocorrectionType = .no
-        textField.isUserInteractionEnabled = false
-        textField.contentVerticalAlignment = .top
+    private let itemPriceCurrencyLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
         
-        return textField
+        return label
     }()
     
-    private let itemPriceTextField: UITextField = {
-        let textField = UITextField()
-        textField.adjustsFontForContentSizeCategory = true
-        textField.font = UIFont.preferredFont(forTextStyle: .body)
-        textField.textColor = .black
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.autocapitalizationType = .none
-        textField.autocorrectionType = .no
-        textField.isUserInteractionEnabled = false
-        textField.keyboardType = .numberPad
-        textField.textAlignment = .right
+    private let itemPriceLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
         
-        return textField
+        return label
     }()
     
-    private let itemDiscountedPriceTextField: UITextField = {
-        let textField = UITextField()
-        textField.adjustsFontForContentSizeCategory = true
-        textField.font = UIFont.preferredFont(forTextStyle: .body)
-        textField.textColor = .black
-        textField.translatesAutoresizingMaskIntoConstraints = false
-        textField.autocapitalizationType = .none
-        textField.autocorrectionType = .no
-        textField.isUserInteractionEnabled = false
-        textField.keyboardType = .numberPad
-        textField.textAlignment = .right
+    private let itemDiscountedPriceLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.adjustsFontForContentSizeCategory = true
+        label.font = UIFont.preferredFont(forTextStyle: .body)
+        label.textColor = .black
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.textAlignment = .right
         
-        return textField
+        return label
     }()
     
     private let itemRegistrationDateLabel: UILabel = {
         let label = UILabel()
+        label.numberOfLines = 0
         label.adjustsFontForContentSizeCategory = true
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.numberOfLines = 0
         label.textAlignment = .left
         
         return label
     }()
     
-    private let itemDetailedDescriptionTextView: UITextView = {
-        let textView = UITextView()
-        textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.adjustsFontForContentSizeCategory = false
-        textView.textAlignment = .natural
-        textView.autocapitalizationType = .none
-        textView.autocorrectionType = .no
-        textView.isEditable = false
-        textView.isScrollEnabled = false
+    private let itemDetailedDescriptionLabel: UILabel = {
+        let label = UILabel()
+        label.numberOfLines = 0
+        label.translatesAutoresizingMaskIntoConstraints = false
+        label.adjustsFontForContentSizeCategory = false
+        label.textAlignment = .natural
         
-        return textView
+        return label
     }()
     
     // MARK: - StackViews
@@ -145,17 +138,25 @@ class OpenMarketDetailedItemViewController: UIViewController {
         stackView.axis = .horizontal
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.distribution = .fill
-        stackView.spacing = 5
+        
+        return stackView
+    }()
+    
+    private let priceStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.axis = .vertical
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.distribution = .fill
         
         return stackView
     }()
     
     private let moneyStackView: UIStackView = {
         let stackView = UIStackView()
-        stackView.axis = .vertical
+        stackView.axis = .horizontal
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.distribution = .fill
-        stackView.alignment = .trailing
+        stackView.alignment = .center
         
         return stackView
     }()
@@ -183,7 +184,6 @@ class OpenMarketDetailedItemViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         overrideUserInterfaceStyle = .light
-        hideView(true)
         setUpNavigationItems()
         getOpenMarketItem()
         assignDelegates()
@@ -194,17 +194,19 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     private func addSubviews() {
         stockStackView.addArrangedSubview(itemStockLabel)
-        stockStackView.addArrangedSubview(itemStockTextField)
+        stockStackView.addArrangedSubview(itemStockTextLabel)
         
-        moneyStackView.addArrangedSubview(itemPriceCurrencyTextField)
-        moneyStackView.addArrangedSubview(itemPriceTextField)
-        moneyStackView.addArrangedSubview(itemDiscountedPriceTextField)
+        priceStackView.addArrangedSubview(itemPriceLabel)
+        priceStackView.addArrangedSubview(itemDiscountedPriceLabel)
         
-        leftlabelsStackView.addArrangedSubview(itemTitleTextView)
+        moneyStackView.addArrangedSubview(itemPriceCurrencyLabel)
+        moneyStackView.addArrangedSubview(priceStackView)
+        
+        leftlabelsStackView.addArrangedSubview(itemTitleLabel)
         leftlabelsStackView.addArrangedSubview(itemRegistrationDateLabel)
         
         
-        [imageSliderCollectionView, imageSlider, stockStackView, leftlabelsStackView,  moneyStackView, itemDetailedDescriptionTextView].forEach { view in
+        [imageSliderCollectionView, imageSlider, stockStackView, leftlabelsStackView,  moneyStackView, itemDetailedDescriptionLabel].forEach { view in
             self.view.addSubview(view)
         }
     }
@@ -237,13 +239,14 @@ class OpenMarketDetailedItemViewController: UIViewController {
             moneyStackView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
             moneyStackView.widthAnchor.constraint(lessThanOrEqualToConstant: self.view.frame.width / 2),
             moneyStackView.bottomAnchor.constraint(equalTo: leftlabelsStackView.bottomAnchor),
+            itemPriceCurrencyLabel.heightAnchor.constraint(equalTo: moneyStackView.heightAnchor),
             
-            itemDetailedDescriptionTextView.topAnchor.constraint(equalTo: leftlabelsStackView.bottomAnchor, constant: 5),
-            itemDetailedDescriptionTextView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
-            itemDetailedDescriptionTextView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+            itemDetailedDescriptionLabel.topAnchor.constraint(equalTo: leftlabelsStackView.bottomAnchor, constant: 5),
+            itemDetailedDescriptionLabel.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
+            itemDetailedDescriptionLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
             
         ])
-        bottomConstraint = itemDetailedDescriptionTextView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -5)
+        bottomConstraint = itemDetailedDescriptionLabel.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -5)
         bottomConstraint?.isActive = true
     }
     
@@ -268,11 +271,11 @@ class OpenMarketDetailedItemViewController: UIViewController {
     }
     
     private func applyUI(_ item: OpenMarketItemToGet) {
-        self.itemTitleTextView.text = item.title
+        self.itemTitleLabel.text = item.title
         applyStockTextField(item)
         applyPriceTextField(item)
         self.itemRegistrationDateLabel.text = Date(timeIntervalSince1970: item.registrationDate).formattedString
-        self.itemDetailedDescriptionTextView.text = item.descriptions
+        self.itemDetailedDescriptionLabel.text = item.descriptions
         self.applyImages(item) { [weak self] images in
             self?.sliderImages = images
         }
@@ -282,31 +285,30 @@ class OpenMarketDetailedItemViewController: UIViewController {
     private func assignDelegates() {
         imageSliderCollectionView.dataSource = self
         imageSliderCollectionView.delegate = self
-        itemTitleTextView.titleViewDelegate = self
     }
     
     private func applyStockTextField(_ item: OpenMarketItemToGet) {
         if item.stock > 999 {
-            self.itemStockTextField.text = "999"
+            self.itemStockTextLabel.text = "999"
         } else {
-            self.itemStockTextField.text = String(item.stock)
+            self.itemStockTextLabel.text = String(item.stock)
         }
     }
     
     private func applyPriceTextField(_ item: OpenMarketItemToGet){
         if let discountedPrice = item.discountedPrice {
-            itemPriceCurrencyTextField.text = item.currency
+            itemPriceCurrencyLabel.text = item.currency
             
-            itemPriceTextField.textColor = .red
-            itemPriceTextField.text = String(item.price)
-            itemPriceTextField.attributedText = itemPriceTextField.text?.strikeThrough()
+            itemPriceLabel.textColor = .red
+            itemPriceLabel.text = String(item.price)
+            itemPriceLabel.attributedText = itemPriceLabel.text?.strikeThrough()
             
-            itemDiscountedPriceTextField.text = String(discountedPrice)
+            itemDiscountedPriceLabel.text = String(discountedPrice)
         } else {
-            itemDiscountedPriceTextField.isHidden = true
+            itemDiscountedPriceLabel.isHidden = true
             
-            itemPriceCurrencyTextField.text = item.currency
-            itemPriceTextField.text = String(item.price)
+            itemPriceCurrencyLabel.text = item.currency
+            itemPriceLabel.text = String(item.price)
         }
     }
     
@@ -365,39 +367,9 @@ class OpenMarketDetailedItemViewController: UIViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    private func setEditMode() {
-        itemTitleTextView.isEditable = true
-        itemTitleTextView.becomeFirstResponder()
-        itemStockTextField.isUserInteractionEnabled = true
-        itemPriceCurrencyTextField.isUserInteractionEnabled = true
-        itemPriceTextField.isUserInteractionEnabled = true
-        itemDiscountedPriceTextField.isUserInteractionEnabled = true
-        itemDiscountedPriceTextField.isHidden = false
-        itemDetailedDescriptionTextView.isEditable = true
-        setTextPlaceholders()
-    }
-    
-    private func setTextPlaceholders() {
-        itemStockTextField.placeholder = OpenMarketItemToPostOrPatch.stock.placeholder
-        itemPriceCurrencyTextField.placeholder = OpenMarketItemToPostOrPatch.currency.placeholder
-        itemPriceTextField.placeholder = OpenMarketItemToPostOrPatch.price.placeholder
-        itemDiscountedPriceTextField.placeholder = OpenMarketItemToPostOrPatch.discountedPrice.placeholder
-    }
-    
     @objc private func didTapActionButton(_ sender: UIBarButtonItem) {
         alertEditOrDeleteItem()
     }
-    
-    override func setEditing(_ editing: Bool, animated: Bool) {
-        super.setEditing(editing, animated: animated)
-        
-        if editing {
-            setEditMode()
-        } else {
-            alertProceedToEditItem()
-        }
-    }
-    
 }
 
 // MARK: - UICollectionViewDataSource
@@ -411,7 +383,6 @@ extension OpenMarketDetailedItemViewController: UICollectionViewDataSource {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImagePickerCollectionViewCell.identifier, for: indexPath) as? ImagePickerCollectionViewCell else {
             return UICollectionViewCell()
         }
-        cell.removeCellDelegate = self
         cell.configureImage(sliderImages, indexPath: indexPath)
         cell.indexPath = indexPath
         cell.isRemoveImageButtonHidden(true)
@@ -438,28 +409,5 @@ extension OpenMarketDetailedItemViewController: UICollectionViewDelegateFlowLayo
         let width = collectionView.frame.width
         
         return CGSize(width: width, height: height)
-    }
-}
-
-extension OpenMarketDetailedItemViewController: PatchingTextConvertible {
-    func convertPasswordTextToDictionary(_ key: OpenMarketItemToPostOrPatch, _ text: String?) {
-        print("hi")
-    }
-    
-    func convertOptionalTextToDictionary(_ key: OpenMarketItemToPostOrPatch, _ text: String?) {
-        itemInformation.updateValue(itemTitleTextView.text, forKey: OpenMarketItemToPostOrPatch.title.key)
-    }
-}
-
-extension OpenMarketDetailedItemViewController: RemoveDelegate {
-    func removeCell(_ indexPath: IndexPath) {
-        imageSliderCollectionView.performBatchUpdates {
-            imageSliderCollectionView.deleteItems(at: [indexPath])
-            sliderImages.remove(at: indexPath.item)
-        } completion: { [weak self] _ in
-            self?.imageSliderCollectionView.reloadData()
-            self?.imageSlider.numberOfPages = self?.sliderImages.count ?? 0
-        }
-
     }
 }

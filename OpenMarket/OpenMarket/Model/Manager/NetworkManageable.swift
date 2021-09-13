@@ -151,7 +151,7 @@ extension NetworkManageable {
             let convertedImage = imageData.base64EncodedData()
             let stringData = String(bytes: convertedImage, encoding: .utf8)
             let finalData = Data(base64Encoded: stringData!)
-            httpBody.append(convertFileData(key: OpenMarketItemToPostOrPatch.images.key, fileName: "\(Date().timeIntervalSince1970)_photo.jpeg", mimeType: "image/jpeg", fileData: finalData!, using: boundary))
+            httpBody.append(convertFileData(key: OpenMarketItemToPost.images.key, fileName: "\(Date().timeIntervalSince1970)_photo.jpeg", mimeType: "image/jpeg", fileData: finalData!, using: boundary))
         }
         httpBody.appendString("--\(boundary)--")
         return httpBody as Data
