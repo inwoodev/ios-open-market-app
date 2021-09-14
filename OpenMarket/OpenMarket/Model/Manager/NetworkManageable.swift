@@ -30,7 +30,7 @@ extension NetworkManageable {
         
         var urlRequest = URLRequest(url: url)
         
-        urlRequest.httpMethod = HTTPMethods.get.rawValue
+        urlRequest.httpMethod = HTTPMethods.get.description
         
         urlSession.dataTask(with: urlRequest) { data, response, error in
             if let dataError = error {
@@ -57,7 +57,7 @@ extension NetworkManageable {
         
         var urlRequest = URLRequest(url: url)
         
-        urlRequest.httpMethod = HTTPMethods.get.rawValue
+        urlRequest.httpMethod = HTTPMethods.get.description
         
         urlSession.dataTask(with: urlRequest) { data, response, error in
             if let dataError = error {
@@ -130,7 +130,7 @@ extension NetworkManageable {
         return data as Data
     }
     
-    func buildMultipartFormData(_ texts: [String: Any?], _ imageList: [UIImage]) -> Data {
+    func buildMultipartFormData(_ texts: [String: Any?], _ imageList: [UIImage]?) -> Data {
         let httpBody = NSMutableData()
         
         for (key, value) in texts {
@@ -141,7 +141,15 @@ extension NetworkManageable {
             
         }
         
-        for image in imageList {
+        guard let images = imageList else {
+            
+            NSLog("httpbody without images")
+            httpBody.appendString("--\(boundary)--")
+            return httpBody as Data
+            
+        }
+        
+        for image in images {
             
             guard let imageData = image.jpegData(compressionQuality: 1) else {
                 return Data()
@@ -149,10 +157,13 @@ extension NetworkManageable {
             }
             
             let convertedImage = imageData.base64EncodedData()
-            let stringData = String(bytes: convertedImage, encoding: .utf8)
-            let finalData = Data(base64Encoded: stringData!)
-            httpBody.append(convertFileData(key: OpenMarketItemToPost.images.key, fileName: "\(Date().timeIntervalSince1970)_photo.jpeg", mimeType: "image/jpeg", fileData: finalData!, using: boundary))
+            guard let stringData = String(bytes: convertedImage, encoding: .utf8),
+                  let finalData = Data(base64Encoded: stringData) else {
+                return Data()
+            }
+            httpBody.append(convertFileData(key: OpenMarketItemToPostOrPatch.images.key, fileName: "\(Date().timeIntervalSince1970)_photo.jpeg", mimeType: "image/jpeg", fileData: finalData, using: boundary))
         }
+        
         httpBody.appendString("--\(boundary)--")
         return httpBody as Data
     }

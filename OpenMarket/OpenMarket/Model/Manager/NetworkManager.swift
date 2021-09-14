@@ -32,7 +32,7 @@ final class NetworkManager: NetworkManageable {
         }
         var urlRequest = URLRequest(url: url)
         
-        urlRequest.httpMethod = HTTPMethods.get.rawValue
+        urlRequest.httpMethod = HTTPMethods.get.description
         
         urlSession.dataTask(with: urlRequest) { data, response, error in
             if let dataError = error {
@@ -63,15 +63,12 @@ final class NetworkManager: NetworkManageable {
         }.resume()
     }
     
-    private func openMarketItemDataTask(url: String, texts: [String : Any?], imageList: [UIImage], completionHandler: @escaping (Bool) -> Void) -> URLSessionDataTask? {
+    private func openMarketItemMultipartFormDataTask(httpMethod: HTTPMethods, url: String, texts: [String : Any?], imageList: [UIImage]?, completionHandler: @escaping(_ result: Result <HTTPURLResponse, NetworkResponseError>) -> Void) {
         
-        guard let validURL = URL(string: url) else {
-            return nil
-            
-        }
+        guard let validURL = URL(string: url) else { return }
         
         var request = URLRequest(url: validURL)
-        request.httpMethod = HTTPMethods.post.rawValue
+        request.httpMethod = httpMethod.description
         request.httpBody = buildMultipartFormData(texts, imageList)
         
         request.setValue("multipart/form-data; boundary=\(boundary)", forHTTPHeaderField: "Content-Type")
@@ -79,27 +76,26 @@ final class NetworkManager: NetworkManageable {
         // MARK: - Request Log
         
         print("------------")
-        print(request.allHTTPHeaderFields)
+        NSLog(String(describing: request.allHTTPHeaderFields))
         print("------------")
-        print(request.httpMethod)
+        NSLog(request.httpMethod ?? "")
         print("------------")
-        print(String(decoding: request.httpBody!, as: UTF8.self))
+        NSLog(String(decoding: request.httpBody!, as: UTF8.self))
         
-        return urlSession.dataTask(with: request) { data, response, error in
+        dataTask = urlSession.dataTask(with: request) { data, response, error in
             if let error = error {
-                print(error.localizedDescription)
-                completionHandler(false)
+                NSLog(error.localizedDescription)
             }
             
             guard let successfulResponse = response as? HTTPURLResponse,
                   (200...299).contains(successfulResponse.statusCode) else {
                 let failedResponse = response as? HTTPURLResponse
                 
-                // MARK: - Response Log
+                // MARK: - failure Response Log
                 
-                print(failedResponse?.statusCode)
+                NSLog((String(describing: failedResponse?.statusCode)))
                 
-                completionHandler(false)
+                completionHandler(.failure(NetworkResponseError.failed))
                 return
             }
             
@@ -130,7 +126,7 @@ final class NetworkManager: NetworkManageable {
         
         var request = URLRequest(url: url)
         
-        request.httpMethod = HTTPMethods.get.rawValue
+        request.httpMethod = HTTPMethods.get.description
         
         dataTask = urlSession.dataTask(with: request) { data, response, error in
             if let networkError = error {
