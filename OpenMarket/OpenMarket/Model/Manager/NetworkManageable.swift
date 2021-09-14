@@ -17,9 +17,9 @@ protocol NetworkManageable {
     
     func getSingleItem(itemURL: String, id: Int, completion: @escaping (_ result: Result <OpenMarketItemToGet, NetworkResponseError>) -> Void)
     
-    func postSingleItem(url: String, texts: [String : Any?], imageList: [UIImage], completionHandler: @escaping (URLSessionDataTask) -> Void)
+    func postSingleItem(url: String, texts: [String : Any?], imageList: [UIImage])
     
-//    func editSingleItem(url: String, texts: [String? : Any?], imageList: [UIImage], completionHandler: @escaping(URLSessionDataTask) -> Void)
+    func patchSingleItem(url: String, texts: [String : Any?], images: [UIImage]?, completionHandler: @escaping (HTTPURLResponse) -> Void)
     
 }
 extension NetworkManageable {

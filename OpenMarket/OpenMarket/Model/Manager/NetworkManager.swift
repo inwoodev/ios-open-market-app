@@ -8,10 +8,6 @@
 import UIKit
 
 final class NetworkManager: NetworkManageable {
-//    func editSingleItem(url: String, texts: [String? : Any?], imageList: [UIImage], completionHandler: @escaping (URLSessionDataTask) -> Void) {
-//        <#code#>
-//    }
-    
     var dataTask: URLSessionDataTask?
     var boundary = "Boundary-\(UUID().uuidString)"
     var isReadyToPaginate: Bool = false
@@ -100,24 +96,39 @@ final class NetworkManager: NetworkManageable {
             }
             
             if let mimeType = successfulResponse.mimeType,
-               mimeType == "multipart/form-data",
-               let _ = data {
-                completionHandler(true)
+               mimeType == "application/json" {
+                
+                // MARK: - successful Response Log
+                
+                NSLog(String(successfulResponse.statusCode))
+                completionHandler(.success(successfulResponse))
+            }
+        }
+        dataTask?.resume()
+    }
+    
+    func postSingleItem(url: String, texts: [String : Any?], imageList: [UIImage]) {
+        openMarketItemMultipartFormDataTask(httpMethod: .post, url: url, texts: texts, imageList: imageList) { result in
+            switch result {
+            case .success(let response):
+                NSLog("item post succeeded with response code: \(response.statusCode)")
+            
+            case .failure(let networkError):
+                NSLog(networkError.description)
             }
         }
     }
     
-    func postSingleItem(url: String, texts: [String : Any?], imageList: [UIImage], completionHandler: @escaping (URLSessionDataTask) -> Void) {
-        dataTask = openMarketItemDataTask(url: OpenMarketAPI.urlForSingleItem.description, texts: texts, imageList: imageList) { bool in
-            switch bool {
-            case true:
-                NSLog("data can be sent to server")
-                
-            case false:
-                NSLog("data has unknown error, and thus cannot be sent to server")
+    func patchSingleItem(url: String, texts: [String : Any?], images: [UIImage]?, completionHandler: @escaping (HTTPURLResponse) -> Void) {
+        openMarketItemMultipartFormDataTask(httpMethod: .patch, url: url, texts: texts, imageList: images, completionHandler: { result in
+            switch result {
+            case .success(let response):
+                NSLog("item patch succeeded with response code: \(response.statusCode)")
+                completionHandler(response)
+            case .failure(let networkError):
+                NSLog(networkError.description)
             }
-        }
-        dataTask?.resume()
+        })
     }
     
     func getSingleItem(itemURL: String, id: Int, completion: @escaping (_ result: Result <OpenMarketItemToGet, NetworkResponseError>) -> Void) {
