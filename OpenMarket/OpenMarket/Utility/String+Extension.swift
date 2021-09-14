@@ -9,6 +9,12 @@ import UIKit
 
 extension String {
     
+    // MARK: - Alphanumeric
+    
+    var isAlphaNumeric: Bool {
+        return !isEmpty && range(of: "[^a-zA-Z0-9]", options: .regularExpression, range: nil, locale: nil) == nil
+    }
+    
     // MARK: - UIText effect
     
     func strikeThrough() -> NSAttributedString {

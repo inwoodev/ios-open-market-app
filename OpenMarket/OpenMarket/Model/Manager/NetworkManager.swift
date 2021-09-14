@@ -76,23 +76,25 @@ final class NetworkManager: NetworkManageable {
         print("------------")
         NSLog(request.httpMethod ?? "")
         print("------------")
-        NSLog(String(decoding: request.httpBody!, as: UTF8.self))
+        print(String(decoding: request.httpBody!, as: UTF8.self))
         
         dataTask = urlSession.dataTask(with: request) { data, response, error in
             if let error = error {
                 NSLog(error.localizedDescription)
+                completionHandler(.failure(NetworkResponseError.failed))
             }
             
             guard let successfulResponse = response as? HTTPURLResponse,
                   (200...299).contains(successfulResponse.statusCode) else {
-                let failedResponse = response as? HTTPURLResponse
-                
-                // MARK: - failure Response Log
-                
-                NSLog((String(describing: failedResponse?.statusCode)))
-                
-                completionHandler(.failure(NetworkResponseError.failed))
+                if let failedResponse = response as? HTTPURLResponse {
+                    
+                    // MARK: - failure Response Log
+                    
+                    NSLog((String(describing: failedResponse.statusCode)))
+                    completionHandler(.success(failedResponse))
+                }
                 return
+                
             }
             
             if let mimeType = successfulResponse.mimeType,
@@ -107,11 +109,12 @@ final class NetworkManager: NetworkManageable {
         dataTask?.resume()
     }
     
-    func postSingleItem(url: String, texts: [String : Any?], imageList: [UIImage]) {
+    func postSingleItem(url: String, texts: [String : Any?], imageList: [UIImage], completionHandler: @escaping (HTTPURLResponse) -> Void) {
         openMarketItemMultipartFormDataTask(httpMethod: .post, url: url, texts: texts, imageList: imageList) { result in
             switch result {
             case .success(let response):
                 NSLog("item post succeeded with response code: \(response.statusCode)")
+                completionHandler(response)
             
             case .failure(let networkError):
                 NSLog(networkError.description)

@@ -21,7 +21,7 @@ class OpenMarketItemViewController: UIViewController {
     private let networkManager: NetworkManageable = NetworkManager()
     private var itemThumbnails: [UIImage] = []
     private var itemInformation: [String: Any?] = [:]
-    
+    private var itemID = Int()
     private let mode: Mode
     
     init(mode: Mode) {
@@ -56,7 +56,7 @@ class OpenMarketItemViewController: UIViewController {
         let textView = UITextView()
         textView.font = UIFont.preferredFont(forTextStyle: .body)
         textView.text = "상품 정보를 입력 해 주세요."
-        textView.textColor = .lightGray
+        textView.textColor = .black
         textView.translatesAutoresizingMaskIntoConstraints = false
         
         return textView
@@ -149,7 +149,7 @@ class OpenMarketItemViewController: UIViewController {
         return sendItem
     }()
     
-    // MARK: - ViewDidLoad()
+    // MARK: - Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
@@ -160,12 +160,51 @@ class OpenMarketItemViewController: UIViewController {
         setUpUIConstraints()
         setDelegates()
         applyCurrencyTextField()
+        setUpPasswordTextField()
+    }
+    
+    func setItemIdentityToPatch(idNumber: Int) {
+        self.itemID = idNumber
+    }
+    
+    func receiveInformation(of item: OpenMarketItemToGet?, images: [UIImage], password: String) {
+        configureUIForEditMode(item, thumbnails: images, password: password)
     }
     
     private func applyCurrencyTextField() {
         currencyTextField.textFieldDelegate = self
         currencyTextField.inputView = currencyPickerView
         currencyTextField.inputAccessoryView = currencyPickerViewToolbar
+    }
+    
+    private func setUpPasswordTextField() {
+        switch mode {
+        case .edit:
+            passwordTextField.isUserInteractionEnabled = false
+            passwordTextField.textColor = .systemGray
+            passwordTextField.delegate?.textFieldDidEndEditing?(passwordTextField)
+        case .register:
+            passwordTextField.isUserInteractionEnabled = true
+        }
+    }
+    
+    private func configureUIForEditMode(_ item: OpenMarketItemToGet?, thumbnails: [UIImage], password: String) {
+        if mode == .edit,
+           let validItem = item {
+            
+            self.titleTextField.text = validItem.title
+            self.priceTextField.text = String(validItem.price)
+            if let discountedPrice = validItem.discountedPrice {
+                self.discountedPriceTextField.text = String(discountedPrice)
+            } else {
+                self.discountedPriceTextField.text = nil
+            }
+            self.stockTextField.text = String(validItem.stock)
+            self.detailedInformationTextView.text = validItem.descriptions
+            self.currencyTextField.text = validItem.currency
+            self.itemThumbnails = thumbnails
+            self.passwordTextField.text = password
+        }
     }
     
     // MARK: - assign Delegates
@@ -187,7 +226,7 @@ extension OpenMarketItemViewController {
     
     // MARK: - Method: Send Information to Server
     
-    private func examineRequiredInformation() {
+    private func examineRequiredInformationToPost() {
         let alertController = UIAlertController(title: "입력 오류", message: "상품 사진 포함 필수항목을 모두 입력 해 주세요.", preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         
@@ -206,20 +245,13 @@ extension OpenMarketItemViewController {
         } else if itemThumbnails.count < 1 && self.presentedViewController == nil {
             self.present(alertController, animated: true, completion: nil)
         }
-        
     }
     
-    private func alertConfirmationToUser() {
+    private func alertConfirmationToPostItem() {
         let alertController = UIAlertController(title: "작성 완료", message: "틀린 내용이 없는지 꼼꼼히 확인 해 주세요. 정말로 상품을 마켓에 올리시겠습니까?", preferredStyle: .alert)
-        let okButton = UIAlertAction(title: "OK", style: .default) { [weak self] action in
+        let okButton = UIAlertAction(title: "OK", style: .default) { action in
             
-            guard let self = self else { return }
-            
-            self.networkManager.postSingleItem(url: OpenMarketAPI.urlForSingleItemToPost.description, texts: self.itemInformation, imageList: self.itemThumbnails)
-            
-            DispatchQueue.main.async {
-                self.dismissCurrentViewController()
-            }
+            self.postItemToServer()
         }
         let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
@@ -229,16 +261,104 @@ extension OpenMarketItemViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
+    private func postItemToServer() {
+        self.networkManager.postSingleItem(url: OpenMarketAPI.urlForSingleItemToPost.description, texts: self.itemInformation, imageList: self.itemThumbnails) { [weak self] response in
+            DispatchQueue.main.async {
+                if (200...299).contains(response.statusCode) {
+                    self?.alertSuccessfulResponseToUser()
+                } else {
+                    self?.alertFailedResponseToUser()
+                }
+            }
+        }
+    }
+    
+    
+    private func alertProceedToEditItem() {
+        let alertController = UIAlertController(title: "상품 수정", message: "정말로 상품을 수정하시겠습니까?", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default) { [weak self] alertAction in
+            self?.updateEditedItemInformation()
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { alertAction in
+            
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        alertController.addAction(okAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    private func updateEditedItemInformation() {
+        self.networkManager.patchSingleItem(url: "\(OpenMarketAPI.urlForSingleItemToGetPatchOrDelete)\(itemID)", texts: itemInformation, images: itemThumbnails) { [weak self] response in
+            DispatchQueue.main.async {
+                if (200...299).contains(response.statusCode) {
+                    self?.alertSuccessfulResponseToUser()
+                } else {
+                    self?.alertFailedResponseToUser()
+                }
+            }
+        }
+    }
+    
+    private func alertSuccessfulResponseToUser() {
+        let editTitle = "상품 수정 완료"
+        let editMessage = "상품 수정이 정상적으로 완료되었습니다."
+        let registerTitle = "상품 등록 완료"
+        let registerMessage = "상품 등록이 정상적으로 완료되었습니다."
+        
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
+        if mode == .register {
+            alertController.title = registerTitle
+            alertController.message = registerMessage
+        } else {
+            alertController.title = editTitle
+            alertController.message = editMessage
+        }
+        
+        self.present(alertController, animated: true) {
+            alertController.dismiss(animated: true) {
+                self.notifyToRefreshItemList()
+                self.navigationController?.popToRootViewController(animated: true)
+            }
+        }
+    }
+    
+    private func alertFailedResponseToUser() {
+        let editTitle = "상품 수정 실패"
+        let editMessage = "상품 수정을 실패하였습니다."
+        let registerTitle = "상품 등록 실패"
+        let registerMessage = "상품 등록을 실패하였습니다."
+        
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
+        if mode == .register {
+            alertController.title = registerTitle
+            alertController.message = registerMessage
+        } else {
+            alertController.title = editTitle
+            alertController.message = editMessage
+        }
+        let okAction = UIAlertAction(title: "OK", style: .default) { action in
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        alertController.addAction(okAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     @objc private func didTapDoneButton(_ sender: UIBarButtonItem) {
         self.view.endEditing(true)
-        examineRequiredInformation()
-        alertConfirmationToUser()
+        switch mode {
+        case .edit:
+            alertProceedToEditItem()
+        case .register:
+            examineRequiredInformationToPost()
+            alertConfirmationToPostItem()
+        }
     }
     
-    private func dismissCurrentViewController() {
-        self.navigationController?.popViewController(animated: true)
+    private func notifyToRefreshItemList() {
+        NotificationCenter.default.post(name: .needToRefreshItemList, object: nil)
     }
-    
+
     // MARK: - Method: hide keyboard when tapped around
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
@@ -249,7 +369,12 @@ extension OpenMarketItemViewController {
     // MARK: - setUp NavigationItems
     
     private func setUpNavigationItems() {
-        self.navigationItem.title = "상품등록"
+        switch mode {
+        case .edit:
+            self.navigationItem.title = "상품수정"
+        case .register:
+            self.navigationItem.title = "상품등록"
+        }
         self.navigationItem.rightBarButtonItem = UIRightBarButtonItem
     }
     
@@ -368,20 +493,19 @@ extension OpenMarketItemViewController: UITextFieldDelegate {
 
 extension OpenMarketItemViewController: TextFieldConvertible {
     
-    func alertInvalidTextField(_ alertController: UIAlertController) {
+    private func alertInvalidPassword() {
+        let alertController = UIAlertController(title: "비밀번호 설정", message: "비밀번호를 영문, 숫자를 사용해서 입력 해 주세요", preferredStyle: .alert)
+        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
+        alertController.addAction(action)
         self.present(alertController, animated: true, completion: nil)
     }
     
     func convertPasswordTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
         itemInformation.updateValue(text, forKey: itemToPost.key)
-        let alertController = UIAlertController(title: "비밀번호 설정", message: "비밀번호를 영문, 숫자를 사용해서 입력 해 주세요", preferredStyle: .alert)
-        let action = UIAlertAction(title: "OK", style: .default, handler: nil)
-        alertController.addAction(action)
         
-        guard let text = text,
-              Int(text) == nil,
-              !text.isEmpty else {
-            alertInvalidTextField(alertController)
+        guard let validText = text,
+              !validText.isEmpty else {
+            alertInvalidPassword()
             return
         }
         
@@ -427,27 +551,34 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
     @objc func didTapUploadPhoto(_ sender: UIButton) {
         
         if itemThumbnails.count < 5 {
-            let alertController = UIAlertController(title: "상품등록", message: nil, preferredStyle: .actionSheet)
-            let photoLibrary = UIAlertAction(title: "사진 앨범", style: .default) { action in
-                self.openLibrary()
-            }
-            let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-            
-            alertController.addAction(photoLibrary)
-            alertController.addAction(cancel)
-            
-            present(alertController, animated: true, completion: nil)
+            alertUploadPhoto()
         } else {
-            let alertController = UIAlertController(title: "사진 제한", message: "사진은 총 5장으로 제한 됩니다.", preferredStyle: .alert)
-            let defaultAction = UIAlertAction(title: "OK", style: .destructive, handler: nil)
-            alertController.addAction(defaultAction)
-            
-            present(alertController, animated: true, completion: nil)
+            alertLimitNumberOfPhoto()
         }
-        
     }
     
-    private func openLibrary() {
+    private func alertUploadPhoto() {
+        let alertController = UIAlertController(title: "상품사진", message: nil, preferredStyle: .actionSheet)
+        let photoLibrary = UIAlertAction(title: "사진 앨범", style: .default) { action in
+            self.openPhotoLibrary()
+        }
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        alertController.addAction(photoLibrary)
+        alertController.addAction(cancel)
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    private func alertLimitNumberOfPhoto() {
+        let alertController = UIAlertController(title: "사진 제한", message: "사진은 총 5장으로 제한 됩니다.", preferredStyle: .alert)
+        let defaultAction = UIAlertAction(title: "OK", style: .destructive, handler: nil)
+        alertController.addAction(defaultAction)
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    private func openPhotoLibrary() {
         imagePicker.sourceType = .photoLibrary
         imagePicker.delegate = self
         present(imagePicker, animated: true, completion: nil)

@@ -35,10 +35,11 @@ class OpenMarketViewController: UIViewController {
         return collectionView
     }()
     
-    private let segmentedController: UISegmentedControl = {
+    private lazy var segmentedController: UISegmentedControl = {
         let segmentedControl = UISegmentedControl(items: ["LIST", "GRID"])
         segmentedControl.sizeToFit()
         segmentedControl.selectedSegmentIndex = 0
+        segmentedControl.addTarget(self, action: #selector(didTapSegmentedControl(_:)), for: .valueChanged)
         return segmentedControl
     }()
     
@@ -54,7 +55,7 @@ class OpenMarketViewController: UIViewController {
         setUpNavigationItems()
         configureCollectionViewConstraint()
         fetchOpenMarketItems()
-        segmentedController.addTarget(self, action: #selector(didTapSegmentedControl(_:)), for: .valueChanged)
+        notifiedToRefreshData()
     }
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
@@ -102,6 +103,7 @@ class OpenMarketViewController: UIViewController {
                     self.openMarketCollectionView.reloadData()
                     self.activityIndicator.stopAnimating()
                     self.networkManager.isReadyToPaginate = true
+                    self.openMarketCollectionView.setContentOffset(.zero, animated: true)
                 }
             case .failure(let error):
                 print(error.localizedDescription)
@@ -131,8 +133,21 @@ extension OpenMarketViewController {
     // MARK: - Tap Rightbar Button
     
     @objc private func didTapAddButton(_ sender: UIBarButtonItem) {
-        let openMarketItemViewController = OpenMarketItemViewController()
+        let openMarketItemViewController = OpenMarketItemViewController(mode: .register)
         navigationController?.pushViewController(openMarketItemViewController, animated: true)
+    }
+    
+    func notifiedToRefreshData() {
+        NotificationCenter.default.addObserver(self, selector: #selector(refreshItemList), name: .needToRefreshItemList, object: nil)
+    }
+    
+    
+    @objc private func refreshItemList() {
+        let firstPage = 1
+        nextPageToLoad = firstPage
+        openMarketItems = []
+        activityIndicator.startAnimating()
+        fetchOpenMarketItems()
     }
 }
 

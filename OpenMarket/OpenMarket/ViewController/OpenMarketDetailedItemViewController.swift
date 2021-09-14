@@ -13,8 +13,10 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     private let networkManager: NetworkManageable = NetworkManager()
     private var bottomConstraint: NSLayoutConstraint?
+    private var openMarketItem: OpenMarketItemToGet?
     var sliderImages = [UIImage]()
-    var itemID: Int = 0
+    var itemID = Int()
+    
     
     // MARK: - Views
     
@@ -210,12 +212,6 @@ class OpenMarketDetailedItemViewController: UIViewController {
         }
     }
     
-    private func hideView(_ bool: Bool) {
-        moneyStackView.isHidden = bool
-        stockStackView.isHidden = bool
-        
-    }
-    
     private func setUpUIConstraint() {
         NSLayoutConstraint.activate([
             imageSliderCollectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 5),
@@ -261,6 +257,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
                     self?.imageSliderCollectionView.reloadData()
                     self?.navigationItem.title = item.title
                     self?.applyUI(item)
+                    self?.openMarketItem = item
                 }
             case .failure(let error):
                 return NSLog(error.description)
@@ -270,8 +267,9 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     private func applyUI(_ item: OpenMarketItemToGet) {
         self.itemTitleLabel.text = item.title
-        applyStockTextField(item)
-        applyPriceTextField(item)
+        self.itemStockLabel.text = "재고: "
+        applyStockTextLabel(item)
+        applyPriceTextLabel(item)
         self.itemRegistrationDateLabel.text = Date(timeIntervalSince1970: item.registrationDate).formattedString
         self.itemDetailedDescriptionLabel.text = item.descriptions
         self.applyImages(item) { [weak self] images in
@@ -285,7 +283,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         imageSliderCollectionView.delegate = self
     }
     
-    private func applyStockTextField(_ item: OpenMarketItemToGet) {
+    private func applyStockTextLabel(_ item: OpenMarketItemToGet) {
         if item.stock > 999 {
             self.itemStockTextLabel.text = "999"
         } else {
@@ -293,7 +291,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         }
     }
     
-    private func applyPriceTextField(_ item: OpenMarketItemToGet){
+    private func applyPriceTextLabel(_ item: OpenMarketItemToGet){
         if let discountedPrice = item.discountedPrice {
             itemPriceCurrencyLabel.text = item.currency
             
@@ -337,36 +335,88 @@ class OpenMarketDetailedItemViewController: UIViewController {
     private func alertEditOrDeleteItem() {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-        let editAction = UIAlertAction(title: "수정", style: .default) { alertAction in
-            self.navigationItem.rightBarButtonItem = self.editButtonItem
-            self.setEditing(true, animated: true)
+        let editAction = UIAlertAction(title: "수정", style: .default) { [weak self] alertAction in
+            self?.alertInsertPassword()
+            
         }
-        let deleteMode = UIAlertAction(title: "삭제", style: .default) { alertAction in
+        let deleteAction = UIAlertAction(title: "삭제", style: .default) { alertAction in
             
         }
         alertController.addAction(editAction)
-        alertController.addAction(deleteMode)
+        alertController.addAction(deleteAction)
         alertController.addAction(cancelAction)
         
         self.present(alertController, animated: true, completion: nil)
         
-    }
-    
-    private func alertProceedToEditItem() {
-        let alertController = UIAlertController(title: "상품 수정", message: "정말로 상품을 수정하시겠습니까?", preferredStyle: .alert)
-        let okAction = UIAlertAction(title: "Ok", style: .default) { alertAction in
-            print("alert")
-        }
-        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { alertAction in
-
-        }
-        alertController.addAction(okAction)
-        alertController.addAction(cancelAction)
-        self.present(alertController, animated: true, completion: nil)
     }
     
     @objc private func didTapActionButton(_ sender: UIBarButtonItem) {
         alertEditOrDeleteItem()
+    }
+}
+
+// MARK: - Edit Item
+
+extension OpenMarketDetailedItemViewController {
+    
+    private func alertInsertPassword() {
+        let alertController = UIAlertController(title: "패스워드 입력", message: "수정하기 위해서는 패스워드 입력이 필요합니다.", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default) { ok in
+            
+            guard let passwordTextField = alertController.textFields?.first,
+                  let insertedPassword = passwordTextField.text else { return }
+            
+            self.isPasswordValid(insertedPassword)
+        }
+        
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { cancel in
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        
+        alertController.addTextField { textField in
+            textField.isSecureTextEntry = true
+            textField.placeholder = "패스워드를 입력 해 주세요"
+        }
+        
+        alertController.addAction(okAction)
+        alertController.addAction(cancelAction)
+        
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    private func isPasswordValid(_ password: String) {
+        networkManager.patchSingleItem(url: "\(OpenMarketAPI.urlForSingleItemToGetPatchOrDelete)\(itemID)", texts: [OpenMarketItemToPostOrPatch.password.key: password], images: nil) { [weak self] response in
+            if (200...299).contains(response.statusCode) {
+                DispatchQueue.main.async {
+                    self?.proceedToEditItem(password)
+                }
+            } else if response.statusCode == 404 {
+                DispatchQueue.main.async {
+                    self?.alertInvalidPassword()
+                }
+            }
+        }
+    }
+    
+    private func proceedToEditItem(_ password: String) {
+        let editItemViewController = OpenMarketItemViewController(mode: .edit)
+        editItemViewController.setItemIdentityToPatch(idNumber: itemID)
+        editItemViewController.receiveInformation(of: openMarketItem, images: sliderImages, password: password)
+        navigationController?.pushViewController(editItemViewController, animated: true)
+    }
+    
+    private func alertInvalidPassword() {
+        let alertController = UIAlertController(title: "패스워드 오류", message: "잘못된 패스워드입니다.", preferredStyle: .alert)
+        let retryAction = UIAlertAction(title: "재시도", style: .default) { [weak self] retry in
+            self?.alertInsertPassword()
+        }
+        let cancelAction = UIAlertAction(title: "취소", style: .cancel) { cancel in
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        alertController.addAction(retryAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
+        
     }
 }
 

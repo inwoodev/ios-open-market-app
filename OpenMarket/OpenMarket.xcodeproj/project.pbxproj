@@ -12,6 +12,8 @@
 		C70FB0FF25BEF61C00C9924E /* OpenMarketViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = C70FB0FE25BEF61C00C9924E /* OpenMarketViewController.swift */; };
 		C70FB10425BEF61D00C9924E /* Assets.xcassets in Resources */ = {isa = PBXBuildFile; fileRef = C70FB10325BEF61D00C9924E /* Assets.xcassets */; };
 		C70FB10725BEF61D00C9924E /* LaunchScreen.storyboard in Resources */ = {isa = PBXBuildFile; fileRef = C70FB10525BEF61D00C9924E /* LaunchScreen.storyboard */; };
+		EA19BE6626F0DF37000C3CFC /* RefreshDataDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA19BE6526F0DF37000C3CFC /* RefreshDataDelegate.swift */; };
+		EA19BE6C26F0FA08000C3CFC /* Notification.Name+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA19BE6B26F0FA08000C3CFC /* Notification.Name+Extension.swift */; };
 		EA8E967C266DE472001280CF /* OpenMarketGridCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E967B266DE472001280CF /* OpenMarketGridCollectionViewCell.swift */; };
 		EA8E967E266DF913001280CF /* CellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E967D266DF913001280CF /* CellLayout.swift */; };
 		EA8E9680266E4085001280CF /* CellDataUpdatable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E967F266E4085001280CF /* CellDataUpdatable.swift */; };
@@ -36,7 +38,7 @@
 		EAC6ED48267CD789006DDA78 /* CurrencyTextField.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC6ED47267CD789006DDA78 /* CurrencyTextField.swift */; };
 		EAC8F7D326915ABA002A07C2 /* ImageCompressor.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAC8F7D226915ABA002A07C2 /* ImageCompressor.swift */; };
 		EAD0EB2226D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD0EB2126D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift */; };
-		EADC04D926DCBEB900A0DF6E /* OpenMarketItemToGet.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADC04D826DCBEB900A0DF6E /* OpenMarketItemToGet.swift */; };
+		EADC04D926DCBEB900A0DF6E /* OpenMarketItem.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADC04D826DCBEB900A0DF6E /* OpenMarketItem.swift */; };
 		EADC04DD26DD006200A0DF6E /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADC04DC26DD006200A0DF6E /* Date+Extension.swift */; };
 		EAED324E26EEF80A00892700 /* OpenMarketItemToPostOrPatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED324D26EEF80A00892700 /* OpenMarketItemToPostOrPatch.swift */; };
 		EAED325026EEF84200892700 /* TextFieldConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED324F26EEF84200892700 /* TextFieldConvertible.swift */; };
@@ -64,6 +66,8 @@
 		C70FB10325BEF61D00C9924E /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		C70FB10625BEF61D00C9924E /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		C70FB10825BEF61D00C9924E /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		EA19BE6526F0DF37000C3CFC /* RefreshDataDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RefreshDataDelegate.swift; sourceTree = "<group>"; };
+		EA19BE6B26F0FA08000C3CFC /* Notification.Name+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Notification.Name+Extension.swift"; sourceTree = "<group>"; };
 		EA8E967B266DE472001280CF /* OpenMarketGridCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketGridCollectionViewCell.swift; sourceTree = "<group>"; };
 		EA8E967D266DF913001280CF /* CellLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellLayout.swift; sourceTree = "<group>"; };
 		EA8E967F266E4085001280CF /* CellDataUpdatable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellDataUpdatable.swift; sourceTree = "<group>"; };
@@ -90,7 +94,7 @@
 		EAC6ED47267CD789006DDA78 /* CurrencyTextField.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CurrencyTextField.swift; sourceTree = "<group>"; };
 		EAC8F7D226915ABA002A07C2 /* ImageCompressor.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCompressor.swift; sourceTree = "<group>"; };
 		EAD0EB2126D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketDetailedItemViewController.swift; sourceTree = "<group>"; };
-		EADC04D826DCBEB900A0DF6E /* OpenMarketItemToGet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemToGet.swift; sourceTree = "<group>"; };
+		EADC04D826DCBEB900A0DF6E /* OpenMarketItem.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItem.swift; sourceTree = "<group>"; };
 		EADC04DC26DD006200A0DF6E /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
 		EAED324D26EEF80A00892700 /* OpenMarketItemToPostOrPatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemToPostOrPatch.swift; sourceTree = "<group>"; };
 		EAED324F26EEF84200892700 /* TextFieldConvertible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldConvertible.swift; sourceTree = "<group>"; };
@@ -158,6 +162,7 @@
 				EA8E9682266E478A001280CF /* String+Extension.swift */,
 				EAEF60EF267B76D800D82B73 /* NSMutableData + Extension.swift */,
 				EADC04DC26DD006200A0DF6E /* Date+Extension.swift */,
+				EA19BE6B26F0FA08000C3CFC /* Notification.Name+Extension.swift */,
 			);
 			path = Utility;
 			sourceTree = "<group>";
@@ -181,7 +186,7 @@
 				EAB7856A2664D0BE0090C7FC /* Manager */,
 				EAB785682664CCEF0090C7FC /* OpenMarketItemList.swift */,
 				EA8E967D266DF913001280CF /* CellLayout.swift */,
-				EADC04D826DCBEB900A0DF6E /* OpenMarketItemToGet.swift */,
+				EADC04D826DCBEB900A0DF6E /* OpenMarketItem.swift */,
 				EAED324D26EEF80A00892700 /* OpenMarketItemToPostOrPatch.swift */,
 			);
 			path = Model;
@@ -213,6 +218,7 @@
 			children = (
 				EAEF60EC2678C31900D82B73 /* RemoveDelegate.swift */,
 				EAED324F26EEF84200892700 /* TextFieldConvertible.swift */,
+				EA19BE6526F0DF37000C3CFC /* RefreshDataDelegate.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -352,6 +358,7 @@
 			isa = PBXSourcesBuildPhase;
 			buildActionMask = 2147483647;
 			files = (
+				EA19BE6C26F0FA08000C3CFC /* Notification.Name+Extension.swift in Sources */,
 				EAB78586266613910090C7FC /* URLSessionProtocol.swift in Sources */,
 				EA8E9683266E478A001280CF /* String+Extension.swift in Sources */,
 				EAC6ED46267CD18B006DDA78 /* PasswordTextField.swift in Sources */,
@@ -371,7 +378,7 @@
 				EAEF60ED2678C31900D82B73 /* RemoveDelegate.swift in Sources */,
 				EAB785992668D8810090C7FC /* NetworkResponse.swift in Sources */,
 				C70FB0FF25BEF61C00C9924E /* OpenMarketViewController.swift in Sources */,
-				EADC04D926DCBEB900A0DF6E /* OpenMarketItemToGet.swift in Sources */,
+				EADC04D926DCBEB900A0DF6E /* OpenMarketItem.swift in Sources */,
 				EAC8F7D326915ABA002A07C2 /* ImageCompressor.swift in Sources */,
 				C70FB0FB25BEF61C00C9924E /* AppDelegate.swift in Sources */,
 				C70FB0FD25BEF61C00C9924E /* SceneDelegate.swift in Sources */,
@@ -379,6 +386,7 @@
 				EA8E967E266DF913001280CF /* CellLayout.swift in Sources */,
 				EAED325026EEF84200892700 /* TextFieldConvertible.swift in Sources */,
 				EAC6ED44267CCFDF006DDA78 /* StockTextField.swift in Sources */,
+				EA19BE6626F0DF37000C3CFC /* RefreshDataDelegate.swift in Sources */,
 				EAC6ED3C267C9E52006DDA78 /* TitleTextField.swift in Sources */,
 				EAC6ED40267CCC78006DDA78 /* PriceTextField.swift in Sources */,
 				EA8E967C266DE472001280CF /* OpenMarketGridCollectionViewCell.swift in Sources */,
