@@ -8,9 +8,9 @@
 import UIKit
 
 protocol TextFieldConvertible: AnyObject {
-    func convertTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?)
+    func convertTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?)
     
-    func convertPasswordTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?)
+    func convertPasswordTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?)
     
-    func convertOptionalTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?)
+    func convertOptionalTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?)
 }

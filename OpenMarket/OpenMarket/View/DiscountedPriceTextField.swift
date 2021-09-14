@@ -13,7 +13,7 @@ class DiscountedPriceTextField: UITextField {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.placeholder = OpenMarketItemToPost.discountedPrice.placeholder.description
+        self.placeholder = OpenMarketItemToPostOrPatch.discountedPrice.placeholder.description
         self.textColor = .black
         self.font = UIFont.preferredFont(forTextStyle: .body)
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -31,6 +31,6 @@ extension DiscountedPriceTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertOptionalTextFieldToDictionary(OpenMarketItemToPost.discountedPrice, textField.text)
+        textFieldDelegate?.convertOptionalTextFieldToDictionary(OpenMarketItemToPostOrPatch.discountedPrice, textField.text)
     }
 }

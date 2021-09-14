@@ -58,7 +58,6 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     private let itemStockLabel: UILabel = {
         let label = UILabel()
-        label.text = "재고: "
         label.adjustsFontForContentSizeCategory = true
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.textColor = .systemGray2
@@ -255,14 +254,13 @@ class OpenMarketDetailedItemViewController: UIViewController {
     }
     
     private func getOpenMarketItem() {
-        networkManager.getSingleItem(itemURL: OpenMarketAPI.urlForSingleItem, id: itemID) { [weak self] result in
+        networkManager.getSingleItem(itemURL: OpenMarketAPI.urlForSingleItemToGetPatchOrDelete, id: itemID) { [weak self] result in
             switch result {
             case .success(let item):
                 DispatchQueue.main.async {
                     self?.imageSliderCollectionView.reloadData()
                     self?.navigationItem.title = item.title
                     self?.applyUI(item)
-                    self?.hideView(false)
                 }
             case .failure(let error):
                 return NSLog(error.description)

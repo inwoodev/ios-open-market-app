@@ -38,11 +38,10 @@
 		EAD0EB2226D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAD0EB2126D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift */; };
 		EADC04D926DCBEB900A0DF6E /* OpenMarketItemToGet.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADC04D826DCBEB900A0DF6E /* OpenMarketItemToGet.swift */; };
 		EADC04DD26DD006200A0DF6E /* Date+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EADC04DC26DD006200A0DF6E /* Date+Extension.swift */; };
-		EAED324E26EEF80A00892700 /* OpenMarketItemToPost.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED324D26EEF80A00892700 /* OpenMarketItemToPost.swift */; };
+		EAED324E26EEF80A00892700 /* OpenMarketItemToPostOrPatch.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED324D26EEF80A00892700 /* OpenMarketItemToPostOrPatch.swift */; };
 		EAED325026EEF84200892700 /* TextFieldConvertible.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAED324F26EEF84200892700 /* TextFieldConvertible.swift */; };
 		EAEF60E526774DD900D82B73 /* OpenMarketItemViewController.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF60E426774DD900D82B73 /* OpenMarketItemViewController.swift */; };
 		EAEF60E9267892D200D82B73 /* ImagePickerCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF60E8267892D200D82B73 /* ImagePickerCollectionViewCell.swift */; };
-		EAEF60EB2678C16000D82B73 /* ImagePickerDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF60EA2678C16000D82B73 /* ImagePickerDelegate.swift */; };
 		EAEF60ED2678C31900D82B73 /* RemoveDelegate.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF60EC2678C31900D82B73 /* RemoveDelegate.swift */; };
 		EAEF60F0267B76D800D82B73 /* NSMutableData + Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAEF60EF267B76D800D82B73 /* NSMutableData + Extension.swift */; };
 /* End PBXBuildFile section */
@@ -93,11 +92,10 @@
 		EAD0EB2126D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketDetailedItemViewController.swift; sourceTree = "<group>"; };
 		EADC04D826DCBEB900A0DF6E /* OpenMarketItemToGet.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemToGet.swift; sourceTree = "<group>"; };
 		EADC04DC26DD006200A0DF6E /* Date+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "Date+Extension.swift"; sourceTree = "<group>"; };
-		EAED324D26EEF80A00892700 /* OpenMarketItemToPost.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemToPost.swift; sourceTree = "<group>"; };
+		EAED324D26EEF80A00892700 /* OpenMarketItemToPostOrPatch.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemToPostOrPatch.swift; sourceTree = "<group>"; };
 		EAED324F26EEF84200892700 /* TextFieldConvertible.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = TextFieldConvertible.swift; sourceTree = "<group>"; };
 		EAEF60E426774DD900D82B73 /* OpenMarketItemViewController.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemViewController.swift; sourceTree = "<group>"; };
 		EAEF60E8267892D200D82B73 /* ImagePickerCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerCollectionViewCell.swift; sourceTree = "<group>"; };
-		EAEF60EA2678C16000D82B73 /* ImagePickerDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImagePickerDelegate.swift; sourceTree = "<group>"; };
 		EAEF60EC2678C31900D82B73 /* RemoveDelegate.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = RemoveDelegate.swift; sourceTree = "<group>"; };
 		EAEF60EF267B76D800D82B73 /* NSMutableData + Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "NSMutableData + Extension.swift"; sourceTree = "<group>"; };
 /* End PBXFileReference section */
@@ -184,7 +182,7 @@
 				EAB785682664CCEF0090C7FC /* OpenMarketItemList.swift */,
 				EA8E967D266DF913001280CF /* CellLayout.swift */,
 				EADC04D826DCBEB900A0DF6E /* OpenMarketItemToGet.swift */,
-				EAED324D26EEF80A00892700 /* OpenMarketItemToPost.swift */,
+				EAED324D26EEF80A00892700 /* OpenMarketItemToPostOrPatch.swift */,
 			);
 			path = Model;
 			sourceTree = "<group>";
@@ -213,7 +211,6 @@
 		EAB7857F2665D92C0090C7FC /* Protocol */ = {
 			isa = PBXGroup;
 			children = (
-				EAEF60EA2678C16000D82B73 /* ImagePickerDelegate.swift */,
 				EAEF60EC2678C31900D82B73 /* RemoveDelegate.swift */,
 				EAED324F26EEF84200892700 /* TextFieldConvertible.swift */,
 			);
@@ -364,11 +361,10 @@
 				EAB785692664CCEF0090C7FC /* OpenMarketItemList.swift in Sources */,
 				EA8E9680266E4085001280CF /* CellDataUpdatable.swift in Sources */,
 				EADC04DD26DD006200A0DF6E /* Date+Extension.swift in Sources */,
-				EAEF60EB2678C16000D82B73 /* ImagePickerDelegate.swift in Sources */,
 				EAEF60E9267892D200D82B73 /* ImagePickerCollectionViewCell.swift in Sources */,
 				EAB7856E2664D1CE0090C7FC /* OpenMarketAPI.swift in Sources */,
 				EAB78592266639780090C7FC /* NetworkManageable.swift in Sources */,
-				EAED324E26EEF80A00892700 /* OpenMarketItemToPost.swift in Sources */,
+				EAED324E26EEF80A00892700 /* OpenMarketItemToPostOrPatch.swift in Sources */,
 				EAEF60E526774DD900D82B73 /* OpenMarketItemViewController.swift in Sources */,
 				EAD0EB2226D670FF0029BE6C /* OpenMarketDetailedItemViewController.swift in Sources */,
 				EAB785662664C9760090C7FC /* HTTPMethods.swift in Sources */,

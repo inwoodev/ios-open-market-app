@@ -13,7 +13,7 @@ class PasswordTextField: UITextField {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.placeholder = OpenMarketItemToPost.password.placeholder.description
+        self.placeholder = OpenMarketItemToPostOrPatch.password.placeholder.description
         self.textColor = .black
         self.font = UIFont.preferredFont(forTextStyle: .body)
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -31,6 +31,6 @@ extension PasswordTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertPasswordTextFieldToDictionary(OpenMarketItemToPost.password, textField.text)
+        textFieldDelegate?.convertPasswordTextFieldToDictionary(OpenMarketItemToPostOrPatch.password, textField.text)
     }
 }

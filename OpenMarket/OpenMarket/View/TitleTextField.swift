@@ -13,7 +13,7 @@ class TitleTextField: UITextField {
     
     override init(frame: CGRect) {
         super.init(frame: frame)
-        self.placeholder = OpenMarketItemToPost.title.placeholder.description
+        self.placeholder = OpenMarketItemToPostOrPatch.title.placeholder.description
         self.textColor = .black
         self.font = UIFont.preferredFont(forTextStyle: .body)
         self.translatesAutoresizingMaskIntoConstraints = false
@@ -30,6 +30,6 @@ extension TitleTextField: UITextFieldDelegate {
     }
     
     func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPost.title, textField.text)
+        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.title, textField.text)
     }
 }
