@@ -103,7 +103,6 @@ class OpenMarketViewController: UIViewController {
                     self.openMarketCollectionView.reloadData()
                     self.activityIndicator.stopAnimating()
                     self.networkManager.isReadyToPaginate = true
-                    self.openMarketCollectionView.setContentOffset(.zero, animated: true)
                 }
             case .failure(let error):
                 print(error.localizedDescription)

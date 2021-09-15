@@ -9,6 +9,10 @@ import UIKit
 
 class OpenMarketDetailedItemViewController: UIViewController {
     
+    enum UserChoice {
+        case edit, delete
+    }
+    
     // MARK: - Properties
     
     private let networkManager: NetworkManageable = NetworkManager()
@@ -335,12 +339,12 @@ class OpenMarketDetailedItemViewController: UIViewController {
     private func alertEditOrDeleteItem() {
         let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .actionSheet)
         let cancelAction = UIAlertAction(title: "취소", style: .cancel, handler: nil)
-        let editAction = UIAlertAction(title: "수정", style: .default) { [weak self] alertAction in
-            self?.alertInsertPassword()
+        let editAction = UIAlertAction(title: "수정", style: .default) { alertAction in
+            self.alertInsertPassword(userChoice: .edit)
             
         }
         let deleteAction = UIAlertAction(title: "삭제", style: .default) { alertAction in
-            
+            self.alertInsertPassword(userChoice: .delete)
         }
         alertController.addAction(editAction)
         alertController.addAction(deleteAction)
@@ -359,14 +363,14 @@ class OpenMarketDetailedItemViewController: UIViewController {
 
 extension OpenMarketDetailedItemViewController {
     
-    private func alertInsertPassword() {
-        let alertController = UIAlertController(title: "패스워드 입력", message: "수정하기 위해서는 패스워드 입력이 필요합니다.", preferredStyle: .alert)
+    private func alertInsertPassword(userChoice: UserChoice) {
+        let alertController = UIAlertController(title: "패스워드 입력", message: "패스워드 입력이 필요합니다.", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "Ok", style: .default) { ok in
             
             guard let passwordTextField = alertController.textFields?.first,
                   let insertedPassword = passwordTextField.text else { return }
             
-            self.isPasswordValid(insertedPassword)
+            self.usePasswordToEditOrDeleteItem(userChoice: userChoice, insertedPassword)
         }
         
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { cancel in
@@ -384,15 +388,27 @@ extension OpenMarketDetailedItemViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
-    private func isPasswordValid(_ password: String) {
-        networkManager.patchSingleItem(url: "\(OpenMarketAPI.urlForSingleItemToGetPatchOrDelete)\(itemID)", texts: [OpenMarketItemToPostOrPatch.password.key: password], images: nil) { [weak self] response in
-            if (200...299).contains(response.statusCode) {
+    private func usePasswordToEditOrDeleteItem(userChoice: UserChoice, _ password: String) {
+        
+        switch userChoice {
+        case .edit:
+            networkManager.patchSingleItem(url: "\(OpenMarketAPI.urlForSingleItemToGetPatchOrDelete)\(itemID)", texts: [OpenMarketItemToPostOrPatch.password.key: password], images: nil) { [weak self] response in
                 DispatchQueue.main.async {
-                    self?.proceedToEditItem(password)
+                    if (200...299).contains(response.statusCode) {
+                        self?.proceedToEditItem(password)
+                    } else if response.statusCode == 404 {
+                        self?.alertInvalidPassword(.edit)
+                    }
                 }
-            } else if response.statusCode == 404 {
+            }
+        case .delete:
+            networkManager.deleteSingleItem(url: "\(OpenMarketAPI.urlForSingleItemToGetPatchOrDelete)", id: itemID, password: password) { [weak self] response in
                 DispatchQueue.main.async {
-                    self?.alertInvalidPassword()
+                    if (200...299).contains(response.statusCode) {
+                        self?.alertDeleteConfirmation()
+                    } else {
+                        self?.alertInvalidPassword(.delete)
+                    }
                 }
             }
         }
@@ -405,10 +421,28 @@ extension OpenMarketDetailedItemViewController {
         navigationController?.pushViewController(editItemViewController, animated: true)
     }
     
-    private func alertInvalidPassword() {
+    private func alertDeleteConfirmation() {
+        let alertController = UIAlertController(title: "주의", message: "삭제 후 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "OK", style: .default) { ok in
+            self.notifyThatAnItemIsDeleted()
+            self.navigationController?.popToRootViewController(animated: true)
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { cancel in
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        alertController.addAction(okAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    private func notifyThatAnItemIsDeleted() {
+        NotificationCenter.default.post(name: .needToRefreshItemList, object: nil)
+    }
+    
+    private func alertInvalidPassword(_ userChoice: UserChoice) {
         let alertController = UIAlertController(title: "패스워드 오류", message: "잘못된 패스워드입니다.", preferredStyle: .alert)
         let retryAction = UIAlertAction(title: "재시도", style: .default) { [weak self] retry in
-            self?.alertInsertPassword()
+            self?.alertInsertPassword(userChoice: userChoice)
         }
         let cancelAction = UIAlertAction(title: "취소", style: .cancel) { cancel in
             alertController.dismiss(animated: true, completion: nil)

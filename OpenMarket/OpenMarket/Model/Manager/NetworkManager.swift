@@ -164,6 +164,42 @@ final class NetworkManager: NetworkManageable {
             }
         }
         dataTask?.resume()
+    }
+    
+    func deleteSingleItem(url: String, id: Int, password: String, completionHandler: @escaping(HTTPURLResponse) -> Void) {
+        guard let validURL = URL(string: "\(url)\(id)") else { return }
         
+        var request = URLRequest(url: validURL)
+        request.httpMethod = HTTPMethods.delete.description
+        request.addValue("application/json",forHTTPHeaderField: "Content-Type")
+        
+        let passwordJSONModel = OpenMarketItemToDelete(password: password)
+        
+        guard let encodedPassword = try? JSONEncoder().encode(passwordJSONModel) else {
+            NSLog(DataError.encoding.description)
+            return
+        }
+        request.httpBody = encodedPassword
+        
+        NSLog(String(describing: request.allHTTPHeaderFields))
+        print("----------")
+        print(String(decoding: request.httpBody!, as: UTF8.self))
+        print("----------")
+        
+        dataTask = urlSession.dataTask(with: request, completionHandler: { data, response, error in
+            if let error = error {
+                NSLog(error.localizedDescription)
+                return
+            }
+            
+            guard let successfulResponse = response as? HTTPURLResponse else {
+                if let failedResponse = response as? HTTPURLResponse {
+                    completionHandler(failedResponse)
+                }
+                return
+            }
+            completionHandler(successfulResponse)
+        })
+        dataTask?.resume()
     }
 }

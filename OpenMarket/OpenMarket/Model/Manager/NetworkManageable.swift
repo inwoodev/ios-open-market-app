@@ -21,6 +21,8 @@ protocol NetworkManageable {
     
     func patchSingleItem(url: String, texts: [String : Any?], images: [UIImage]?, completionHandler: @escaping (HTTPURLResponse) -> Void)
     
+    func deleteSingleItem(url: String, id: Int, password: String, completionHandler: @escaping(HTTPURLResponse) -> Void)
+    
 }
 extension NetworkManageable {
     func examineNetworkResponse(page: Int, completionHandler: @escaping (_ result: Result <HTTPURLResponse, Error>) -> Void) {
