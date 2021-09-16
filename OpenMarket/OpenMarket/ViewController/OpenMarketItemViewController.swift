@@ -318,9 +318,14 @@ extension OpenMarketItemViewController {
         }
         
         self.present(alertController, animated: true) {
-            alertController.dismiss(animated: true) {
-                self.notifyToRefreshItemList()
-                self.navigationController?.popToRootViewController(animated: true)
+            
+            let delay = DispatchTime.now() + 1
+            
+            DispatchQueue.main.asyncAfter(deadline: delay) {
+                alertController.dismiss(animated: true) {
+                    self.navigationController?.popToRootViewController(animated: true)
+                    self.notifyToRefreshItemList()
+                }
             }
         }
     }

@@ -425,7 +425,10 @@ extension OpenMarketDetailedItemViewController {
         let alertController = UIAlertController(title: "주의", message: "삭제 후 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default) { ok in
             self.notifyThatAnItemIsDeleted()
-            self.navigationController?.popToRootViewController(animated: true)
+            alertController.dismiss(animated: true) {
+                self.alertSuccessfulDeletion()
+            }
+            
         }
         let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { cancel in
             alertController.dismiss(animated: true, completion: nil)
@@ -433,6 +436,20 @@ extension OpenMarketDetailedItemViewController {
         alertController.addAction(okAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    private func alertSuccessfulDeletion() {
+        let alertController = UIAlertController(title: "상품 삭제 완료", message: "상품이 정상적으로 삭제되었습니다.", preferredStyle: .alert)
+        
+        self.present(alertController, animated: true) {
+            let delay = DispatchTime.now() + 1
+            
+            DispatchQueue.main.asyncAfter(deadline: delay) {
+                alertController.dismiss(animated: true) {
+                    self.navigationController?.popToRootViewController(animated: true)
+                }
+            }
+        }
     }
     
     private func notifyThatAnItemIsDeleted() {
