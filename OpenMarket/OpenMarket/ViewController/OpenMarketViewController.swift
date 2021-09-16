@@ -21,6 +21,13 @@ class OpenMarketViewController: UIViewController {
         return activityIndicator
     }()
     
+    private let refreshControl: UIRefreshControl = {
+        let refreshControl = UIRefreshControl()
+        refreshControl.addTarget(self, action: #selector(refreshItemList), for: .valueChanged)
+        refreshControl.tintColor = .systemBlue
+        return refreshControl
+    }()
+    
     private let openMarketCollectionView: UICollectionView = {
         let flowlayout = UICollectionViewFlowLayout()
         flowlayout.scrollDirection = .vertical
@@ -69,6 +76,7 @@ class OpenMarketViewController: UIViewController {
         self.view.addSubview(openMarketCollectionView)
         openMarketCollectionView.delegate = self
         openMarketCollectionView.dataSource = self
+        openMarketCollectionView.refreshControl = refreshControl
     }
     
     private func setUpActivityIndicator() {
@@ -142,11 +150,11 @@ extension OpenMarketViewController {
     
     
     @objc private func refreshItemList() {
-        let firstPage = 1
+        let firstPage = 0
         nextPageToLoad = firstPage
         openMarketItems = []
-        activityIndicator.startAnimating()
-        fetchOpenMarketItems()
+        openMarketCollectionView.reloadData()
+        refreshControl.endRefreshing()
     }
 }
 
@@ -237,7 +245,7 @@ extension OpenMarketViewController: UICollectionViewDelegate {
 
 extension OpenMarketViewController: UIScrollViewDelegate {
     
-    // MARK: - Fetch additional Data
+    // MARK: - Fetch Data After Dragging
     
     func scrollViewDidScroll(_ scrollView: UIScrollView) {
         let position = scrollView.contentOffset.y
