@@ -8,8 +8,6 @@
 import UIKit
 
 class StockTextField: UITextField {
-
-    weak var textFieldDelegate: TextFieldConvertible?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -20,20 +18,9 @@ class StockTextField: UITextField {
         self.translatesAutoresizingMaskIntoConstraints = false
         self.textAlignment = .right
         self.keyboardType = .numberPad
-        self.delegate = self
         self.setContentHuggingPriority(.defaultHigh, for: .horizontal)
     }
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-    }
-}
-extension StockTextField: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.stock, textField.text)
     }
 }

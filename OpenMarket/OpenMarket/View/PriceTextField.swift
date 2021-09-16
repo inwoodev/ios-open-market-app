@@ -8,8 +8,6 @@
 import UIKit
 
 class PriceTextField: UITextField {
-
-    weak var textFieldDelegate: TextFieldConvertible?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -18,20 +16,8 @@ class PriceTextField: UITextField {
         self.font = UIFont.preferredFont(forTextStyle: .body)
         self.translatesAutoresizingMaskIntoConstraints = false
         self.keyboardType = .numberPad
-        self.delegate = self
     }
     required init?(coder: NSCoder) {
         super.init(coder: coder)
     }
 }
-extension PriceTextField: UITextFieldDelegate {
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.price, textField.text)
-    }
-}
-

@@ -8,8 +8,6 @@
 import UIKit
 
 class CurrencyTextField: UITextField {
-
-    weak var textFieldDelegate: TextFieldConvertible?
     
     override init(frame: CGRect) {
         super.init(frame: frame)
@@ -18,23 +16,8 @@ class CurrencyTextField: UITextField {
         self.font = UIFont.preferredFont(forTextStyle: .title3)
         self.tintColor = .clear
         self.translatesAutoresizingMaskIntoConstraints = false
-        self.delegate = self
     }
     required init?(coder: NSCoder) {
         super.init(coder: coder)
-    }
-}
-extension CurrencyTextField: UITextFieldDelegate {
-    func textFieldDidBeginEditing(_ textField: UITextField) {
-        textField.text = "KRW"
-    }
-    
-    func textFieldShouldReturn(_ textField: UITextField) -> Bool {
-        textField.resignFirstResponder()
-        return true
-    }
-    
-    func textFieldDidEndEditing(_ textField: UITextField) {
-        textFieldDelegate?.convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.currency, textField.text)
     }
 }

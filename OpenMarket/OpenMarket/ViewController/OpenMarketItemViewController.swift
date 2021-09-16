@@ -58,6 +58,8 @@ class OpenMarketItemViewController: UIViewController {
         textView.text = "상품 정보를 입력 해 주세요."
         textView.textColor = .black
         textView.translatesAutoresizingMaskIntoConstraints = false
+        textView.autocorrectionType = .no
+        textView.autocapitalizationType = .none
         
         return textView
     }()
@@ -172,7 +174,6 @@ class OpenMarketItemViewController: UIViewController {
     }
     
     private func applyCurrencyTextField() {
-        currencyTextField.textFieldDelegate = self
         currencyTextField.inputView = currencyPickerView
         currencyTextField.inputAccessoryView = currencyPickerViewToolbar
     }
@@ -210,11 +211,12 @@ class OpenMarketItemViewController: UIViewController {
     // MARK: - assign Delegates
     
     private func setDelegates() {
-        titleTextField.textFieldDelegate = self
-        priceTextField.textFieldDelegate = self
-        discountedPriceTextField.textFieldDelegate = self
-        stockTextField.textFieldDelegate = self
-        passwordTextField.textFieldDelegate = self
+        titleTextField.delegate = self
+        currencyTextField.delegate = self
+        priceTextField.delegate = self
+        discountedPriceTextField.delegate = self
+        stockTextField.delegate = self
+        passwordTextField.delegate = self
         detailedInformationTextView.delegate = self
         currencyPickerView.dataSource = self
         currencyPickerView.delegate = self
@@ -487,11 +489,27 @@ extension OpenMarketItemViewController: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if textField == titleTextField {
+            convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.title, textField.text)
+        } else if textField == priceTextField {
+            convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.price, textField.text)
+        } else if textField == discountedPriceTextField {
+            convertOptionalTextFieldToDictionary(OpenMarketItemToPostOrPatch.discountedPrice, textField.text)
+        } else if textField == currencyTextField {
+            convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.currency, textField.text)
+        } else if textField == stockTextField {
+            convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.stock, textField.text)
+        } else if textField == passwordTextField {
+            convertPasswordTextFieldToDictionary(OpenMarketItemToPostOrPatch.password, textField.text)
+        }
+    }
 }
 
-// MARK: - TextFieldConvertible
+// MARK: - Convert Texts to Dictionary
 
-extension OpenMarketItemViewController: TextFieldConvertible {
+extension OpenMarketItemViewController {
     
     private func alertInvalidPassword() {
         let alertController = UIAlertController(title: "비밀번호 설정", message: "비밀번호를 영문, 숫자를 사용해서 입력 해 주세요", preferredStyle: .alert)
