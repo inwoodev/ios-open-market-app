@@ -67,7 +67,9 @@ class OpenMarketViewController: UIViewController {
     
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
-        openMarketCollectionView.collectionViewLayout.invalidateLayout()
+        coordinator.animate(alongsideTransition: { (_) in
+            self.openMarketCollectionView.collectionViewLayout.invalidateLayout()
+        }, completion: nil)
     }
     
     // MARK: - Setup CollectionView

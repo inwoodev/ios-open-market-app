@@ -24,6 +24,22 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     // MARK: - Views
     
+    private let contentScrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.backgroundColor = .white
+        scrollView.showsVerticalScrollIndicator = false
+        
+        return scrollView
+    }()
+    
+    private let contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        return view
+    }()
+    
     private let imageSliderCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
         layout.scrollDirection = .horizontal
@@ -197,6 +213,18 @@ class OpenMarketDetailedItemViewController: UIViewController {
         self.view.backgroundColor = .white
     }
     
+    override func viewWillAppear(_ animated: Bool) {
+        super.viewDidLoad()
+        self.view.layoutIfNeeded()
+    }
+    
+    override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
+        super.viewWillTransition(to: size, with: coordinator)
+        coordinator.animate(alongsideTransition: { (_) in
+            self.imageSliderCollectionView.collectionViewLayout.invalidateLayout()
+        }, completion: nil)
+    }
+    
     private func addSubviews() {
         stockStackView.addArrangedSubview(itemStockLabel)
         stockStackView.addArrangedSubview(itemStockTextLabel)
@@ -212,40 +240,59 @@ class OpenMarketDetailedItemViewController: UIViewController {
         
         
         [imageSliderCollectionView, imageSlider, stockStackView, leftlabelsStackView,  moneyStackView, itemDetailedDescriptionLabel].forEach { view in
-            self.view.addSubview(view)
+            contentView.addSubview(view)
         }
+        
+        contentScrollView.addSubview(contentView)
+        self.view.addSubview(contentScrollView)
     }
     
     private func setUpUIConstraint() {
+        
+        let contentViewHeight = contentView.heightAnchor.constraint(greaterThanOrEqualTo: self.view.heightAnchor)
+        contentViewHeight.priority = .defaultLow
+        
         NSLayoutConstraint.activate([
-            imageSliderCollectionView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 5),
-            imageSliderCollectionView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
-            imageSliderCollectionView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
-            imageSliderCollectionView.bottomAnchor.constraint(equalTo: imageSlider.topAnchor, constant: -5),
+            contentScrollView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            contentScrollView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
+            contentScrollView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
+            contentScrollView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
+            contentView.topAnchor.constraint(equalTo: contentScrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: contentScrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: contentScrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: contentScrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: contentScrollView.widthAnchor),
+            contentViewHeight,
             
-            imageSlider.centerXAnchor.constraint(equalTo: self.view.centerXAnchor),
+            imageSliderCollectionView.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 5),
+            imageSliderCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            imageSliderCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            imageSliderCollectionView.bottomAnchor.constraint(equalTo: imageSlider.topAnchor, constant: -5),
+//            imageSliderCollectionView.heightAnchor.constraint(greaterThanOrEqualToConstant: self.view.frame.height / 3),
+            
+            imageSlider.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             imageSlider.bottomAnchor.constraint(equalTo: leftlabelsStackView.topAnchor, constant: -5),
             
-            leftlabelsStackView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
+            leftlabelsStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
             leftlabelsStackView.widthAnchor.constraint(equalToConstant: self.view.frame.width / 2),
             
             stockStackView.widthAnchor.constraint(lessThanOrEqualToConstant: self.view.frame.width / 2),
             stockStackView.topAnchor.constraint(equalTo: leftlabelsStackView.topAnchor),
-            stockStackView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+            stockStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
             
             
             moneyStackView.topAnchor.constraint(equalTo: stockStackView.bottomAnchor, constant: 5),
-            moneyStackView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+            moneyStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
             moneyStackView.widthAnchor.constraint(lessThanOrEqualToConstant: self.view.frame.width / 2),
             moneyStackView.bottomAnchor.constraint(equalTo: leftlabelsStackView.bottomAnchor),
             itemPriceCurrencyLabel.heightAnchor.constraint(equalTo: moneyStackView.heightAnchor),
             
             itemDetailedDescriptionLabel.topAnchor.constraint(equalTo: leftlabelsStackView.bottomAnchor, constant: 5),
-            itemDetailedDescriptionLabel.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
-            itemDetailedDescriptionLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+            itemDetailedDescriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            itemDetailedDescriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
             
         ])
-        bottomConstraint = itemDetailedDescriptionLabel.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -5)
+        bottomConstraint = itemDetailedDescriptionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5)
         bottomConstraint?.isActive = true
     }
     
@@ -504,6 +551,7 @@ extension OpenMarketDetailedItemViewController: UICollectionViewDelegate {
 
 extension OpenMarketDetailedItemViewController: UICollectionViewDelegateFlowLayout {
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
+        
         let height = collectionView.frame.height
         let width = collectionView.frame.width
         

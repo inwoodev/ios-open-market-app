@@ -35,6 +35,22 @@ class OpenMarketItemViewController: UIViewController {
     
     // MARK: - Views
     
+    private let contentScrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.backgroundColor = .white
+        scrollView.showsVerticalScrollIndicator = false
+        
+        return scrollView
+    }()
+    
+    private let contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        return view
+    }()
+    
     private let titleTextField = TitleTextField()
     private let priceTextField = PriceTextField()
     private let discountedPriceTextField = DiscountedPriceTextField()
@@ -156,13 +172,13 @@ class OpenMarketItemViewController: UIViewController {
     override func viewDidLoad() {
         super.viewDidLoad()
         overrideUserInterfaceStyle = .light
-        self.view.backgroundColor = .white
         setUpNavigationItems()
         addSubviews()
         setUpUIConstraints()
         setDelegates()
         applyCurrencyTextField()
         setUpPasswordTextField()
+        self.view.backgroundColor = .white
     }
     
     func setItemIdentityToPatch(idNumber: Int) {
@@ -402,33 +418,49 @@ extension OpenMarketItemViewController {
         [titleTextField, passwordTextField, currencyAndPricesStackView, stockStackView].forEach { view in
             itemRegistrationInformationStackView.addArrangedSubview(view)
         }
-        self.view.addSubview(uploadImageButton)
-        self.view.addSubview(thumbnailCollectionView)
-        self.view.addSubview(itemRegistrationInformationStackView)
-        self.view.addSubview(detailedInformationTextView)
+        self.view.addSubview(contentScrollView)
+        contentScrollView.addSubview(contentView)
+        self.contentView.addSubview(uploadImageButton)
+        self.contentView.addSubview(thumbnailCollectionView)
+        self.contentView.addSubview(itemRegistrationInformationStackView)
+        self.contentView.addSubview(detailedInformationTextView)
     }
     
     private func setUpUIConstraints() {
         
+        let contentViewHeight = contentView.heightAnchor.constraint(greaterThanOrEqualTo: self.view.heightAnchor)
+        contentViewHeight.priority = .defaultLow
+        
         NSLayoutConstraint.activate([
+            contentScrollView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            contentScrollView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
+            contentScrollView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
+            contentScrollView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
             
-            uploadImageButton.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            uploadImageButton.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            uploadImageButton.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor),
+            contentView.topAnchor.constraint(equalTo: contentScrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: contentScrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: contentScrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: contentScrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: contentScrollView.widthAnchor),
+            contentViewHeight,
             
-            thumbnailCollectionView.heightAnchor.constraint(equalToConstant: self.view.frame.height / 6.5),
+            
+            uploadImageButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            uploadImageButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            
+            thumbnailCollectionView.heightAnchor.constraint(equalToConstant: view.frame.height / 6.5),
             thumbnailCollectionView.topAnchor.constraint(equalTo: uploadImageButton.bottomAnchor, constant: 5),
-            thumbnailCollectionView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
-            thumbnailCollectionView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+            thumbnailCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            thumbnailCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
             
             itemRegistrationInformationStackView.topAnchor.constraint(equalTo: thumbnailCollectionView.bottomAnchor, constant: 5),
-            itemRegistrationInformationStackView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            itemRegistrationInformationStackView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            itemRegistrationInformationStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            itemRegistrationInformationStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             itemRegistrationInformationStackView.bottomAnchor.constraint(equalTo: detailedInformationTextView.topAnchor, constant: -5),
             
-            detailedInformationTextView.leadingAnchor.constraint(equalTo: self.view.leadingAnchor, constant: 10),
-            detailedInformationTextView.trailingAnchor.constraint(equalTo: self.view.trailingAnchor, constant: -10),
-            detailedInformationTextView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -5)
+            detailedInformationTextView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            detailedInformationTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            detailedInformationTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5)
         ])
     }
 }
