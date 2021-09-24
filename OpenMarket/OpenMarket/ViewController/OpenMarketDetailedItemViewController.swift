@@ -253,7 +253,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         contentViewHeight.priority = .defaultLow
         
         NSLayoutConstraint.activate([
-            contentScrollView.topAnchor.constraint(equalTo: self.view.topAnchor),
+            contentScrollView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
             contentScrollView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
             contentScrollView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
             contentScrollView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
@@ -268,8 +268,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
             imageSliderCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
             imageSliderCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
             imageSliderCollectionView.bottomAnchor.constraint(equalTo: imageSlider.topAnchor, constant: -5),
-//            imageSliderCollectionView.heightAnchor.constraint(greaterThanOrEqualToConstant: self.view.frame.height / 3),
-            
+            imageSliderCollectionView.heightAnchor.constraint(equalToConstant: self.view.frame.height / 2),
             imageSlider.centerXAnchor.constraint(equalTo: contentView.centerXAnchor),
             imageSlider.bottomAnchor.constraint(equalTo: leftlabelsStackView.topAnchor, constant: -5),
             
