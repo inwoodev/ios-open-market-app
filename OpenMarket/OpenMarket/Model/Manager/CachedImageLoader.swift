@@ -7,8 +7,6 @@
 
 import UIKit
 
-let cache = ImageCache<NSString, UIImage>()
-
 final class CachedImageLoader {
     
     private let imageDownloader: ImageDownloadable
@@ -21,7 +19,7 @@ final class CachedImageLoader {
     func loadImageWithCache(with link: String, completion: @escaping (UIImage) ->()) {
         let nsText = link as NSString
         
-        if let cachedImage = cache[nsText] {
+        if let cachedImage = CacheManager.cache[nsText] {
             print("return cachedImage")
             return completion(cachedImage)
         }
@@ -31,7 +29,7 @@ final class CachedImageLoader {
             case .failure(let error):
                 NSLog(error.localizedDescription)
             case .success(let image):
-                cache.insert(image, forkey: nsText)
+                CacheManager.cache.insert(image, forkey: nsText)
                 return completion(image)
             }
         }

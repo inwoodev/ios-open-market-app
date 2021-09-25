@@ -33,6 +33,7 @@
 		EA5DCEE626F1A9F300A793CC /* OpenMarketItemToDelete.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5DCEE526F1A9F300A793CC /* OpenMarketItemToDelete.swift */; };
 		EA5DCF2626F4AFAB00A793CC /* ImageCache.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA5DCF2526F4AFAB00A793CC /* ImageCache.swift */; };
 		EA8592B626FDFD32003E1FA7 /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8592B526FDFD32003E1FA7 /* UIImageView+Extension.swift */; };
+		EA8592B826FF724A003E1FA7 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8592B726FF724A003E1FA7 /* CacheManager.swift */; };
 		EA8E967C266DE472001280CF /* OpenMarketGridCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E967B266DE472001280CF /* OpenMarketGridCollectionViewCell.swift */; };
 		EA8E967E266DF913001280CF /* CellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E967D266DF913001280CF /* CellLayout.swift */; };
 		EA8E9683266E478A001280CF /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E9682266E478A001280CF /* String+Extension.swift */; };
@@ -102,6 +103,7 @@
 		EA5DCEE526F1A9F300A793CC /* OpenMarketItemToDelete.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemToDelete.swift; sourceTree = "<group>"; };
 		EA5DCF2526F4AFAB00A793CC /* ImageCache.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageCache.swift; sourceTree = "<group>"; };
 		EA8592B526FDFD32003E1FA7 /* UIImageView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
+		EA8592B726FF724A003E1FA7 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
 		EA8E967B266DE472001280CF /* OpenMarketGridCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketGridCollectionViewCell.swift; sourceTree = "<group>"; };
 		EA8E967D266DF913001280CF /* CellLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellLayout.swift; sourceTree = "<group>"; };
 		EA8E9682266E478A001280CF /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
@@ -253,6 +255,7 @@
 				EA47611E26F4ED1E00869211 /* MultipartFormDataBuilder.swift */,
 				EA47612026F4F37500869211 /* MultipartFormDataConverter.swift */,
 				EA47612A26F5139400869211 /* RequestBuilder.swift */,
+				EA8592B726FF724A003E1FA7 /* CacheManager.swift */,
 			);
 			path = Manager;
 			sourceTree = "<group>";
@@ -447,6 +450,7 @@
 				EA8E967E266DF913001280CF /* CellLayout.swift in Sources */,
 				EA47612326F4F3DD00869211 /* MultipartFormDataConvertible.swift in Sources */,
 				EA47612126F4F37500869211 /* MultipartFormDataConverter.swift in Sources */,
+				EA8592B826FF724A003E1FA7 /* CacheManager.swift in Sources */,
 				EAED325026EEF84200892700 /* TextFieldConvertible.swift in Sources */,
 				EAC6ED44267CCFDF006DDA78 /* StockTextField.swift in Sources */,
 				EA5DCF2626F4AFAB00A793CC /* ImageCache.swift in Sources */,
