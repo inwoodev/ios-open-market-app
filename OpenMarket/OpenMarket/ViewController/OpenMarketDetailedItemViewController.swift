@@ -305,14 +305,14 @@ class OpenMarketDetailedItemViewController: UIViewController {
         }
     }
     
-    private func applyUI(_ item: OpenMarketItemToGet) {
+    private func applyUI(_ item: OpenMarketItemWithDetailInformation) {
         self.itemTitleLabel.text = item.title
         self.itemStockLabel.text = "재고: "
         applyStockTextLabel(item)
         applyPriceTextLabel(item)
         self.itemRegistrationDateLabel.text = Date(timeIntervalSince1970: item.registrationDate).formattedString
         self.itemDetailedDescriptionLabel.text = item.descriptions
-        self.applyImages(item) { [weak self] images in
+        self.downloadImages(item) { [weak self] images in
             self?.sliderImages = images
             self?.imageSlider.numberOfPages = images.count
             self?.imageSliderCollectionView.reloadData()
@@ -334,7 +334,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         }
     }
     
-    private func applyPriceTextLabel(_ item: OpenMarketItemToGet){
+    private func applyPriceTextLabel(_ item: OpenMarketItemWithDetailInformation){
         if let discountedPrice = item.discountedPrice {
             itemPriceCurrencyLabel.text = item.currency
             
@@ -351,9 +351,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         }
     }
     
-    private func applyImages(_ item: OpenMarketItemToGet, completion: @escaping ([UIImage]) -> ()) {
-        var downloadedImages: [UIImage] = []
-        
+    private func downloadImages(_ item: OpenMarketItemWithDetailInformation, completion: @escaping ([UIImage]) -> Void) {
         let downloadedImageURLStrings = item.thumbnails
         
         var imageArray = [UIImage]()
