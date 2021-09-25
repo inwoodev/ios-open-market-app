@@ -22,6 +22,7 @@ class OpenMarketItemViewController: UIViewController {
     private var itemThumbnails: [UIImage] = []
     private var itemInformation: [String: Any?] = [:]
     private var itemID = Int()
+    private var bottomConstraint: NSLayoutConstraint?
     private let mode: Mode
     
     init(mode: Mode) {
@@ -72,10 +73,13 @@ class OpenMarketItemViewController: UIViewController {
         let textView = UITextView()
         textView.font = UIFont.preferredFont(forTextStyle: .body)
         textView.text = "상품 정보를 입력 해 주세요."
-        textView.textColor = .black
+        textView.textColor = .lightGray
         textView.translatesAutoresizingMaskIntoConstraints = false
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
+        textView.keyboardDismissMode = .interactive
+        textView.setContentHuggingPriority(.defaultLow, for: .vertical)
+        textView.isScrollEnabled = false
         
         return textView
     }()
@@ -178,6 +182,8 @@ class OpenMarketItemViewController: UIViewController {
         setDelegates()
         applyCurrencyTextField()
         setUpPasswordTextField()
+        adjustViewWhenKeyboardShows()
+        adjustViewWhenKeyboardHides()
         self.view.backgroundColor = .white
     }
     
@@ -218,6 +224,7 @@ class OpenMarketItemViewController: UIViewController {
             }
             self.stockTextField.text = String(validItem.stock)
             self.detailedInformationTextView.text = validItem.descriptions
+            self.detailedInformationTextView.textColor = .black
             self.currencyTextField.text = validItem.currency
             self.itemThumbnails = thumbnails
             self.passwordTextField.text = password
@@ -382,11 +389,38 @@ extension OpenMarketItemViewController {
         NotificationCenter.default.post(name: .needToRefreshItemList, object: nil)
     }
 
-    // MARK: - Method: hide keyboard when tapped around
+    // MARK: - Method: methods Regarding Keyboard
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         self.view.endEditing(true)
+    }
+    
+    private func adjustViewWhenKeyboardShows() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+            guard let userInfo = notification.userInfo else { return }
+            guard let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            self.bottomConstraint?.constant = -keyboardFrame.height - 10
+            
+            guard let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+            
+            UIView.animate(withDuration: duration) {
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+    
+    private func adjustViewWhenKeyboardHides() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { notification in
+            guard let userInfo = notification.userInfo,
+                  let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+            
+            self.bottomConstraint?.constant = -5
+            
+            UIView.animate(withDuration: duration) {
+                self.view.layoutIfNeeded()
+            }
+        }
     }
     
     // MARK: - setUp NavigationItems
@@ -435,7 +469,6 @@ extension OpenMarketItemViewController {
             contentScrollView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
             contentScrollView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
             contentScrollView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
-            contentScrollView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor),
             
             contentView.topAnchor.constraint(equalTo: contentScrollView.topAnchor),
             contentView.leadingAnchor.constraint(equalTo: contentScrollView.leadingAnchor),
@@ -458,10 +491,14 @@ extension OpenMarketItemViewController {
             itemRegistrationInformationStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             itemRegistrationInformationStackView.bottomAnchor.constraint(equalTo: detailedInformationTextView.topAnchor, constant: -5),
             
+            detailedInformationTextView.heightAnchor.constraint(equalToConstant: view.frame.height / 2),
             detailedInformationTextView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             detailedInformationTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             detailedInformationTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5)
         ])
+        
+        bottomConstraint = contentScrollView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
+        bottomConstraint?.isActive = true
     }
 }
 

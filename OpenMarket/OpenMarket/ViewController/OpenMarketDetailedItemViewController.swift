@@ -289,10 +289,9 @@ class OpenMarketDetailedItemViewController: UIViewController {
             itemDetailedDescriptionLabel.topAnchor.constraint(equalTo: leftlabelsStackView.bottomAnchor, constant: 5),
             itemDetailedDescriptionLabel.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
             itemDetailedDescriptionLabel.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
+            itemDetailedDescriptionLabel.bottomAnchor.constraint(equalTo: self.contentView.bottomAnchor, constant: -5)
             
         ])
-        bottomConstraint = itemDetailedDescriptionLabel.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5)
-        bottomConstraint?.isActive = true
     }
     
     private func setUpNavigationItems() {
