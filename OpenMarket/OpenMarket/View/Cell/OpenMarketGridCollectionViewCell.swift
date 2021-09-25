@@ -7,8 +7,7 @@
 
 import UIKit
 
-class OpenMarketGridCollectionViewCell: UICollectionViewCell, CellDataUpdatable {
-    var networkManager: NetworkManageable = NetworkManager()
+class OpenMarketGridCollectionViewCell: UICollectionViewCell {
     static let identifier: String = "OpenMarketGridCollectionViewCell"
     
     override init(frame: CGRect) {
@@ -124,26 +123,57 @@ extension OpenMarketGridCollectionViewCell {
     
     // MARK: - configure cell
     
-    func configure(_ openMarketItems: [OpenMarketItem], indexPath: Int) {
-        itemTitleLabel.text = openMarketItems[indexPath].title
-        itemPriceLabel.text = "\(openMarketItems[indexPath].currency) \(openMarketItems[indexPath].price)"
-        itemStockLabel.text = String(openMarketItems[indexPath].stock)
+    func configure(itemInformation: [OpenMarketItem], index: Int) {
+        let thumbnailDownloadLink = itemInformation[index].thumbnails[0]
         
-        configureDiscountedPriceLabel(openMarketItems, indexPath: indexPath)
-        configureStockLabel(openMarketItems, indexPath: indexPath)
-        DispatchQueue.global().async { [weak self] in
-            self?.networkManager.dataTask = self?.applyRequestedImage(openMarketItems, indexPath: indexPath)
-            self?.networkManager.dataTask?.resume()
-        }
+        itemTitleLabel.text = itemInformation[index].title
+        itemPriceLabel.text = "\(itemInformation[index].currency)\(itemInformation[index].price)"
+        self.configureDiscountedPriceLabel(itemInformation, indexPath: index)
+        self.configureStockLabel(itemInformation, indexPath: index)
+        itemThumbnail.applyDownloadedImage(link: thumbnailDownloadLink)
     }
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.networkManager.dataTask?.cancel()
         self.itemThumbnail.image = UIImage(named: "loadingPic")
         self.itemTitleLabel.text = nil
         self.itemPriceLabel.attributedText = .none
         self.itemStockLabel.text = nil
         self.itemDiscountedPriceLabel.text = nil
+    }
+    
+    func configureDiscountedPriceLabel(_ openMarketItems: [OpenMarketItem], indexPath: Int) {
+        if let discountedPrice = (openMarketItems[indexPath].discountedPrice) {
+            itemPriceLabel.textColor = .red
+            itemPriceLabel.attributedText = itemPriceLabel.text?.strikeThrough()
+            itemDiscountedPriceLabel.textColor = .black
+            itemDiscountedPriceLabel.text = "\(openMarketItems[indexPath].currency) \(discountedPrice)"
+        } else if openMarketItems[indexPath].discountedPrice == 0 {
+            itemPriceLabel.textColor = .red
+            itemPriceLabel.attributedText = itemPriceLabel.text?.strikeThrough()
+            itemDiscountedPriceLabel.textColor = .black
+            itemDiscountedPriceLabel.text = "무료 나눔"
+        }
+        
+        else {
+            itemPriceLabel.textColor = .black
+            itemDiscountedPriceLabel.text = nil
+        }
+        
+    }
+    
+    func configureStockLabel(_ openMarketItems: [OpenMarketItem], indexPath: Int) {
+        if openMarketItems[indexPath].stock == 0 {
+            itemStockLabel.textColor = .orange
+            itemStockLabel.text = "품절"
+        }
+        else if openMarketItems[indexPath].stock > 999 {
+            itemStockLabel.textColor = .black
+            itemStockLabel.text = "잔여수량 : 999+"
+        }
+        else {
+            itemStockLabel.textColor = .black
+            itemStockLabel.text = "잔여수량 : \(openMarketItems[indexPath].stock)"
+        }
     }
 }

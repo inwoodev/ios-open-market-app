@@ -15,10 +15,9 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     // MARK: - Properties
     
-    private let networkManager: NetworkManageable = NetworkManager()
-    private var bottomConstraint: NSLayoutConstraint?
-    private var openMarketItem: OpenMarketItemToGet?
-    var sliderImages = [UIImage]()
+    private let openMarketDataManager = OpenMarketDataManager(network: Network(), dataParser: DataParser(), multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder())
+    private var openMarketItem: OpenMarketItemWithDetailInformation?
+    private var sliderImages = [UIImage]()
     var itemID = Int()
     
     
@@ -213,11 +212,6 @@ class OpenMarketDetailedItemViewController: UIViewController {
         self.view.backgroundColor = .white
     }
     
-    override func viewWillAppear(_ animated: Bool) {
-        super.viewDidLoad()
-        self.view.layoutIfNeeded()
-    }
-    
     override func viewWillTransition(to size: CGSize, with coordinator: UIViewControllerTransitionCoordinator) {
         super.viewWillTransition(to: size, with: coordinator)
         coordinator.animate(alongsideTransition: { (_) in
@@ -299,18 +293,15 @@ class OpenMarketDetailedItemViewController: UIViewController {
     }
     
     private func getOpenMarketItem() {
-        networkManager.getSingleItem(itemURL: OpenMarketAPI.urlForSingleItemToGetPatchOrDelete, id: itemID) { [weak self] result in
-            switch result {
-            case .success(let item):
-                DispatchQueue.main.async {
-                    self?.imageSliderCollectionView.reloadData()
-                    self?.navigationItem.title = item.title
-                    self?.applyUI(item)
-                    self?.openMarketItem = item
-                }
-            case .failure(let error):
-                return NSLog(error.description)
+        openMarketDataManager.getOpenMarketItemModel(serverAPI: .singleItemToGetPatchOrDelete(itemID)) { [weak self] (item: OpenMarketItemWithDetailInformation) in
+            
+            DispatchQueue.main.async {
+                self?.imageSliderCollectionView.reloadData()
+                self?.navigationItem.title = item.title
+                self?.applyUI(item)
+                self?.openMarketItem = item
             }
+            
         }
     }
     
@@ -323,8 +314,11 @@ class OpenMarketDetailedItemViewController: UIViewController {
         self.itemDetailedDescriptionLabel.text = item.descriptions
         self.applyImages(item) { [weak self] images in
             self?.sliderImages = images
+            self?.imageSlider.numberOfPages = images.count
+            self?.imageSliderCollectionView.reloadData()
+            
         }
-        self.setUpImageSliderPageControl()
+        
     }
     
     private func assignDelegates() {
@@ -332,7 +326,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
         imageSliderCollectionView.delegate = self
     }
     
-    private func applyStockTextLabel(_ item: OpenMarketItemToGet) {
+    private func applyStockTextLabel(_ item: OpenMarketItemWithDetailInformation) {
         if item.stock > 999 {
             self.itemStockTextLabel.text = "999"
         } else {
@@ -362,23 +356,21 @@ class OpenMarketDetailedItemViewController: UIViewController {
         
         let downloadedImageURLStrings = item.thumbnails
         
-        downloadedImageURLStrings.forEach { string in
-            guard let imageURL = URL(string: string) else { return }
-            let downloadedimage = downloadImage(url: imageURL)
-            downloadedImages.append(downloadedimage)
-        }
-        completion(downloadedImages)
-    }
-    
-    private func downloadImage(url: URL) -> UIImage {
-        guard let data = try? Data(contentsOf: url),
-              let image = UIImage(data: data) else { return UIImage() }
-        return image
+        var imageArray = [UIImage]()
         
-    }
-    
-    private func setUpImageSliderPageControl() {
-        imageSlider.numberOfPages = sliderImages.count
+        let dispatchGroup = DispatchGroup()
+        
+        for urlString in downloadedImageURLStrings {
+            dispatchGroup.enter()
+            cachedImageLoader.loadImageWithCache(with: urlString) { image in
+                imageArray.append(image)
+                dispatchGroup.leave()
+            }
+        }
+        
+        dispatchGroup.notify(queue: .main) {
+            completion(imageArray)
+        }
     }
     
     private func alertEditOrDeleteItem() {
@@ -437,17 +429,17 @@ extension OpenMarketDetailedItemViewController {
         
         switch userChoice {
         case .edit:
-            networkManager.patchSingleItem(url: "\(OpenMarketAPI.urlForSingleItemToGetPatchOrDelete)\(itemID)", texts: [OpenMarketItemToPostOrPatch.password.key: password], images: nil) { [weak self] response in
+            openMarketDataManager.patchOpenMarketItemData(serverAPI: .singleItemToGetPatchOrDelete(itemID), texts: [OpenMarketItemToPostOrPatch.password.key: password], imageList: nil) { [weak self] response in
                 DispatchQueue.main.async {
                     if (200...299).contains(response.statusCode) {
                         self?.proceedToEditItem(password)
-                    } else if response.statusCode == 404 {
+                    } else {
                         self?.alertInvalidPassword(.edit)
                     }
                 }
             }
         case .delete:
-            networkManager.deleteSingleItem(url: "\(OpenMarketAPI.urlForSingleItemToGetPatchOrDelete)", id: itemID, password: password) { [weak self] response in
+            openMarketDataManager.deleteItemData(serverAPI: .singleItemToGetPatchOrDelete(itemID), password: password) { [weak self] response in
                 DispatchQueue.main.async {
                     if (200...299).contains(response.statusCode) {
                         self?.alertDeleteConfirmation()

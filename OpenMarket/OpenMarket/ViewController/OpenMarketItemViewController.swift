@@ -18,12 +18,12 @@ class OpenMarketItemViewController: UIViewController {
     private let currencyList = ["KRW", "USD", "BTC", "JPY", "EUR", "GBP", "CNY"]
     private let imagePicker = UIImagePickerController()
     private let textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
-    private let networkManager: NetworkManageable = NetworkManager()
     private var itemThumbnails: [UIImage] = []
     private var itemInformation: [String: Any?] = [:]
     private var itemID = Int()
     private var bottomConstraint: NSLayoutConstraint?
     private let mode: Mode
+    private let openMarketDataManager = OpenMarketDataManager(network: Network(), dataParser: nil, multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder())
     
     init(mode: Mode) {
         self.mode = mode
@@ -191,7 +191,7 @@ class OpenMarketItemViewController: UIViewController {
         self.itemID = idNumber
     }
     
-    func receiveInformation(of item: OpenMarketItemToGet?, images: [UIImage], password: String) {
+    func receiveInformation(of item: OpenMarketItemWithDetailInformation?, images: [UIImage], password: String) {
         configureUIForEditMode(item, thumbnails: images, password: password)
     }
     
@@ -211,7 +211,7 @@ class OpenMarketItemViewController: UIViewController {
         }
     }
     
-    private func configureUIForEditMode(_ item: OpenMarketItemToGet?, thumbnails: [UIImage], password: String) {
+    private func configureUIForEditMode(_ item: OpenMarketItemWithDetailInformation?, thumbnails: [UIImage], password: String) {
         if mode == .edit,
            let validItem = item {
             
@@ -285,9 +285,8 @@ extension OpenMarketItemViewController {
         
         self.present(alertController, animated: true, completion: nil)
     }
-    
     private func postItemToServer() {
-        self.networkManager.postSingleItem(url: OpenMarketAPI.urlForSingleItemToPost.description, texts: self.itemInformation, imageList: self.itemThumbnails) { [weak self] response in
+        self.openMarketDataManager.postOpenMarketItemData(serverAPI: .singleItemToPost, texts: itemInformation, imageList: itemThumbnails) { [weak self] response in
             DispatchQueue.main.async {
                 if (200...299).contains(response.statusCode) {
                     self?.alertSuccessfulResponseToUser()
@@ -297,7 +296,6 @@ extension OpenMarketItemViewController {
             }
         }
     }
-    
     
     private func alertProceedToEditItem() {
         let alertController = UIAlertController(title: "상품 수정", message: "정말로 상품을 수정하시겠습니까?", preferredStyle: .alert)
@@ -312,9 +310,8 @@ extension OpenMarketItemViewController {
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
     }
-    
     private func updateEditedItemInformation() {
-        self.networkManager.patchSingleItem(url: "\(OpenMarketAPI.urlForSingleItemToGetPatchOrDelete)\(itemID)", texts: itemInformation, images: itemThumbnails) { [weak self] response in
+        self.openMarketDataManager.patchOpenMarketItemData(serverAPI: .singleItemToGetPatchOrDelete(itemID), texts: itemInformation, imageList: itemThumbnails) { [weak self] response in
             DispatchQueue.main.async {
                 if (200...299).contains(response.statusCode) {
                     self?.alertSuccessfulResponseToUser()
