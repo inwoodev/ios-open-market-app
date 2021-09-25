@@ -7,11 +7,6 @@
 
 import Foundation
 
-enum NetworkResponseResult<String> {
-    case success
-    case failure(String)
-}
-
 enum NetworkResponseError: Error {
     case authenticationError, badRequest, outdated, failed, noData, unableToDecode
 }

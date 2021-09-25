@@ -25,4 +25,11 @@ extension String {
             range: NSMakeRange(0,attributeString.length))
         return attributeString
     }
+    
+    func createURL() -> URL {
+        guard let url = URL(string: self) else {
+            return URL(fileURLWithPath: "")
+        }
+        return url
+    }
 }

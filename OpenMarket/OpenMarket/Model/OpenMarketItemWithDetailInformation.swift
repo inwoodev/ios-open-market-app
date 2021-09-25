@@ -7,7 +7,7 @@
 
 import Foundation
 
-struct OpenMarketItemToGet: Decodable {
+struct OpenMarketItemWithDetailInformation: Decodable {
     var id: Int
     var title: String
     var price: Int
