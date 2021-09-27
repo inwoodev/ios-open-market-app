@@ -8,7 +8,7 @@
 import UIKit
 
 extension UIImageView {
-    private var imageLoader: CachedImageLoader {
+    private var imageLoader: CachedImageLoadable {
         return CachedImageLoader(imageDownloader: ImageDownloader(network: Network()))
     }
     

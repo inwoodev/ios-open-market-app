@@ -10,17 +10,13 @@ import Foundation
 final class ImageCache<Key: Hashable, Value> {
     private let wrappedKeyAndEntry = NSCache<WrappedKey, Entry>()
     
+    init(totalCostLimit: Int) {
+        self.wrappedKeyAndEntry.totalCostLimit = totalCostLimit
+    }
+    
     func insert(_ value: Value, forkey key: Key) {
         let entry = Entry(value: value)
-        var numberOfImages = 0
-        wrappedKeyAndEntry.countLimit = 80
-        
-        if numberOfImages < wrappedKeyAndEntry.countLimit {
-            wrappedKeyAndEntry.setObject(entry, forKey: WrappedKey(key))
-            numberOfImages += 1
-        } else {
-            wrappedKeyAndEntry.removeAllObjects()
-        }
+        wrappedKeyAndEntry.setObject(entry, forKey: WrappedKey(key))
         
     }
     

@@ -11,4 +11,5 @@ protocol ImageDownloadable: AnyObject {
     typealias downloadHandler = (Result<UIImage, Error>) ->()
     
     func downloadImage(url: URL, completion: @escaping downloadHandler)
+    func cancelDownloading()
 }

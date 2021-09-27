@@ -64,7 +64,6 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell {
         let imageView = UIImageView()
         imageView.translatesAutoresizingMaskIntoConstraints = false
         imageView.adjustsImageSizeForAccessibilityContentSizeCategory = true
-        imageView.image = UIImage(named: "loadingPic")
         imageView.contentMode = .scaleAspectFit
         return imageView
     }()
@@ -141,7 +140,7 @@ extension OpenMarketListCollectionViewCell {
     
     override func prepareForReuse() {
         super.prepareForReuse()
-        self.itemThumbnail.image = UIImage(named: "loadingPic")
+        self.itemThumbnail.image = nil
         self.itemTitleLabel.text = nil
         self.itemPriceLabel.attributedText = .none
         self.itemStockLabel.text = nil

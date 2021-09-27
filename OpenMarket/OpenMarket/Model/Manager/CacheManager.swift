@@ -8,6 +8,6 @@
 import UIKit
 
 final class CacheManager {
-    static let cache = ImageCache<NSString, UIImage>()
+    static let cache = ImageCache<NSString, UIImage>(totalCostLimit: 500 * 1024 * 1024)
     private init() { }
 }

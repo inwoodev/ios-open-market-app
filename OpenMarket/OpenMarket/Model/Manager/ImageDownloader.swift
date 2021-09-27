@@ -28,7 +28,7 @@ final class ImageDownloader: ImageDownloadable {
         })
     }
     
-    func cancelImageDownload() {
+    func cancelDownloading() {
         network?.cancel()
     }
 }

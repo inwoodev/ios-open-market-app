@@ -9,6 +9,5 @@ import Foundation
 
 protocol Networkable: AnyObject {    
     func load(request: URLRequest, completion: @escaping (Data?, HTTPURLResponse?, NetworkResponseError?) -> ())
-    
     func cancel()
 }

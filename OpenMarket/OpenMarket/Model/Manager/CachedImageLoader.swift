@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class CachedImageLoader {
+final class CachedImageLoader: CachedImageLoadable {
     
     private let imageDownloader: ImageDownloadable
     
@@ -33,5 +33,9 @@ final class CachedImageLoader {
                 return completion(image)
             }
         }
+    }
+    
+    func cancelLoading() {
+        imageDownloader.cancelDownloading()
     }
 }
