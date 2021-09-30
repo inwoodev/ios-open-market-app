@@ -8,6 +8,7 @@
 import UIKit
 
 protocol ImageDownloadable: AnyObject {
+    var network: Networkable { get }
     typealias downloadHandler = (Result<UIImage, Error>) ->()
     
     func downloadImage(url: URL, completion: @escaping downloadHandler)

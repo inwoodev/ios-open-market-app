@@ -8,96 +8,82 @@
 import XCTest
 @testable import OpenMarket
 final class OpenMarketNetworkTests: XCTestCase {
-    var sut_networkManager: NetworkManageable!
+    var sut_network: Networkable!
+    var mock_URLRequest: URLRequest!
+    let firstPage = 1
     
     override func setUpWithError() throws {
         try super.setUpWithError()
-        sut_networkManager = NetworkManager(urlSession: MockURLSession())
+        
+        // given
+        let itemListFirstPageAPI = OpenMarketServerAPI.itemList(firstPage).URL
+        mock_URLRequest = URLRequest(url: itemListFirstPageAPI)
     }
 
     override func tearDownWithError() throws {
         try super.tearDownWithError()
-        sut_networkManager = nil
+        sut_network = nil
+        mock_URLRequest = nil
 
     }
     
-    func test_networkResponse_successfulResponse_receiveStatusCode200() {
+    func test_networkResponse_loadFirstPageOfItemList_successfulResponse_receiveStatusCode200() {
+        
         // given
         let expectation = XCTestExpectation()
-        let pageNumber: Int = 1
+        sut_network = Network(urlSession: MockURLSession())
     
         // when
-        sut_networkManager.examineNetworkResponse(page: pageNumber) { result in
-            
-            // then
-            switch result {
-            case .success(let response):
-                XCTAssertEqual(response.statusCode, 200)
-                // then
-            case .failure(let error):
-                XCTFail("\(error)")
-            }
+        sut_network.load(request: mock_URLRequest) { _, response, _ in
+            XCTAssertEqual(response?.statusCode, 200)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
     }
     
-    func test_networkResponse_failureResponse_receiveStatusCode400() {
+    func test_networkResponse_loadFirstPageOfItemList_failureResponse_receiveStatusCode400() {
+        
         // given
-        sut_networkManager = NetworkManager(urlSession: MockURLSession.init(buildRequestFail: true))
         let expectation = XCTestExpectation()
-        let pageNumber: Int = 1
+        sut_network = Network(urlSession: MockURLSession(buildRequestFail: true))
+        
         
         // when
-        sut_networkManager.examineNetworkResponse(page: pageNumber) { result in
-            
-            // then
-            switch result {
-            case .success:
-                XCTFail()
-            case .failure(let error):
-                XCTAssertNotNil(error)
-            }
+        sut_network.load(request: mock_URLRequest) { _, response, _ in
+            XCTAssertEqual(response?.statusCode, 400)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
     }
     
-    func test_networkRequest_correctURL() {
+    func test_networkResponse_correctURL() {
+        
         // given
         let expectation = XCTestExpectation()
-        let pageNumber: Int = 1
+        sut_network = Network(urlSession: MockURLSession())
         
         // when
-        sut_networkManager.examineNetworkRequest(page: pageNumber) { result in
-
-            // then
-            switch result {
-            case .success(let request):
-                XCTAssertEqual(request.url, URL(string: "\(OpenMarketAPI.urlForItemList)\(pageNumber)"))
-            case .failure(let errror):
-                XCTFail("\(errror)")
-            }
+        sut_network.load(request: mock_URLRequest) { _, response, _ in
+            XCTAssertEqual(response?.url, self.mock_URLRequest.url)
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)
     }
     
-    func test_networkRequest_correctHTTPMethod_GET() {
-        //given
-        let expectation = XCTestExpectation()
-        let pageNumber: Int = 1
+    func test_network_cancelLoading() {
         
-        //when
-        sut_networkManager.examineNetworkRequest(page: pageNumber) { result in
-            switch result {
-            case .success(let request):
-                XCTAssertEqual(request.httpMethod, HTTPMethods.get.rawValue)
-            case .failure(let error):
-                XCTFail("\(error)")
-            }
+        // given
+        let expectation = XCTestExpectation()
+        var spy_cancel_counter = 0
+        let mock_URL_session_datatask = MockURLSessionDataTask()
+        sut_network = Network(urlSession: MockURLSession(), dataTask: mock_URL_session_datatask)
+        // when
+        mock_URL_session_datatask.cancelDidCall = {
+            spy_cancel_counter += 1
             expectation.fulfill()
         }
+        sut_network.cancel()
         wait(for: [expectation], timeout: 1)
+        XCTAssertEqual(spy_cancel_counter, 1)
     }
 }

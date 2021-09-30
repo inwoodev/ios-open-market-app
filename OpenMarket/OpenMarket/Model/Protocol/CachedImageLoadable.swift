@@ -8,6 +8,6 @@
 import UIKit
 
 protocol CachedImageLoadable: AnyObject {
-    func loadImageWithCache(with text: String, completion: @escaping (UIImage) ->())
+    func loadImageWithCache(with link: String, completion: @escaping (UIImage) ->())
     func cancelLoading()
 }

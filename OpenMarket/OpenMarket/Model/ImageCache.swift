@@ -28,6 +28,10 @@ final class ImageCache<Key: Hashable, Value> {
     func removeValue(forKey key: Key) {
         wrappedKeyAndEntry.removeObject(forKey: WrappedKey(key))
     }
+    
+    func removeAllObjects() {
+        wrappedKeyAndEntry.removeAllObjects()
+    }
 }
 private extension ImageCache {
     final class WrappedKey: NSObject {

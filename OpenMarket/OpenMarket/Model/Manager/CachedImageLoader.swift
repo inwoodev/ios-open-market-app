@@ -8,7 +8,6 @@
 import UIKit
 
 final class CachedImageLoader: CachedImageLoadable {
-    
     private let imageDownloader: ImageDownloadable
     
     
@@ -20,7 +19,6 @@ final class CachedImageLoader: CachedImageLoadable {
         let nsText = link as NSString
         
         if let cachedImage = CacheManager.cache[nsText] {
-            print("return cachedImage")
             return completion(cachedImage)
         }
 

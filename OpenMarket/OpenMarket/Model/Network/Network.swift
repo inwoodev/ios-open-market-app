@@ -9,11 +9,12 @@ import Foundation
 
 final class Network: Networkable {
     
-    private let urlSession: URLSessionProtocol
-    private var dataTask: URLSessionDataTask?
+    let urlSession: URLSessionProtocol
+    var dataTask: URLSessionDataTask?
     
-    init(urlSession: URLSessionProtocol = URLSession.shared) {
+    init(urlSession: URLSessionProtocol = URLSession.shared, dataTask: URLSessionDataTask? = nil) {
         self.urlSession = urlSession
+        self.dataTask = dataTask
     }
     
     func load(request: URLRequest, completion: @escaping (Data?, HTTPURLResponse?, NetworkResponseError?) -> ()) {
@@ -22,7 +23,7 @@ final class Network: Networkable {
             
             if let error = error {
                 NSLog(error.localizedDescription)
-                completion(nil, nil, error as? NetworkResponseError)
+                completion(nil, response as? HTTPURLResponse, error as? NetworkResponseError)
             }
             guard let successFulResponse = response as? HTTPURLResponse,
                   let completedData = data

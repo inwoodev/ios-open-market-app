@@ -7,7 +7,10 @@
 
 import Foundation
 
-protocol Networkable: AnyObject {    
+protocol Networkable: AnyObject {
+    var urlSession: URLSessionProtocol { get }
+    var dataTask: URLSessionDataTask? { get set }
+    
     func load(request: URLRequest, completion: @escaping (Data?, HTTPURLResponse?, NetworkResponseError?) -> ())
     func cancel()
 }
