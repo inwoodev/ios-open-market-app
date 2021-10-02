@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class OpenMarketDataManager {
+final class OpenMarketDataManager: OpenMarketDataManageable {
     private let network: Networkable
     private let dataParser: DataParsible?
     private let multipartFormDataBuilder: MultipartFormDataBuildable?

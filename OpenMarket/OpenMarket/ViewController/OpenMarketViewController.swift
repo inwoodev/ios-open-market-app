@@ -8,10 +8,8 @@ import UIKit
 
 class OpenMarketViewController: UIViewController {
     private var layoutType = OpenMarketCellLayoutType.list
-    private var isNextPageReady: Bool = false
     private var nextPageToLoad: Int = 1
-    private var openMarketItems: [OpenMarketItem] = []
-    private let openMarketDataManager = OpenMarketDataManager(network: Network(), dataParser: DataParser(), multipartFormDataBuilder: nil, requestBuilder: RequestBuilder())
+    private let openMarketListDataStorage = OpenMarketListDataStorage(dataManager: OpenMarketDataManager(network: Network(), dataParser: DataParser(), multipartFormDataBuilder: nil, requestBuilder: RequestBuilder()))
     
     // MARK: - Views
     
@@ -106,25 +104,15 @@ class OpenMarketViewController: UIViewController {
     // MARK: - Initial Data fetching
     
     private func getOpenMarketItemList() {
-        openMarketDataManager.getOpenMarketItemModel(serverAPI: .itemList(nextPageToLoad)) { [weak self] (itemList: OpenMarketItemList) in
-            
-            let startItemCount = self?.openMarketItems.count ?? 0
-            let totalItemCount = startItemCount + itemList.items.count
-            
-            self?.openMarketItems.append(contentsOf: itemList.items)
-            
-            
+        openMarketListDataStorage.insertOpenMarketItemList(page: nextPageToLoad) { itemList, startItemCount, totalItemCount in
             DispatchQueue.main.async {
-                var indexPaths = [IndexPath]()
-                
                 for index in startItemCount..<totalItemCount {
                     let indexPath = IndexPath(item: index, section: 0)
-                    indexPaths.append(indexPath)
+                    self.openMarketCollectionView.insertItems(at: [indexPath])
                 }
-                self?.openMarketCollectionView.insertItems(at: indexPaths)
-                self?.activityIndicator.stopAnimating()
-                self?.nextPageToLoad += 1
-                self?.refreshControl.endRefreshing()
+                self.activityIndicator.stopAnimating()
+                self.nextPageToLoad += 1
+                self.refreshControl.endRefreshing()
             }
         }
     }
@@ -163,7 +151,8 @@ extension OpenMarketViewController {
     @objc private func refreshItemList() {
         let firstPage = 1
         nextPageToLoad = firstPage
-        openMarketItems = []
+        openMarketListDataStorage.removeAllOpenMarketItemList()
+        CacheManager.cache.removeAllObjects()
         getOpenMarketItemList()
         self.openMarketCollectionView.reloadData()
     }
@@ -174,7 +163,7 @@ extension OpenMarketViewController {
 extension OpenMarketViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         for indexPath in indexPaths {
-            if openMarketItems.count - 1 == indexPath.item {
+            if self.openMarketListDataStorage.accessOpenMarketItemList().count - 1 == indexPath.item {
                 self.getOpenMarketItemList()
             }
         }
@@ -189,7 +178,7 @@ extension OpenMarketViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return openMarketItems.count
+        return openMarketListDataStorage.accessOpenMarketItemList().count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -199,7 +188,7 @@ extension OpenMarketViewController: UICollectionViewDataSource {
                 return UICollectionViewCell()
             }
             
-            cell.configure(itemInformation: openMarketItems, index: indexPath.item)
+            cell.configure(itemInformation: openMarketListDataStorage.accessOpenMarketItemList(), index: indexPath.item)
             return cell
             
         case .grid:
@@ -207,7 +196,7 @@ extension OpenMarketViewController: UICollectionViewDataSource {
                 return UICollectionViewCell()
             }
 
-            cell.configure(itemInformation: openMarketItems, index: indexPath.item)
+            cell.configure(itemInformation: openMarketListDataStorage.accessOpenMarketItemList(), index: indexPath.item)
             return cell
         }
     }
@@ -259,7 +248,7 @@ extension OpenMarketViewController: UICollectionViewDelegateFlowLayout {
 extension OpenMarketViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailedItemViewController = OpenMarketDetailedItemViewController()
-        detailedItemViewController.itemID = openMarketItems[indexPath.item].id
+        detailedItemViewController.itemID = openMarketListDataStorage.accessItem(at: indexPath.item).id
         navigationController?.pushViewController(detailedItemViewController, animated: false)
         
     }

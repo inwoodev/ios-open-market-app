@@ -15,10 +15,12 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     // MARK: - Properties
     
-    private let openMarketDataManager = OpenMarketDataManager(network: Network(), dataParser: DataParser(), multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder())
-    private let cachedImageLoader = CachedImageLoader(imageDownloader: ImageDownloader(network: Network()))
-    private var openMarketItem: OpenMarketItemWithDetailInformation?
-    private var sliderImages = [UIImage]()
+//    private let openMarketDataManager = OpenMarketDataManager(network: Network(), dataParser: DataParser(), multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder())
+//    private let cachedImageLoader = CachedImageLoader(imageDownloader: ImageDownloader(network: Network()))
+//    private var openMarketItem: OpenMarketItemWithDetailInformation?
+//    private var sliderImages = [UIImage]()
+    
+    private let itemInformationDataSource = OpenMarketItemInformationDataStorage(dataManager: OpenMarketDataManager(network: Network(), dataParser: DataParser(), multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder()), cachedImageLoader: CachedImageLoader(imageDownloader: ImageDownloader(network: Network())))
     var itemID = Int()
     
     
@@ -294,15 +296,12 @@ class OpenMarketDetailedItemViewController: UIViewController {
     }
     
     private func getOpenMarketItem() {
-        openMarketDataManager.getOpenMarketItemModel(serverAPI: .singleItemToGetPatchOrDelete(itemID)) { [weak self] (item: OpenMarketItemWithDetailInformation) in
-            
+        itemInformationDataSource.insertOpenMarketItemInformation(id: itemID) { item in
             DispatchQueue.main.async {
-                self?.imageSliderCollectionView.reloadData()
-                self?.navigationItem.title = item.title
-                self?.applyUI(item)
-                self?.openMarketItem = item
+                self.imageSliderCollectionView.reloadData()
+                self.navigationItem.title = item.title
+                self.applyUI(item)
             }
-            
         }
     }
     
@@ -313,11 +312,11 @@ class OpenMarketDetailedItemViewController: UIViewController {
         applyPriceTextLabel(item)
         self.itemRegistrationDateLabel.text = Date(timeIntervalSince1970: item.registrationDate).formattedString
         self.itemDetailedDescriptionLabel.text = item.descriptions
-        self.downloadImages(item) { [weak self] images in
-            self?.sliderImages = images
-            self?.imageSlider.numberOfPages = images.count
-            self?.imageSliderCollectionView.reloadData()
-            
+        itemInformationDataSource.downloadImages { [weak self] images in
+            DispatchQueue.main.async {
+                self?.imageSlider.numberOfPages = images.count
+                self?.imageSliderCollectionView.reloadData()
+            }
         }
         
     }
@@ -349,26 +348,6 @@ class OpenMarketDetailedItemViewController: UIViewController {
             
             itemPriceCurrencyLabel.text = item.currency
             itemPriceLabel.text = String(item.price)
-        }
-    }
-    
-    private func downloadImages(_ item: OpenMarketItemWithDetailInformation, completion: @escaping ([UIImage]) -> Void) {
-        let downloadedImageURLStrings = item.thumbnails
-        
-        var imageArray = [UIImage]()
-        
-        let dispatchGroup = DispatchGroup()
-        
-        for urlString in downloadedImageURLStrings {
-            dispatchGroup.enter()
-            cachedImageLoader.loadImageWithCache(with: urlString) { image in
-                imageArray.append(image)
-                dispatchGroup.leave()
-            }
-        }
-        
-        dispatchGroup.notify(queue: .main) {
-            completion(imageArray)
         }
     }
     
@@ -428,7 +407,7 @@ extension OpenMarketDetailedItemViewController {
         
         switch userChoice {
         case .edit:
-            openMarketDataManager.patchOpenMarketItemData(serverAPI: .singleItemToGetPatchOrDelete(itemID), texts: [OpenMarketItemToPostOrPatch.password.key: password], imageList: nil) { [weak self] response in
+            itemInformationDataSource.proceedToPatchOpenMarketItem(id: itemID, password: password) { [weak self] response in
                 DispatchQueue.main.async {
                     if (200...299).contains(response.statusCode) {
                         self?.proceedToEditItem(password)
@@ -438,7 +417,7 @@ extension OpenMarketDetailedItemViewController {
                 }
             }
         case .delete:
-            openMarketDataManager.deleteItemData(serverAPI: .singleItemToGetPatchOrDelete(itemID), password: password) { [weak self] response in
+            itemInformationDataSource.deleteOpenMarketItem(id: itemID, password: password) { [weak self] response in
                 DispatchQueue.main.async {
                     if (200...299).contains(response.statusCode) {
                         self?.alertDeleteConfirmation()
@@ -453,7 +432,7 @@ extension OpenMarketDetailedItemViewController {
     private func proceedToEditItem(_ password: String) {
         let editItemViewController = OpenMarketItemViewController(mode: .edit)
         editItemViewController.setItemIdentityToPatch(idNumber: itemID)
-        editItemViewController.receiveInformation(of: openMarketItem, images: sliderImages, password: password)
+        editItemViewController.receiveInformation(of: itemInformationDataSource.accessItemInformation(), images: itemInformationDataSource.accessSliderImages(), password: password)
         navigationController?.pushViewController(editItemViewController, animated: true)
     }
     
@@ -511,14 +490,14 @@ extension OpenMarketDetailedItemViewController {
 
 extension OpenMarketDetailedItemViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        sliderImages.count
+        itemInformationDataSource.accessSliderImages().count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
         guard let cell = collectionView.dequeueReusableCell(withReuseIdentifier: ImagePickerCollectionViewCell.identifier, for: indexPath) as? ImagePickerCollectionViewCell else {
             return UICollectionViewCell()
         }
-        cell.configureImage(sliderImages, indexPath: indexPath)
+        cell.configureImage(itemInformationDataSource.accessSliderImages(), indexPath: indexPath)
         cell.indexPath = indexPath
         cell.isRemoveImageButtonHidden(true)
         return cell

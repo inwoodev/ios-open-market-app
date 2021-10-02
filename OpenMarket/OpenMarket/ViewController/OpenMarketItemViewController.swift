@@ -15,15 +15,12 @@ class OpenMarketItemViewController: UIViewController {
     
     // MARK: - Properties
     
-    private let currencyList = ["KRW", "USD", "BTC", "JPY", "EUR", "GBP", "CNY"]
     private let imagePicker = UIImagePickerController()
-    private let textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
-    private var itemThumbnails: [UIImage] = []
-    private var itemInformation: [String: Any?] = [:]
     private var itemID = Int()
     private var bottomConstraint: NSLayoutConstraint?
     private let mode: Mode
-    private let openMarketDataManager = OpenMarketDataManager(network: Network(), dataParser: nil, multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder())
+    private let textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
+    private let openMarketMultipartFormDataStorage = OpenMarketMultipartFormDataStorage(dataManager: OpenMarketDataManager(network: Network(), dataParser: nil, multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder()))
     
     init(mode: Mode) {
         self.mode = mode
@@ -226,7 +223,7 @@ class OpenMarketItemViewController: UIViewController {
             self.detailedInformationTextView.text = validItem.descriptions
             self.detailedInformationTextView.textColor = .black
             self.currencyTextField.text = validItem.currency
-            self.itemThumbnails = thumbnails
+            openMarketMultipartFormDataStorage.addImages(thumbnails)
             self.passwordTextField.text = password
         }
     }
@@ -267,7 +264,7 @@ extension OpenMarketItemViewController {
         guard let detailedText = detailedInformationTextView.text else { return }
         if (detailedText.isEmpty || detailedText == textViewDefaultMessage) && self.presentedViewController == nil {
             self.present(alertController, animated: true, completion: nil)
-        } else if itemThumbnails.count < 1 && self.presentedViewController == nil {
+        } else if openMarketMultipartFormDataStorage.accessItemImages().count < 1 && self.presentedViewController == nil {
             self.present(alertController, animated: true, completion: nil)
         }
     }
@@ -285,13 +282,14 @@ extension OpenMarketItemViewController {
         
         self.present(alertController, animated: true, completion: nil)
     }
+    
     private func postItemToServer() {
-        self.openMarketDataManager.postOpenMarketItemData(serverAPI: .singleItemToPost, texts: itemInformation, imageList: itemThumbnails) { [weak self] response in
+        openMarketMultipartFormDataStorage.postOpenMarketItem { response in
             DispatchQueue.main.async {
                 if (200...299).contains(response.statusCode) {
-                    self?.alertSuccessfulResponseToUser()
+                    self.alertSuccessfulResponseToUser()
                 } else {
-                    self?.alertFailedResponseToUser()
+                    self.alertFailedResponseToUser()
                 }
             }
         }
@@ -311,12 +309,12 @@ extension OpenMarketItemViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     private func updateEditedItemInformation() {
-        self.openMarketDataManager.patchOpenMarketItemData(serverAPI: .singleItemToGetPatchOrDelete(itemID), texts: itemInformation, imageList: itemThumbnails) { [weak self] response in
+        openMarketMultipartFormDataStorage.patchOpenMarketItem(id: itemID) { response in
             DispatchQueue.main.async {
                 if (200...299).contains(response.statusCode) {
-                    self?.alertSuccessfulResponseToUser()
+                    self.alertSuccessfulResponseToUser()
                 } else {
-                    self?.alertFailedResponseToUser()
+                    self.alertFailedResponseToUser()
                 }
             }
         }
@@ -504,11 +502,11 @@ extension OpenMarketItemViewController {
 extension OpenMarketItemViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return currencyList[row]
+        return openMarketMultipartFormDataStorage.getCurrency(at: row).description
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        currencyTextField.text = currencyList[row]
+        currencyTextField.text = openMarketMultipartFormDataStorage.getCurrency(at: row).description
     }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -516,7 +514,7 @@ extension OpenMarketItemViewController: UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        currencyList.count
+        openMarketMultipartFormDataStorage.accessCurrencyList().count
     }
     
     @objc private func donePicker() {
@@ -549,7 +547,8 @@ extension OpenMarketItemViewController: UITextViewDelegate {
         }
         
         guard let text = textView.text else { return }
-        itemInformation.updateValue(text, forKey: OpenMarketItemToPostOrPatch.descriptions.key)
+        openMarketMultipartFormDataStorage.updateItemInformation(text, forKey: OpenMarketItemToPostOrPatch.descriptions.key)
+        
     }
 }
 
@@ -590,7 +589,7 @@ extension OpenMarketItemViewController {
     }
     
     func convertPasswordTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
-        itemInformation.updateValue(text, forKey: itemToPost.key)
+        openMarketMultipartFormDataStorage.updateItemInformation(text, forKey: itemToPost.key)
         
         guard let validText = text,
               !validText.isEmpty else {
@@ -598,24 +597,24 @@ extension OpenMarketItemViewController {
             return
         }
         
-        itemInformation.updateValue(text, forKey: itemToPost.key)
+        openMarketMultipartFormDataStorage.updateItemInformation(text, forKey: itemToPost.key)
     }
     
     func convertOptionalTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
         
         guard let text = text,
               let number = Int(text) else { return }
-        itemInformation.updateValue(number, forKey: itemToPost.key)
+        openMarketMultipartFormDataStorage.updateItemInformation(number, forKey: itemToPost.key)
     }
     
     func convertTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
         
         guard let text = text else { return }
         if let number = Int(text) {
-            itemInformation.updateValue(number, forKey: itemToPost.key)
+            openMarketMultipartFormDataStorage.updateItemInformation(number, forKey: itemToPost.key)
             
         } else {
-            itemInformation.updateValue(text, forKey: itemToPost.key)
+            openMarketMultipartFormDataStorage.updateItemInformation(text, forKey: itemToPost.key)
         }
     }
 }
@@ -628,7 +627,8 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
         guard let selectedImage: UIImage = info[.originalImage] as? UIImage else { return }
         
         ImageCompressor.compress(image: selectedImage, maxByte: 300000) { image in
-            self.itemThumbnails.append(image ?? selectedImage)
+//            self.itemThumbnails.append(image ?? selectedImage)
+            self.openMarketMultipartFormDataStorage.addImages([image ?? selectedImage])
             
             DispatchQueue.main.async {
                 self.thumbnailCollectionView.reloadData()
@@ -638,8 +638,8 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
     }
     
     @objc func didTapUploadPhoto(_ sender: UIButton) {
-        
-        if itemThumbnails.count < 5 {
+
+        if openMarketMultipartFormDataStorage.accessItemImages().count < 5 {
             alertUploadPhoto()
         } else {
             alertLimitNumberOfPhoto()
@@ -678,7 +678,7 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
 
 extension OpenMarketItemViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return itemThumbnails.count
+        return openMarketMultipartFormDataStorage.accessItemImages().count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -686,7 +686,7 @@ extension OpenMarketItemViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         cell.indexPath = indexPath
-        cell.configureImage(itemThumbnails, indexPath: indexPath)
+        cell.configureImage(openMarketMultipartFormDataStorage.accessItemImages(), indexPath: indexPath)
         cell.removeCellDelegate = self
         return cell
     }
@@ -720,7 +720,7 @@ extension OpenMarketItemViewController: RemoveDelegate {
     func removeCell(_ indexPath : IndexPath) {
         self.thumbnailCollectionView.performBatchUpdates {
             self.thumbnailCollectionView.deleteItems(at: [indexPath])
-            self.itemThumbnails.remove(at: indexPath.row)
+            openMarketMultipartFormDataStorage.removeImage(at: indexPath.item)
         } completion: { (_) in
             self.thumbnailCollectionView.reloadData()
         }

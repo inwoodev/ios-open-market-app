@@ -48,6 +48,10 @@
 		EA8E967E266DF913001280CF /* CellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E967D266DF913001280CF /* CellLayout.swift */; };
 		EA8E9683266E478A001280CF /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E9682266E478A001280CF /* String+Extension.swift */; };
 		EAA7C58A2704035700270267 /* OpenMarketDataManageTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA7C5892704035700270267 /* OpenMarketDataManageTests.swift */; };
+		EAA7C59D2707359D00270267 /* OpenMarketListDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA7C59C2707359D00270267 /* OpenMarketListDataStorage.swift */; };
+		EAA7C59F2707363A00270267 /* OpenMarketDataManageable.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA7C59E2707363A00270267 /* OpenMarketDataManageable.swift */; };
+		EAA7C5A22707406D00270267 /* OpenMarketItemInformationDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA7C5A12707406D00270267 /* OpenMarketItemInformationDataStorage.swift */; };
+		EAA7C5A42707452900270267 /* OpenMarketMultipartFormDataStorage.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAA7C5A32707452900270267 /* OpenMarketMultipartFormDataStorage.swift */; };
 		EAB785662664C9760090C7FC /* HTTPMethods.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB785652664C9760090C7FC /* HTTPMethods.swift */; };
 		EAB785692664CCEF0090C7FC /* OpenMarketItemList.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB785682664CCEF0090C7FC /* OpenMarketItemList.swift */; };
 		EAB785702664E6980090C7FC /* DataError.swift in Sources */ = {isa = PBXBuildFile; fileRef = EAB7856F2664E6980090C7FC /* DataError.swift */; };
@@ -129,6 +133,10 @@
 		EA8E967D266DF913001280CF /* CellLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellLayout.swift; sourceTree = "<group>"; };
 		EA8E9682266E478A001280CF /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
 		EAA7C5892704035700270267 /* OpenMarketDataManageTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketDataManageTests.swift; sourceTree = "<group>"; };
+		EAA7C59C2707359D00270267 /* OpenMarketListDataStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketListDataStorage.swift; sourceTree = "<group>"; };
+		EAA7C59E2707363A00270267 /* OpenMarketDataManageable.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketDataManageable.swift; sourceTree = "<group>"; };
+		EAA7C5A12707406D00270267 /* OpenMarketItemInformationDataStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemInformationDataStorage.swift; sourceTree = "<group>"; };
+		EAA7C5A32707452900270267 /* OpenMarketMultipartFormDataStorage.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketMultipartFormDataStorage.swift; sourceTree = "<group>"; };
 		EAB785652664C9760090C7FC /* HTTPMethods.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = HTTPMethods.swift; sourceTree = "<group>"; };
 		EAB785682664CCEF0090C7FC /* OpenMarketItemList.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketItemList.swift; sourceTree = "<group>"; };
 		EAB7856F2664E6980090C7FC /* DataError.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = DataError.swift; sourceTree = "<group>"; };
@@ -222,6 +230,7 @@
 				EA47612C26F5141900869211 /* RequestBuildable.swift */,
 				EAB78585266613910090C7FC /* URLSessionProtocol.swift */,
 				EA8592B927000F22003E1FA7 /* URLSessionDataTaskProtocol.swift */,
+				EAA7C59E2707363A00270267 /* OpenMarketDataManageable.swift */,
 			);
 			path = Protocol;
 			sourceTree = "<group>";
@@ -236,6 +245,16 @@
 				EA8592B526FDFD32003E1FA7 /* UIImageView+Extension.swift */,
 			);
 			path = Utility;
+			sourceTree = "<group>";
+		};
+		EAA7C5A027073F1E00270267 /* DataStorage */ = {
+			isa = PBXGroup;
+			children = (
+				EAA7C59C2707359D00270267 /* OpenMarketListDataStorage.swift */,
+				EAA7C5A12707406D00270267 /* OpenMarketItemInformationDataStorage.swift */,
+				EAA7C5A32707452900270267 /* OpenMarketMultipartFormDataStorage.swift */,
+			);
+			path = DataStorage;
 			sourceTree = "<group>";
 		};
 		EAB785642664C95D0090C7FC /* Network */ = {
@@ -254,6 +273,7 @@
 		EAB785672664CCC10090C7FC /* Model */ = {
 			isa = PBXGroup;
 			children = (
+				EAA7C5A027073F1E00270267 /* DataStorage */,
 				EA47611526F4E51300869211 /* Protocol */,
 				EAB785642664C95D0090C7FC /* Network */,
 				EAB7856A2664D0BE0090C7FC /* Manager */,
@@ -454,8 +474,10 @@
 				EAC6ED46267CD18B006DDA78 /* PasswordTextField.swift in Sources */,
 				EAB785702664E6980090C7FC /* DataError.swift in Sources */,
 				EAEF60F0267B76D800D82B73 /* NSMutableData + Extension.swift in Sources */,
+				EAA7C59D2707359D00270267 /* OpenMarketListDataStorage.swift in Sources */,
 				EAB785692664CCEF0090C7FC /* OpenMarketItemList.swift in Sources */,
 				EA47611D26F4EB9400869211 /* DataParsible.swift in Sources */,
+				EAA7C5A42707452900270267 /* OpenMarketMultipartFormDataStorage.swift in Sources */,
 				EADC04DD26DD006200A0DF6E /* Date+Extension.swift in Sources */,
 				EA47612926F4F9E600869211 /* OpenMarketURL.swift in Sources */,
 				EAEF60E9267892D200D82B73 /* ImagePickerCollectionViewCell.swift in Sources */,
@@ -471,6 +493,7 @@
 				C70FB0FF25BEF61C00C9924E /* OpenMarketViewController.swift in Sources */,
 				EADC04D926DCBEB900A0DF6E /* OpenMarketItemWithDetailInformation.swift in Sources */,
 				EA47611726F4E52B00869211 /* ImageDownloadable.swift in Sources */,
+				EAA7C5A22707406D00270267 /* OpenMarketItemInformationDataStorage.swift in Sources */,
 				EA47611026F4C65A00869211 /* DataParser.swift in Sources */,
 				EAC8F7D326915ABA002A07C2 /* ImageCompressor.swift in Sources */,
 				EA8592BA27000F22003E1FA7 /* URLSessionDataTaskProtocol.swift in Sources */,
@@ -489,6 +512,7 @@
 				EAC6ED44267CCFDF006DDA78 /* StockTextField.swift in Sources */,
 				EA5DCF2626F4AFAB00A793CC /* ImageCache.swift in Sources */,
 				EA47611F26F4ED1E00869211 /* MultipartFormDataBuilder.swift in Sources */,
+				EAA7C59F2707363A00270267 /* OpenMarketDataManageable.swift in Sources */,
 				EA47611426F4E4DC00869211 /* OpenMarketDataManager.swift in Sources */,
 				EAC6ED3C267C9E52006DDA78 /* TitleTextField.swift in Sources */,
 				EAC6ED40267CCC78006DDA78 /* PriceTextField.swift in Sources */,
