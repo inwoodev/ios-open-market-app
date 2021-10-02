@@ -7,7 +7,7 @@
 
 import UIKit
 
-final class  OpenMarketItemInformationDataStorage {
+final class OpenMarketItemInformationDataStorage {
     private let dataManager: OpenMarketDataManageable
     private let cachedImageLoader: CachedImageLoadable
     private var sliderImages = [UIImage]()
