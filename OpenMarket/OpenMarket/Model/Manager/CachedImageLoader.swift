@@ -18,7 +18,7 @@ final class CachedImageLoader: CachedImageLoadable {
     func loadImageWithCache(with link: String, completion: @escaping (UIImage) ->()) {
         let nsText = link as NSString
         
-        if let cachedImage = CacheManager.cache[nsText] {
+        if let cachedImage = CacheManager.shared.cache[nsText] {
             return completion(cachedImage)
         }
 
@@ -27,7 +27,7 @@ final class CachedImageLoader: CachedImageLoadable {
             case .failure(let error):
                 NSLog(error.localizedDescription)
             case .success(let image):
-                CacheManager.cache.insert(image, forkey: nsText)
+                CacheManager.shared.cache.insert(image, forkey: nsText)
                 return completion(image)
             }
         }

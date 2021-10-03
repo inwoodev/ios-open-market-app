@@ -156,7 +156,7 @@ extension OpenMarketViewController {
         let firstPage = 1
         nextPageToLoad = firstPage
         openMarketListDataStorage.removeAllOpenMarketItemList()
-        CacheManager.cache.removeAllObjects()
+        CacheManager.shared.cache.removeAllObjects()
         getOpenMarketItemList()
         self.openMarketCollectionView.reloadData()
     }

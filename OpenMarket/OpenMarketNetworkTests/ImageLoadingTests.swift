@@ -10,11 +10,11 @@ import XCTest
 class ImageLoadingTests: XCTestCase {
     var sut_cached_image_loader: CachedImageLoadable!
     var mock_image_downloader: MockImageDownloader!
-    var image_cache: ImageCache<NSString, UIImage>!
     var mock_network: Networkable!
     var mock_urlsession: MockURLSession!
     var mock_data_task: MockURLSessionDataTask!
     var stub_url_link = "www.dummy.com"
+    var mock_cache_manager: CacheManager!
     
     override func setUpWithError() throws {
         try super.setUpWithError()
@@ -25,7 +25,7 @@ class ImageLoadingTests: XCTestCase {
         mock_network = Network(urlSession: mock_urlsession, dataTask: mock_data_task)
         mock_image_downloader = MockImageDownloader(network: mock_network)
         sut_cached_image_loader = CachedImageLoader(imageDownloader: mock_image_downloader)
-        image_cache = CacheManager.cache
+        mock_cache_manager = CacheManager.shared
     }
 
     override func tearDownWithError() throws {
@@ -35,7 +35,7 @@ class ImageLoadingTests: XCTestCase {
         mock_network = nil
         mock_image_downloader = nil
         sut_cached_image_loader = nil
-        CacheManager.cache.removeAllObjects()
+        mock_cache_manager = nil
     }
 
     func test_did_image_successfully_load() {
@@ -62,14 +62,14 @@ class ImageLoadingTests: XCTestCase {
         sut_cached_image_loader.loadImageWithCache(with: stub_url_link) { image in
             
             // then
-            XCTAssertEqual(self.image_cache[self.stub_url_link as NSString], image)
+            XCTAssertEqual(self.mock_cache_manager.cache[self.stub_url_link as NSString], image)
         }
         
         // when
         sut_cached_image_loader.loadImageWithCache(with: stub_url_link) { image in
             
             // then
-            XCTAssertEqual(image, self.image_cache[self.stub_url_link as NSString])
+            XCTAssertEqual(image, self.mock_cache_manager.cache[self.stub_url_link as NSString])
             expectation.fulfill()
         }
         wait(for: [expectation], timeout: 1)

@@ -21,7 +21,7 @@ final class MockCachedImageLoader: CachedImageLoadable {
     func loadImageWithCache(with link: String, completion: @escaping (UIImage) ->()) {
         let nsText = link as NSString
         
-        if let cachedImage = CacheManager.cache[nsText] {
+        if let cachedImage = CacheManager.shared.cache[nsText] {
             return completion(cachedImage)
         }
         
@@ -30,7 +30,7 @@ final class MockCachedImageLoader: CachedImageLoadable {
             case .failure(_):
                 return
             case .success(let image):
-                CacheManager.cache.insert(image, forkey: nsText)
+                CacheManager.shared.cache.insert(image, forkey: nsText)
                 self.imageCacheCounter += 1
                 self.loadImageWithCacheDidCall()
                 return completion(image)
