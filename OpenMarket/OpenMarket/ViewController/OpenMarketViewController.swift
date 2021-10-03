@@ -105,11 +105,15 @@ class OpenMarketViewController: UIViewController {
     
     private func getOpenMarketItemList() {
         openMarketListDataStorage.insertOpenMarketItemList(page: nextPageToLoad) { itemList, startItemCount, totalItemCount in
+            
+            var indexPaths = [IndexPath]()
+            
             DispatchQueue.main.async {
                 for index in startItemCount..<totalItemCount {
                     let indexPath = IndexPath(item: index, section: 0)
-                    self.openMarketCollectionView.insertItems(at: [indexPath])
+                    indexPaths.append(indexPath)
                 }
+                self.openMarketCollectionView.insertItems(at: indexPaths)
                 self.activityIndicator.stopAnimating()
                 self.nextPageToLoad += 1
                 self.refreshControl.endRefreshing()

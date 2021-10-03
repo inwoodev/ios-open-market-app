@@ -43,7 +43,6 @@
 		EA67D2E727034E9B00CB609C /* ImageLoadingTests.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA67D2E627034E9B00CB609C /* ImageLoadingTests.swift */; };
 		EA8592B626FDFD32003E1FA7 /* UIImageView+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8592B526FDFD32003E1FA7 /* UIImageView+Extension.swift */; };
 		EA8592B826FF724A003E1FA7 /* CacheManager.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8592B726FF724A003E1FA7 /* CacheManager.swift */; };
-		EA8592BA27000F22003E1FA7 /* URLSessionDataTaskProtocol.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8592B927000F22003E1FA7 /* URLSessionDataTaskProtocol.swift */; };
 		EA8E967C266DE472001280CF /* OpenMarketGridCollectionViewCell.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E967B266DE472001280CF /* OpenMarketGridCollectionViewCell.swift */; };
 		EA8E967E266DF913001280CF /* CellLayout.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E967D266DF913001280CF /* CellLayout.swift */; };
 		EA8E9683266E478A001280CF /* String+Extension.swift in Sources */ = {isa = PBXBuildFile; fileRef = EA8E9682266E478A001280CF /* String+Extension.swift */; };
@@ -132,7 +131,6 @@
 		EA67D2E627034E9B00CB609C /* ImageLoadingTests.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = ImageLoadingTests.swift; sourceTree = "<group>"; };
 		EA8592B526FDFD32003E1FA7 /* UIImageView+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "UIImageView+Extension.swift"; sourceTree = "<group>"; };
 		EA8592B726FF724A003E1FA7 /* CacheManager.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CacheManager.swift; sourceTree = "<group>"; };
-		EA8592B927000F22003E1FA7 /* URLSessionDataTaskProtocol.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = URLSessionDataTaskProtocol.swift; sourceTree = "<group>"; };
 		EA8E967B266DE472001280CF /* OpenMarketGridCollectionViewCell.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = OpenMarketGridCollectionViewCell.swift; sourceTree = "<group>"; };
 		EA8E967D266DF913001280CF /* CellLayout.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = CellLayout.swift; sourceTree = "<group>"; };
 		EA8E9682266E478A001280CF /* String+Extension.swift */ = {isa = PBXFileReference; lastKnownFileType = sourcecode.swift; path = "String+Extension.swift"; sourceTree = "<group>"; };
@@ -237,7 +235,6 @@
 				EA47612626F4F6FA00869211 /* MultipartFormDataBuildable.swift */,
 				EA47612C26F5141900869211 /* RequestBuildable.swift */,
 				EAB78585266613910090C7FC /* URLSessionProtocol.swift */,
-				EA8592B927000F22003E1FA7 /* URLSessionDataTaskProtocol.swift */,
 				EAA7C59E2707363A00270267 /* OpenMarketDataManageable.swift */,
 			);
 			path = Protocol;
@@ -508,7 +505,6 @@
 				EAA7C5A22707406D00270267 /* OpenMarketItemInformationDataStorage.swift in Sources */,
 				EA47611026F4C65A00869211 /* DataParser.swift in Sources */,
 				EAC8F7D326915ABA002A07C2 /* ImageCompressor.swift in Sources */,
-				EA8592BA27000F22003E1FA7 /* URLSessionDataTaskProtocol.swift in Sources */,
 				C70FB0FB25BEF61C00C9924E /* AppDelegate.swift in Sources */,
 				EA47611226F4DEA600869211 /* ImageDownloader.swift in Sources */,
 				EA47612726F4F6FA00869211 /* MultipartFormDataBuildable.swift in Sources */,
