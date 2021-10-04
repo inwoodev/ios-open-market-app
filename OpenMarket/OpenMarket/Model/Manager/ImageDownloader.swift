@@ -15,6 +15,10 @@ final class ImageDownloader: ImageDownloadable {
         self.network = network
     }
     
+    convenience init() {
+        self.init(network: Network())
+    }
+    
     func downloadImage(url: URL, completion: @escaping downloadHandler) {
         let request = URLRequest(url: url)
         network.load(request: request, completion: { data, _, _ in

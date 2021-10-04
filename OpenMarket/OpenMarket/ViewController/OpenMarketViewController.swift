@@ -9,7 +9,7 @@ import UIKit
 class OpenMarketViewController: UIViewController {
     private var layoutType = OpenMarketCellLayoutType.list
     private var nextPageToLoad: Int = 1
-    private let openMarketListDataStorage = OpenMarketListDataStorage(dataManager: OpenMarketDataManager(network: Network(), dataParser: DataParser(), multipartFormDataBuilder: nil, requestBuilder: RequestBuilder()))
+    private let openMarketListDataStorage = OpenMarketListDataStorage()
     
     // MARK: - Views
     

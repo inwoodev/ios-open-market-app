@@ -20,6 +20,29 @@ final class OpenMarketDataManager: OpenMarketDataManageable {
         self.requestBuilder = requestBuilder
     }
     
+    convenience init(dataParser: DataParser) {
+        let network = Network()
+        let multipartFormDataBuilder = MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter())
+        let requestBuilder = RequestBuilder()
+        self.init(network: network, dataParser: dataParser, multipartFormDataBuilder: multipartFormDataBuilder, requestBuilder: requestBuilder)
+    }
+    
+    convenience init(multipartFormDataConverter: MultipartFormDataConverter) {
+        let network = Network()
+        let multipartFormDataBuilder = MultipartFormDataBuilder(multipartFormDataConverter: multipartFormDataConverter)
+        let requestBuilder = RequestBuilder()
+        self.init(network: network, dataParser: nil, multipartFormDataBuilder: multipartFormDataBuilder, requestBuilder: requestBuilder)
+    }
+    
+    convenience init() {
+        let network = Network()
+        let dataParser = DataParser()
+        let multipartFormDataConverter = MultipartFormDataConverter()
+        let multipartFormDataBuilder = MultipartFormDataBuilder(multipartFormDataConverter: multipartFormDataConverter)
+        let requestBuilder = RequestBuilder()
+        self.init(network: network, dataParser: dataParser, multipartFormDataBuilder: multipartFormDataBuilder, requestBuilder: requestBuilder)
+    }
+    
     func getOpenMarketItemModel< U: Decodable> (serverAPI: OpenMarketServerAPI<Int>, completion: @escaping (U) -> ()) {
         
         let request = requestBuilder.buildRequest(url: serverAPI.URL, httpMethod: .get, httpBody: nil, headerField: nil, value: nil)

@@ -15,6 +15,11 @@ final class CachedImageLoader: CachedImageLoadable {
         self.imageDownloader = imageDownloader
     }
     
+    convenience init() {
+        let imageDownloader = ImageDownloader()
+        self.init(imageDownloader: imageDownloader)
+    }
+    
     func loadImageWithCache(with link: String, completion: @escaping (UIImage) ->()) {
         let nsText = link as NSString
         

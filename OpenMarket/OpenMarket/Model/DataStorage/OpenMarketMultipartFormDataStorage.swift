@@ -41,6 +41,11 @@ final class OpenMarketMultipartFormDataStorage {
         self.dataManager = dataManager
     }
     
+    convenience init() {
+        let dataManager = OpenMarketDataManager(multipartFormDataConverter: MultipartFormDataConverter())
+        self.init(dataManager: dataManager)
+    }
+    
     func accessItemImages() -> [UIImage] {
         return itemImages
     }

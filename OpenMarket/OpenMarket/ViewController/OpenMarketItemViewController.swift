@@ -20,7 +20,7 @@ class OpenMarketItemViewController: UIViewController {
     private var bottomConstraint: NSLayoutConstraint?
     private let mode: Mode
     private let textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
-    private let openMarketMultipartFormDataStorage = OpenMarketMultipartFormDataStorage(dataManager: OpenMarketDataManager(network: Network(), dataParser: nil, multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder()))
+    private let openMarketMultipartFormDataStorage = OpenMarketMultipartFormDataStorage()
     
     init(mode: Mode) {
         self.mode = mode

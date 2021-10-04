@@ -18,6 +18,12 @@ final class OpenMarketItemInformationDataStorage {
         self.cachedImageLoader = cachedImageLoader
     }
     
+    convenience init() {
+        let dataManager = OpenMarketDataManager()
+        let imageLoader = CachedImageLoader()
+        self.init(dataManager: dataManager, cachedImageLoader: imageLoader)
+    }
+    
     func accessSliderImages() -> [UIImage] {
         return sliderImages
     }

@@ -18,6 +18,11 @@ final class OpenMarketListDataStorage {
         self.dataManager = dataManager
     }
     
+    convenience init() {
+        let dataManager = OpenMarketDataManager(dataParser: DataParser())
+        self.init(dataManager: dataManager)
+    }
+    
     func accessOpenMarketItemList() -> [OpenMarketItem] {
         return openMarketItems
     }

@@ -15,12 +15,7 @@ class OpenMarketDetailedItemViewController: UIViewController {
     
     // MARK: - Properties
     
-//    private let openMarketDataManager = OpenMarketDataManager(network: Network(), dataParser: DataParser(), multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder())
-//    private let cachedImageLoader = CachedImageLoader(imageDownloader: ImageDownloader(network: Network()))
-//    private var openMarketItem: OpenMarketItemWithDetailInformation?
-//    private var sliderImages = [UIImage]()
-    
-    private let itemInformationDataSource = OpenMarketItemInformationDataStorage(dataManager: OpenMarketDataManager(network: Network(), dataParser: DataParser(), multipartFormDataBuilder: MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter()), requestBuilder: RequestBuilder()), cachedImageLoader: CachedImageLoader(imageDownloader: ImageDownloader(network: Network())))
+    private let itemInformationDataSource = OpenMarketItemInformationDataStorage()
     var itemID = Int()
     
     
