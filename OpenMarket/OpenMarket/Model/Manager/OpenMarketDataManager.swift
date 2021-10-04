@@ -22,9 +22,8 @@ final class OpenMarketDataManager: OpenMarketDataManageable {
     
     convenience init(dataParser: DataParser) {
         let network = Network()
-        let multipartFormDataBuilder = MultipartFormDataBuilder(multipartFormDataConverter: MultipartFormDataConverter())
         let requestBuilder = RequestBuilder()
-        self.init(network: network, dataParser: dataParser, multipartFormDataBuilder: multipartFormDataBuilder, requestBuilder: requestBuilder)
+        self.init(network: network, dataParser: dataParser, multipartFormDataBuilder: nil, requestBuilder: requestBuilder)
     }
     
     convenience init(multipartFormDataConverter: MultipartFormDataConverter) {
