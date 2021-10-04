@@ -24,8 +24,9 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell {
     var itemTitleLabel: UILabel = {
         let label = UILabel()
         label.font = UIFont.preferredFont(forTextStyle: .title3)
-        label.numberOfLines = 1
+        label.numberOfLines = 0
         label.translatesAutoresizingMaskIntoConstraints = false
+        label.setContentCompressionResistancePriority(.defaultLow, for: .vertical)
         label.setContentHuggingPriority(.defaultLow, for: .horizontal)
         label.textColor = .black
         return label
@@ -55,7 +56,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell {
         label.numberOfLines = 1
         label.textAlignment = .right
         label.translatesAutoresizingMaskIntoConstraints = false
-        label.setContentCompressionResistancePriority(.required, for: .horizontal)
+        label.setContentCompressionResistancePriority(.init(rawValue: 999), for: .horizontal)
         label.textColor = .black
         return label
     }()
@@ -72,7 +73,7 @@ class OpenMarketListCollectionViewCell: UICollectionViewCell {
         let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .horizontal
-        stackView.distribution = .fillEqually
+        stackView.distribution = .fill
         stackView.spacing = 10
         return stackView
     }()
