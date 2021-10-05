@@ -9,7 +9,7 @@ import UIKit
 class OpenMarketViewController: UIViewController {
     private var layoutType = OpenMarketCellLayoutType.list
     private var nextPageToLoad: Int = 1
-    private let openMarketListDataStorage = OpenMarketListDataStorage()
+    private let itemListDataStorage = OpenMarketListDataStorage()
     
     // MARK: - Views
     
@@ -104,7 +104,7 @@ class OpenMarketViewController: UIViewController {
     // MARK: - Initial Data fetching
     
     private func getOpenMarketItemList() {
-        openMarketListDataStorage.insertOpenMarketItemList(page: nextPageToLoad) { itemList, startItemCount, totalItemCount in
+        itemListDataStorage.insertOpenMarketItemList(page: nextPageToLoad) { itemList, startItemCount, totalItemCount in
             
             var indexPaths = [IndexPath]()
             
@@ -155,7 +155,7 @@ extension OpenMarketViewController {
     @objc private func refreshItemList() {
         let firstPage = 1
         nextPageToLoad = firstPage
-        openMarketListDataStorage.removeAllOpenMarketItemList()
+        itemListDataStorage.removeAllOpenMarketItemList()
         CacheManager.shared.cache.removeAllObjects()
         getOpenMarketItemList()
         self.openMarketCollectionView.reloadData()
@@ -167,7 +167,7 @@ extension OpenMarketViewController {
 extension OpenMarketViewController: UICollectionViewDataSourcePrefetching {
     func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
         for indexPath in indexPaths {
-            if self.openMarketListDataStorage.accessOpenMarketItemList().count - 1 == indexPath.item {
+            if self.itemListDataStorage.accessOpenMarketItemList().count - 1 == indexPath.item {
                 self.getOpenMarketItemList()
             }
         }
@@ -182,7 +182,7 @@ extension OpenMarketViewController: UICollectionViewDataSource {
     
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
         
-        return openMarketListDataStorage.accessOpenMarketItemList().count
+        return itemListDataStorage.accessOpenMarketItemList().count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -192,7 +192,7 @@ extension OpenMarketViewController: UICollectionViewDataSource {
                 return UICollectionViewCell()
             }
             
-            cell.configure(itemInformation: openMarketListDataStorage.accessOpenMarketItemList(), index: indexPath.item)
+            cell.configure(itemInformation: itemListDataStorage.accessOpenMarketItemList(), index: indexPath.item)
             return cell
             
         case .grid:
@@ -200,7 +200,7 @@ extension OpenMarketViewController: UICollectionViewDataSource {
                 return UICollectionViewCell()
             }
 
-            cell.configure(itemInformation: openMarketListDataStorage.accessOpenMarketItemList(), index: indexPath.item)
+            cell.configure(itemInformation: itemListDataStorage.accessOpenMarketItemList(), index: indexPath.item)
             return cell
         }
     }
@@ -252,7 +252,7 @@ extension OpenMarketViewController: UICollectionViewDelegateFlowLayout {
 extension OpenMarketViewController: UICollectionViewDelegate {
     func collectionView(_ collectionView: UICollectionView, didSelectItemAt indexPath: IndexPath) {
         let detailedItemViewController = OpenMarketDetailedItemViewController()
-        detailedItemViewController.itemID = openMarketListDataStorage.accessItem(at: indexPath.item).id
+        detailedItemViewController.itemID = itemListDataStorage.accessItem(at: indexPath.item).id
         navigationController?.pushViewController(detailedItemViewController, animated: false)
         
     }
