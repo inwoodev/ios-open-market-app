@@ -9,7 +9,7 @@ import UIKit
 
 final class ImageDownloader: ImageDownloadable {
     typealias downloadHandler = (Result<UIImage, Error>) ->()
-    let network: Networkable
+    private let network: Networkable
     
     init(network: Networkable) {
         self.network = network
