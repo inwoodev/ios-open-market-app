@@ -10,6 +10,7 @@ class OpenMarketViewController: UIViewController {
     private var layoutType = OpenMarketCellLayoutType.list
     private var nextPageToLoad: Int = 1
     private let itemListDataStorage = OpenMarketListDataStorage()
+    private var isLastItem: Bool = false
     
     // MARK: - Views
     
@@ -76,7 +77,6 @@ class OpenMarketViewController: UIViewController {
         self.view.addSubview(openMarketCollectionView)
         openMarketCollectionView.delegate = self
         openMarketCollectionView.dataSource = self
-        openMarketCollectionView.prefetchDataSource = self
         openMarketCollectionView.refreshControl = refreshControl
         
     }
@@ -104,19 +104,22 @@ class OpenMarketViewController: UIViewController {
     // MARK: - Initial Data fetching
     
     private func getOpenMarketItemList() {
+        if self.isLastItem {
+            self.isLastItem = false
+        }
         itemListDataStorage.insertOpenMarketItemList(page: nextPageToLoad) { itemList, startItemCount, totalItemCount in
-            
-            var indexPaths = [IndexPath]()
-            
             DispatchQueue.main.async {
-                for index in startItemCount..<totalItemCount {
-                    let indexPath = IndexPath(item: index, section: 0)
-                    indexPaths.append(indexPath)
+                self.openMarketCollectionView.performBatchUpdates({
+                    for index in startItemCount..<totalItemCount {
+                        let indexPath = IndexPath(item: index, section: 0)
+                        self.openMarketCollectionView.insertItems(at: [indexPath])
+                    }
+                }) { loadingFinished in
+                    self.activityIndicator.stopAnimating()
+                    self.nextPageToLoad += 1
+                    self.refreshControl.endRefreshing()
+                    self.isLastItem = true
                 }
-                self.openMarketCollectionView.insertItems(at: indexPaths)
-                self.activityIndicator.stopAnimating()
-                self.nextPageToLoad += 1
-                self.refreshControl.endRefreshing()
             }
         }
     }
@@ -162,14 +165,16 @@ extension OpenMarketViewController {
     }
 }
 
-// MARK: - UICollectionViewDataSourcePrefetching
+// MARK: - UIScrollViewDelegate
 
-extension OpenMarketViewController: UICollectionViewDataSourcePrefetching {
-    func collectionView(_ collectionView: UICollectionView, prefetchItemsAt indexPaths: [IndexPath]) {
-        for indexPath in indexPaths {
-            if self.itemListDataStorage.accessOpenMarketItemList().count - 1 == indexPath.item {
-                self.getOpenMarketItemList()
-            }
+extension OpenMarketViewController: UIScrollViewDelegate {
+    func scrollViewDidScroll(_ scrollView: UIScrollView) {
+        let position = scrollView.contentOffset.y
+        
+        guard isLastItem else { return }
+        
+        if position > (scrollView.contentSize.height - scrollView.frame.height) {
+            getOpenMarketItemList()
         }
     }
 }

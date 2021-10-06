@@ -13,6 +13,7 @@ final class OpenMarketListDataStorage {
     
     private var openMarketItems: [OpenMarketItem] = []
     private let dataManager: OpenMarketDataManageable
+    private var isLastItem: Bool = false
     
     init(dataManager: OpenMarketDataManageable) {
         self.dataManager = dataManager
@@ -33,6 +34,7 @@ final class OpenMarketListDataStorage {
     
     func insertOpenMarketItemList(page: Int, completion: @escaping ([OpenMarketItem], startItemCount, totalItemCount) -> ()) {
         dataManager.getOpenMarketItemModel(serverAPI: .itemList(page)) { [weak self] (itemList: OpenMarketItemList) in
+            
             let startItemCount = self?.openMarketItems.count ?? 0
             let totalItemCount = startItemCount + itemList.items.count
             
