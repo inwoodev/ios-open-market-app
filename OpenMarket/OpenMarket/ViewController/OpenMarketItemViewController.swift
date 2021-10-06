@@ -37,7 +37,7 @@ class OpenMarketItemViewController: UIViewController {
         let scrollView = UIScrollView()
         scrollView.translatesAutoresizingMaskIntoConstraints = false
         scrollView.backgroundColor = .white
-        scrollView.showsVerticalScrollIndicator = false
+        scrollView.showsVerticalScrollIndicator = true
         
         return scrollView
     }()
@@ -75,9 +75,7 @@ class OpenMarketItemViewController: UIViewController {
         textView.autocorrectionType = .no
         textView.autocapitalizationType = .none
         textView.keyboardDismissMode = .interactive
-        textView.setContentHuggingPriority(.defaultLow, for: .vertical)
         textView.isScrollEnabled = false
-        
         return textView
     }()
     
@@ -486,7 +484,7 @@ extension OpenMarketItemViewController {
             itemRegistrationInformationStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             itemRegistrationInformationStackView.bottomAnchor.constraint(equalTo: detailedInformationTextView.topAnchor, constant: -5),
             
-            detailedInformationTextView.heightAnchor.constraint(equalToConstant: view.frame.height / 2),
+            detailedInformationTextView.heightAnchor.constraint(equalToConstant: view.frame.height),
             detailedInformationTextView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
             detailedInformationTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
             detailedInformationTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5)
@@ -627,7 +625,6 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
         guard let selectedImage: UIImage = info[.originalImage] as? UIImage else { return }
         
         ImageCompressor.compress(image: selectedImage, maxByte: 300000) { image in
-//            self.itemThumbnails.append(image ?? selectedImage)
             self.multipartFormDataStorage.addImages([image ?? selectedImage])
             
             DispatchQueue.main.async {
