@@ -412,15 +412,7 @@ extension OpenMarketDetailedItemViewController {
                 }
             }
         case .delete:
-            itemInformationDataSource.deleteOpenMarketItem(id: itemID, password: password) { [weak self] response in
-                DispatchQueue.main.async {
-                    if (200...299).contains(response.statusCode) {
-                        self?.alertDeleteConfirmation()
-                    } else {
-                        self?.alertInvalidPassword(.delete)
-                    }
-                }
-            }
+            self.alertDeleteConfirmation(given: password)
         }
     }
     
@@ -431,12 +423,14 @@ extension OpenMarketDetailedItemViewController {
         navigationController?.pushViewController(editItemViewController, animated: true)
     }
     
-    private func alertDeleteConfirmation() {
+    private func alertDeleteConfirmation(given password: String) {
         let alertController = UIAlertController(title: "주의", message: "삭제 후 되돌릴 수 없습니다. 정말로 삭제하시겠습니까?", preferredStyle: .alert)
         let okAction = UIAlertAction(title: "OK", style: .default) { ok in
-            self.notifyThatAnItemIsDeleted()
-            alertController.dismiss(animated: true) {
-                self.alertSuccessfulDeletion()
+            
+            self.itemInformationDataSource.deleteOpenMarketItem(id: self.itemID, password: password) { [weak self] response in
+                DispatchQueue.main.async {
+                    self?.alertWhetherItemIsDeltedOrNot(check: response, with: alertController)
+                }
             }
             
         }
@@ -446,6 +440,17 @@ extension OpenMarketDetailedItemViewController {
         alertController.addAction(okAction)
         alertController.addAction(cancelAction)
         self.present(alertController, animated: true, completion: nil)
+    }
+    
+    private func alertWhetherItemIsDeltedOrNot(check response: HTTPURLResponse, with alertController: UIAlertController) {
+        if (200...299).contains(response.statusCode) {
+            self.notifyThatAnItemIsDeleted()
+            alertController.dismiss(animated: true) {
+                self.alertSuccessfulDeletion()
+            }
+        } else {
+            self.alertInvalidPassword(.delete)
+        }
     }
     
     private func alertSuccessfulDeletion() {
