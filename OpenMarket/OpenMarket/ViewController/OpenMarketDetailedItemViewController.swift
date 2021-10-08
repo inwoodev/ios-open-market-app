@@ -404,11 +404,7 @@ extension OpenMarketDetailedItemViewController {
         case .edit:
             itemInformationDataSource.proceedToPatchOpenMarketItem(id: itemID, password: password) { [weak self] response in
                 DispatchQueue.main.async {
-                    if (200...299).contains(response.statusCode) {
-                        self?.proceedToEditItem(password)
-                    } else {
-                        self?.alertInvalidPassword(.edit)
-                    }
+                    self?.alertWhetherItemCanBeEditedOrNot(with: password, check: response)
                 }
             }
         case .delete:
@@ -450,6 +446,14 @@ extension OpenMarketDetailedItemViewController {
             }
         } else {
             self.alertInvalidPassword(.delete)
+        }
+    }
+    
+    private func alertWhetherItemCanBeEditedOrNot(with password: String, check response: HTTPURLResponse) {
+        if (200...299).contains(response.statusCode) {
+            self.proceedToEditItem(password)
+        } else {
+            self.alertInvalidPassword(.edit)
         }
     }
     
