@@ -412,10 +412,12 @@ extension OpenMarketDetailedItemViewController {
         }
     }
     
-    private func proceedToEditItem(_ password: String) {
+    private func proceedToEditItem(insert password: String) {
         let editItemViewController = OpenMarketItemViewController(mode: .edit)
+        let itemInformation = itemInformationDataSource.accessItemInformation()
+        let itemSliderImages = itemInformationDataSource.accessSliderImages()
         editItemViewController.setItemIdentityToPatch(idNumber: itemID)
-        editItemViewController.receiveInformation(of: itemInformationDataSource.accessItemInformation(), images: itemInformationDataSource.accessSliderImages(), password: password)
+        editItemViewController.receiveInformation(of: itemInformation, images: itemSliderImages, password: password)
         navigationController?.pushViewController(editItemViewController, animated: true)
     }
     
@@ -451,7 +453,7 @@ extension OpenMarketDetailedItemViewController {
     
     private func alertWhetherItemCanBeEditedOrNot(with password: String, check response: HTTPURLResponse) {
         if (200...299).contains(response.statusCode) {
-            self.proceedToEditItem(password)
+            self.proceedToEditItem(insert: password)
         } else {
             self.alertInvalidPassword(.edit)
         }
