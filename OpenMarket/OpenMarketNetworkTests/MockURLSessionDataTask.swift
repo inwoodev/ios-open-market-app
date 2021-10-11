@@ -6,12 +6,18 @@
 //
 
 import Foundation
+@testable import OpenMarket
 
 final class MockURLSessionDataTask: URLSessionDataTask {
     override init() { }
     var resumeDidCall: () -> Void = { }
+    var cancelDidCall: () -> Void = { }
     
     override func resume() {
         resumeDidCall()
+    }
+    
+    override func cancel() {
+        cancelDidCall()
     }
 }

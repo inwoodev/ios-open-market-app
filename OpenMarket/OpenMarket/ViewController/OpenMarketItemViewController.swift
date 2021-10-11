@@ -9,52 +9,79 @@ import UIKit
 
 class OpenMarketItemViewController: UIViewController {
     
+    enum Mode {
+        case register, edit
+    }
+    
     // MARK: - Properties
     
-    private let currencyList = ["KRW", "USD", "BTC", "JPY", "EUR", "GBP", "CNY"]
     private let imagePicker = UIImagePickerController()
-    private var itemThumbnails: [UIImage] = []
-    private var itemInformation: [String: Any?] = [:]
-    private var textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
-    private var networkManager: NetworkManageable = NetworkManager()
+    private var itemID = Int()
+    private var bottomConstraint: NSLayoutConstraint?
+    private let mode: Mode
+    private let textViewDefaultMessage: String = "상품 정보를 입력 해 주세요."
+    private let multipartFormDataStorage = OpenMarketMultipartFormDataStorage()
+    
+    init(mode: Mode) {
+        self.mode = mode
+        super.init(nibName: nil, bundle: nil)
+    }
+    
+    required init?(coder: NSCoder) {
+        fatalError("init(coder:) is not supported")
+    }
     
     // MARK: - Views
     
-    private var titleTextField = TitleTextField()
-    private var priceTextField = PriceTextField()
-    private var discountedPriceTextField = DiscountedPriceTextField()
-    private var stockTextField = StockTextField()
-    private var passwordTextField = PasswordTextField()
-    private var currencyTextField = CurrencyTextField()
+    private let contentScrollView: UIScrollView = {
+        let scrollView = UIScrollView()
+        scrollView.translatesAutoresizingMaskIntoConstraints = false
+        scrollView.backgroundColor = .white
+        scrollView.showsVerticalScrollIndicator = true
+        
+        return scrollView
+    }()
     
-    private lazy var stockLabel: UILabel = {
+    private let contentView: UIView = {
+        let view = UIView()
+        view.translatesAutoresizingMaskIntoConstraints = false
+        
+        return view
+    }()
+    
+    private let titleTextField = TitleTextField()
+    private let priceTextField = PriceTextField()
+    private let discountedPriceTextField = DiscountedPriceTextField()
+    private let stockTextField = StockTextField()
+    private let passwordTextField = PasswordTextField()
+    private let currencyTextField = CurrencyTextField()
+    
+    private let stockLabel: UILabel = {
         let label = UILabel()
         label.text = "개"
         label.textColor = .lightGray
-        label.setContentCompressionResistancePriority(.defaultLow, for: .horizontal)
         label.font = UIFont.preferredFont(forTextStyle: .body)
         label.translatesAutoresizingMaskIntoConstraints = false
         
         return label
     }()
     
-    private lazy var detailedInformationTextView: UITextView = {
+    private let detailedInformationTextView: UITextView = {
         let textView = UITextView()
         textView.font = UIFont.preferredFont(forTextStyle: .body)
-        textView.text = textViewDefaultMessage
+        textView.text = "상품 정보를 입력 해 주세요."
         textView.textColor = .lightGray
         textView.translatesAutoresizingMaskIntoConstraints = false
-        textView.delegate = self
-        
+        textView.autocorrectionType = .no
+        textView.autocapitalizationType = .none
+        textView.keyboardDismissMode = .interactive
+        textView.isScrollEnabled = false
         return textView
     }()
     
-    private lazy var currencyPickerView: UIPickerView = {
-        let pickerView = UIPickerView(frame: CGRect(x: 0, y: 200, width: view.frame.width, height: 300))
+    private let currencyPickerView: UIPickerView = {
+        let pickerView = UIPickerView()
         pickerView.backgroundColor = UIColor.white
-        pickerView.dataSource = self
-        pickerView.delegate = self
-        pickerView.translatesAutoresizingMaskIntoConstraints = false
         
         return pickerView
     }()
@@ -67,7 +94,7 @@ class OpenMarketItemViewController: UIViewController {
         toolbar.sizeToFit()
         
         let doneButton = UIBarButtonItem(title: "완료", style: .done, target: self, action: #selector(self.donePicker))
-        let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(self.donePicker))
+        let cancelButton = UIBarButtonItem(title: "취소", style: .plain, target: self, action: #selector(self.cancelPicker))
         
         toolbar.setItems([doneButton, cancelButton], animated: true)
         toolbar.isUserInteractionEnabled = true
@@ -85,37 +112,52 @@ class OpenMarketItemViewController: UIViewController {
         return button
     }()
     
-    private lazy var thumbnailCollectionView: UICollectionView = {
+    private let thumbnailCollectionView: UICollectionView = {
         let layout = UICollectionViewFlowLayout()
-        let viewWidth = self.view.frame.width / 2
-        let viewHeight = self.view.frame.height / 5
-        layout.itemSize = CGSize(width: viewWidth, height: viewHeight)
         layout.scrollDirection = .horizontal
         let collectionView = UICollectionView(frame: .zero, collectionViewLayout: layout)
         collectionView.register(ImagePickerCollectionViewCell.self, forCellWithReuseIdentifier: ImagePickerCollectionViewCell.identifier)
         collectionView.backgroundColor = .white
-        collectionView.delegate = self
-        collectionView.dataSource = self
         collectionView.translatesAutoresizingMaskIntoConstraints = false
+        collectionView.showsHorizontalScrollIndicator = false
         
         return collectionView
     }()
     
-    private lazy var uploadImageStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [uploadImageButton, thumbnailCollectionView])
-        stackView.translatesAutoresizingMaskIntoConstraints = false
-        stackView.distribution = .fillEqually
-        stackView.axis = .horizontal
-        
-        return stackView
-    }()
-    
-    private lazy var pricesStackView: UIStackView = {
-        let stackView = UIStackView(arrangedSubviews: [priceTextField, discountedPriceTextField])
+    private let pricesStackView: UIStackView = {
+        let stackView = UIStackView()
         stackView.translatesAutoresizingMaskIntoConstraints = false
         stackView.axis = .vertical
         stackView.distribution = .fillEqually
         
+        return stackView
+    }()
+    
+    private let currencyAndPricesStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .horizontal
+        stackView.distribution = .fillProportionally
+        stackView.spacing = 10
+        return stackView
+    }()
+    
+    private let stockStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .horizontal
+        stackView.distribution = .fill
+        stackView.alignment = .leading
+        stackView.spacing = 5
+        return stackView
+    }()
+    
+    private let itemRegistrationInformationStackView: UIStackView = {
+        let stackView = UIStackView()
+        stackView.translatesAutoresizingMaskIntoConstraints = false
+        stackView.axis = .vertical
+        stackView.distribution = .fill
+        stackView.spacing = 10
         return stackView
     }()
     
@@ -124,33 +166,87 @@ class OpenMarketItemViewController: UIViewController {
         return sendItem
     }()
     
-    // MARK: - ViewDidLoad()
+    // MARK: - Methods
     
     override func viewDidLoad() {
         super.viewDidLoad()
-        self.view.backgroundColor = .white
+        overrideUserInterfaceStyle = .light
         setUpNavigationItems()
         addSubviews()
         setUpUIConstraints()
-        titleTextField.textFieldDelegate = self
-        priceTextField.textFieldDelegate = self
-        discountedPriceTextField.textFieldDelegate = self
-        stockTextField.textFieldDelegate = self
-        passwordTextField.textFieldDelegate = self
+        setDelegates()
         applyCurrencyTextField()
+        setUpPasswordTextField()
+        adjustViewWhenKeyboardShows()
+        adjustViewWhenKeyboardHides()
+        self.view.backgroundColor = .white
+    }
+    
+    func setItemIdentityToPatch(idNumber: Int) {
+        self.itemID = idNumber
+    }
+    
+    func receiveInformation(of item: OpenMarketItemWithDetailInformation?, images: [UIImage], password: String) {
+        configureUIForEditMode(item, thumbnails: images, password: password)
     }
     
     private func applyCurrencyTextField() {
-        currencyTextField.textFieldDelegate = self
         currencyTextField.inputView = currencyPickerView
         currencyTextField.inputAccessoryView = currencyPickerViewToolbar
+    }
+    
+    private func setUpPasswordTextField() {
+        switch mode {
+        case .edit:
+            passwordTextField.isUserInteractionEnabled = false
+            passwordTextField.textColor = .systemGray
+            passwordTextField.delegate?.textFieldDidEndEditing?(passwordTextField)
+        case .register:
+            passwordTextField.isUserInteractionEnabled = true
+        }
+    }
+    
+    private func configureUIForEditMode(_ item: OpenMarketItemWithDetailInformation?, thumbnails: [UIImage], password: String) {
+        if mode == .edit,
+           let validItem = item {
+            
+            self.titleTextField.text = validItem.title
+            self.priceTextField.text = String(validItem.price)
+            if let discountedPrice = validItem.discountedPrice {
+                self.discountedPriceTextField.text = String(discountedPrice)
+            } else {
+                self.discountedPriceTextField.text = nil
+            }
+            self.stockTextField.text = String(validItem.stock)
+            self.detailedInformationTextView.text = validItem.descriptions
+            self.detailedInformationTextView.textColor = .black
+            self.currencyTextField.text = validItem.currency
+            multipartFormDataStorage.addImages(thumbnails)
+            self.passwordTextField.text = password
+        }
+    }
+    
+    // MARK: - assign Delegates
+    
+    private func setDelegates() {
+        titleTextField.delegate = self
+        currencyTextField.delegate = self
+        priceTextField.delegate = self
+        discountedPriceTextField.delegate = self
+        stockTextField.delegate = self
+        passwordTextField.delegate = self
+        detailedInformationTextView.delegate = self
+        currencyPickerView.dataSource = self
+        currencyPickerView.delegate = self
+        thumbnailCollectionView.delegate = self
+        thumbnailCollectionView.dataSource = self
     }
 }
 extension OpenMarketItemViewController {
     
     // MARK: - Method: Send Information to Server
     
-    private func examineRequiredInformation() {
+    private func examineRequiredInformationToPost() {
         let alertController = UIAlertController(title: "입력 오류", message: "상품 사진 포함 필수항목을 모두 입력 해 주세요.", preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         
@@ -166,24 +262,16 @@ extension OpenMarketItemViewController {
         guard let detailedText = detailedInformationTextView.text else { return }
         if (detailedText.isEmpty || detailedText == textViewDefaultMessage) && self.presentedViewController == nil {
             self.present(alertController, animated: true, completion: nil)
-        } else if itemThumbnails.count < 1 && self.presentedViewController == nil {
+        } else if multipartFormDataStorage.accessItemImages().count < 1 && self.presentedViewController == nil {
             self.present(alertController, animated: true, completion: nil)
         }
-        
     }
     
-    private func alertConfirmationToUser() {
+    private func alertConfirmationToPostItem() {
         let alertController = UIAlertController(title: "작성 완료", message: "틀린 내용이 없는지 꼼꼼히 확인 해 주세요. 정말로 상품을 마켓에 올리시겠습니까?", preferredStyle: .alert)
-        let okButton = UIAlertAction(title: "OK", style: .default) { [weak self] action in
+        let okButton = UIAlertAction(title: "OK", style: .default) { action in
             
-            guard let self = self else { return }
-            
-            self.networkManager.postSingleItem(url: OpenMarketAPI.urlForSingleItem.description, texts: self.itemInformation, imageList: self.itemThumbnails, completionHandler: { task in
-            })
-            
-            DispatchQueue.main.async {
-                self.dismissCurrentViewController()
-            }
+            self.postItemToServer()
         }
         let cancelButton = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
         
@@ -193,30 +281,150 @@ extension OpenMarketItemViewController {
         self.present(alertController, animated: true, completion: nil)
     }
     
+    private func postItemToServer() {
+        multipartFormDataStorage.postOpenMarketItem { response in
+            DispatchQueue.main.async {
+                if (200...299).contains(response.statusCode) {
+                    self.alertSuccessfulResponseToUser()
+                } else {
+                    self.alertFailedResponseToUser()
+                }
+            }
+        }
+    }
+    
+    private func alertProceedToEditItem() {
+        let alertController = UIAlertController(title: "상품 수정", message: "정말로 상품을 수정하시겠습니까?", preferredStyle: .alert)
+        let okAction = UIAlertAction(title: "Ok", style: .default) { [weak self] alertAction in
+            self?.updateEditedItemInformation()
+        }
+        let cancelAction = UIAlertAction(title: "Cancel", style: .cancel) { alertAction in
+            
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        alertController.addAction(okAction)
+        alertController.addAction(cancelAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    private func updateEditedItemInformation() {
+        multipartFormDataStorage.patchOpenMarketItem(id: itemID) { response in
+            DispatchQueue.main.async {
+                if (200...299).contains(response.statusCode) {
+                    self.alertSuccessfulResponseToUser()
+                } else {
+                    self.alertFailedResponseToUser()
+                }
+            }
+        }
+    }
+    
+    private func alertSuccessfulResponseToUser() {
+        let editTitle = "상품 수정 완료"
+        let editMessage = "상품 수정이 정상적으로 완료되었습니다."
+        let registerTitle = "상품 등록 완료"
+        let registerMessage = "상품 등록이 정상적으로 완료되었습니다."
+        
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
+        if mode == .register {
+            alertController.title = registerTitle
+            alertController.message = registerMessage
+        } else {
+            alertController.title = editTitle
+            alertController.message = editMessage
+        }
+        
+        self.present(alertController, animated: true) {
+            
+            let delay = DispatchTime.now() + 1
+            
+            DispatchQueue.main.asyncAfter(deadline: delay) {
+                alertController.dismiss(animated: true) {
+                    self.navigationController?.popToRootViewController(animated: true)
+                    self.notifyToRefreshItemList()
+                }
+            }
+        }
+    }
+    
+    private func alertFailedResponseToUser() {
+        let editTitle = "상품 수정 실패"
+        let editMessage = "상품 수정을 실패하였습니다."
+        let registerTitle = "상품 등록 실패"
+        let registerMessage = "상품 등록을 실패하였습니다."
+        
+        let alertController = UIAlertController(title: nil, message: nil, preferredStyle: .alert)
+        if mode == .register {
+            alertController.title = registerTitle
+            alertController.message = registerMessage
+        } else {
+            alertController.title = editTitle
+            alertController.message = editMessage
+        }
+        let okAction = UIAlertAction(title: "OK", style: .default) { action in
+            alertController.dismiss(animated: true, completion: nil)
+        }
+        alertController.addAction(okAction)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
     @objc private func didTapDoneButton(_ sender: UIBarButtonItem) {
         self.view.endEditing(true)
-        examineRequiredInformation()
-        alertConfirmationToUser()
+        switch mode {
+        case .edit:
+            alertProceedToEditItem()
+        case .register:
+            examineRequiredInformationToPost()
+            alertConfirmationToPostItem()
+        }
     }
     
-    private func dismissCurrentViewController() {
-        self.navigationController?.popViewController(animated: true)
-//        if self.presentedViewController == nil {
-//
-//        }
+    private func notifyToRefreshItemList() {
+        NotificationCenter.default.post(name: .needToRefreshItemList, object: nil)
     }
-    
-    // MARK: - Method: hide keyboard when tapped around
+
+    // MARK: - Method: methods Regarding Keyboard
     
     override func touchesBegan(_ touches: Set<UITouch>, with event: UIEvent?) {
         super.touchesBegan(touches, with: event)
         self.view.endEditing(true)
     }
     
+    private func adjustViewWhenKeyboardShows() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillShowNotification, object: nil, queue: .main) { notification in
+            guard let userInfo = notification.userInfo else { return }
+            guard let keyboardFrame = userInfo[UIResponder.keyboardFrameEndUserInfoKey] as? CGRect else { return }
+            self.bottomConstraint?.constant = -keyboardFrame.height - 10
+            
+            guard let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+            
+            UIView.animate(withDuration: duration) {
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+    
+    private func adjustViewWhenKeyboardHides() {
+        NotificationCenter.default.addObserver(forName: UIResponder.keyboardWillHideNotification, object: nil, queue: .main) { notification in
+            guard let userInfo = notification.userInfo,
+                  let duration = userInfo[UIResponder.keyboardAnimationDurationUserInfoKey] as? TimeInterval else { return }
+            
+            self.bottomConstraint?.constant = -5
+            
+            UIView.animate(withDuration: duration) {
+                self.view.layoutIfNeeded()
+            }
+        }
+    }
+    
     // MARK: - setUp NavigationItems
     
     private func setUpNavigationItems() {
-        self.navigationItem.title = "상품등록"
+        switch mode {
+        case .edit:
+            self.navigationItem.title = "상품수정"
+        case .register:
+            self.navigationItem.title = "상품등록"
+        }
         self.navigationItem.rightBarButtonItem = UIRightBarButtonItem
     }
     
@@ -224,55 +432,66 @@ extension OpenMarketItemViewController {
     // MARK: - setUp UI Constraints
     
     private func addSubviews() {
-        [titleTextField, passwordTextField, currencyTextField, pricesStackView, stockTextField, stockLabel, detailedInformationTextView, uploadImageButton, thumbnailCollectionView].forEach {
-            self.view.addSubview($0)
+        
+        pricesStackView.addArrangedSubview(priceTextField)
+        pricesStackView.addArrangedSubview(discountedPriceTextField)
+        
+        currencyAndPricesStackView.addArrangedSubview(currencyTextField)
+        currencyAndPricesStackView.addArrangedSubview(pricesStackView)
+        
+        stockStackView.addArrangedSubview(stockTextField)
+        stockStackView.addArrangedSubview(stockLabel)
+        
+        [titleTextField, passwordTextField, currencyAndPricesStackView, stockStackView].forEach { view in
+            itemRegistrationInformationStackView.addArrangedSubview(view)
         }
+        self.view.addSubview(contentScrollView)
+        contentScrollView.addSubview(contentView)
+        self.contentView.addSubview(uploadImageButton)
+        self.contentView.addSubview(thumbnailCollectionView)
+        self.contentView.addSubview(itemRegistrationInformationStackView)
+        self.contentView.addSubview(detailedInformationTextView)
     }
     
     private func setUpUIConstraints() {
         
+        let contentViewHeight = contentView.heightAnchor.constraint(greaterThanOrEqualTo: self.view.heightAnchor)
+        contentViewHeight.priority = .defaultLow
+        
         NSLayoutConstraint.activate([
+            contentScrollView.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor),
+            contentScrollView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor),
+            contentScrollView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor),
             
-            uploadImageButton.topAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.topAnchor, constant: 20),
-            uploadImageButton.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 20),
-            uploadImageButton.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor),
+            contentView.topAnchor.constraint(equalTo: contentScrollView.topAnchor),
+            contentView.leadingAnchor.constraint(equalTo: contentScrollView.leadingAnchor),
+            contentView.trailingAnchor.constraint(equalTo: contentScrollView.trailingAnchor),
+            contentView.bottomAnchor.constraint(equalTo: contentScrollView.bottomAnchor),
+            contentView.widthAnchor.constraint(equalTo: contentScrollView.widthAnchor),
+            contentViewHeight,
             
-            thumbnailCollectionView.heightAnchor.constraint(lessThanOrEqualToConstant: self.view.frame.height / 10),
-            thumbnailCollectionView.widthAnchor.constraint(equalToConstant: self.view.frame.width - 10),
+            
+            uploadImageButton.topAnchor.constraint(equalTo: contentView.topAnchor, constant: 20),
+            uploadImageButton.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 20),
+            
+            thumbnailCollectionView.heightAnchor.constraint(equalToConstant: view.frame.height / 6.5),
             thumbnailCollectionView.topAnchor.constraint(equalTo: uploadImageButton.bottomAnchor, constant: 5),
-            thumbnailCollectionView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 5),
-            thumbnailCollectionView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -5),
+            thumbnailCollectionView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 5),
+            thumbnailCollectionView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -5),
             
-            titleTextField.topAnchor.constraint(equalTo: thumbnailCollectionView.bottomAnchor, constant: 20),
-            titleTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            titleTextField.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
+            itemRegistrationInformationStackView.topAnchor.constraint(equalTo: thumbnailCollectionView.bottomAnchor, constant: 5),
+            itemRegistrationInformationStackView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            itemRegistrationInformationStackView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            itemRegistrationInformationStackView.bottomAnchor.constraint(equalTo: detailedInformationTextView.topAnchor, constant: -5),
             
-            passwordTextField.topAnchor.constraint(equalTo: titleTextField.bottomAnchor, constant: 20),
-            passwordTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            passwordTextField.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            
-            currencyTextField.topAnchor.constraint(equalTo: passwordTextField.bottomAnchor, constant: 20),
-            currencyTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            
-            pricesStackView.topAnchor.constraint(equalTo: currencyTextField.topAnchor),
-            pricesStackView.leadingAnchor.constraint(equalTo: currencyTextField.trailingAnchor, constant: 20),
-            pricesStackView.trailingAnchor.constraint(lessThanOrEqualTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            pricesStackView.bottomAnchor.constraint(equalTo: currencyTextField.bottomAnchor),
-            
-            stockTextField.topAnchor.constraint(equalTo: currencyTextField.bottomAnchor, constant: 20),
-            stockTextField.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            
-            stockLabel.topAnchor.constraint(equalTo: stockTextField.topAnchor),
-            stockLabel.leadingAnchor.constraint(equalTo: stockTextField.trailingAnchor, constant: 5),
-            stockLabel.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -200),
-            stockLabel.bottomAnchor.constraint(equalTo: stockTextField.bottomAnchor),
-            
-            detailedInformationTextView.topAnchor.constraint(equalTo: stockTextField.bottomAnchor, constant: 20),
-            detailedInformationTextView.leadingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.leadingAnchor, constant: 10),
-            detailedInformationTextView.trailingAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.trailingAnchor, constant: -10),
-            detailedInformationTextView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor, constant: -10)
-            
+            detailedInformationTextView.heightAnchor.constraint(equalToConstant: view.frame.height),
+            detailedInformationTextView.leadingAnchor.constraint(equalTo: contentView.leadingAnchor, constant: 10),
+            detailedInformationTextView.trailingAnchor.constraint(equalTo: contentView.trailingAnchor, constant: -10),
+            detailedInformationTextView.bottomAnchor.constraint(equalTo: contentView.bottomAnchor, constant: -5)
         ])
+        
+        bottomConstraint = contentScrollView.bottomAnchor.constraint(equalTo: self.view.safeAreaLayoutGuide.bottomAnchor)
+        bottomConstraint?.isActive = true
     }
 }
 
@@ -281,11 +500,11 @@ extension OpenMarketItemViewController {
 extension OpenMarketItemViewController: UIPickerViewDelegate, UIPickerViewDataSource {
     
     func pickerView(_ pickerView: UIPickerView, titleForRow row: Int, forComponent component: Int) -> String? {
-        return currencyList[row]
+        return multipartFormDataStorage.getCurrency(at: row).description
     }
     
     func pickerView(_ pickerView: UIPickerView, didSelectRow row: Int, inComponent component: Int) {
-        currencyTextField.text = currencyList[row]
+        currencyTextField.text = multipartFormDataStorage.getCurrency(at: row).description
     }
     
     func numberOfComponents(in pickerView: UIPickerView) -> Int {
@@ -293,13 +512,19 @@ extension OpenMarketItemViewController: UIPickerViewDelegate, UIPickerViewDataSo
     }
     
     func pickerView(_ pickerView: UIPickerView, numberOfRowsInComponent component: Int) -> Int {
-        currencyList.count
+        multipartFormDataStorage.accessCurrencyList().count
     }
     
     @objc private func donePicker() {
         currencyTextField.resignFirstResponder()
         let row = currencyPickerView.selectedRow(inComponent: 0)
         pickerView(currencyPickerView, didSelectRow: row, inComponent: 0)
+    }
+    
+    @objc private func cancelPicker() {
+        currencyTextField.resignFirstResponder()
+        currencyTextField.text = nil
+        currencyPickerView.selectRow(0, inComponent: 0, animated: true)
     }
 }
 
@@ -320,7 +545,8 @@ extension OpenMarketItemViewController: UITextViewDelegate {
         }
         
         guard let text = textView.text else { return }
-        itemInformation.updateValue(text, forKey: OpenMarketItemToPost.descriptions.key)
+        multipartFormDataStorage.updateItemInformation(text, forKey: OpenMarketItemToPostOrPatch.descriptions.key)
+        
     }
 }
 
@@ -331,47 +557,62 @@ extension OpenMarketItemViewController: UITextFieldDelegate {
         textField.resignFirstResponder()
         return true
     }
+    
+    func textFieldDidEndEditing(_ textField: UITextField) {
+        if textField == titleTextField {
+            convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.title, textField.text)
+        } else if textField == priceTextField {
+            convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.price, textField.text)
+        } else if textField == discountedPriceTextField {
+            convertOptionalTextFieldToDictionary(OpenMarketItemToPostOrPatch.discountedPrice, textField.text)
+        } else if textField == currencyTextField {
+            convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.currency, textField.text)
+        } else if textField == stockTextField {
+            convertTextFieldToDictionary(OpenMarketItemToPostOrPatch.stock, textField.text)
+        } else if textField == passwordTextField {
+            convertPasswordTextFieldToDictionary(OpenMarketItemToPostOrPatch.password, textField.text)
+        }
+    }
 }
 
-// MARK: - TextFieldConvertible
+// MARK: - Convert Texts to Dictionary
 
-extension OpenMarketItemViewController: TextFieldConvertible {
+extension OpenMarketItemViewController {
     
-    func alertInvalidTextField(_ alertController: UIAlertController) {
-        self.present(alertController, animated: true, completion: nil)
-    }
-    
-    func convertPasswordTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
-        itemInformation.updateValue(text, forKey: itemToPost.key)
+    private func alertInvalidPassword() {
         let alertController = UIAlertController(title: "비밀번호 설정", message: "비밀번호를 영문, 숫자를 사용해서 입력 해 주세요", preferredStyle: .alert)
         let action = UIAlertAction(title: "OK", style: .default, handler: nil)
         alertController.addAction(action)
+        self.present(alertController, animated: true, completion: nil)
+    }
+    
+    func convertPasswordTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
+        multipartFormDataStorage.updateItemInformation(text, forKey: itemToPost.key)
         
-        guard let text = text,
-              Int(text) == nil,
-              !text.isEmpty else {
-            alertInvalidTextField(alertController)
+        guard let validText = text,
+              !validText.isEmpty else {
+            alertInvalidPassword()
             return
         }
         
-        itemInformation.updateValue(text, forKey: itemToPost.key)
+        multipartFormDataStorage.updateItemInformation(text, forKey: itemToPost.key)
     }
     
-    func convertOptionalTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
+    func convertOptionalTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
         
         guard let text = text,
               let number = Int(text) else { return }
-        itemInformation.updateValue(number, forKey: itemToPost.key)
+        multipartFormDataStorage.updateItemInformation(number, forKey: itemToPost.key)
     }
     
-    func convertTextFieldToDictionary(_ itemToPost: OpenMarketItemToPost, _ text: String?) {
+    func convertTextFieldToDictionary(_ itemToPost: OpenMarketItemToPostOrPatch, _ text: String?) {
         
         guard let text = text else { return }
         if let number = Int(text) {
-            itemInformation.updateValue(number, forKey: itemToPost.key)
+            multipartFormDataStorage.updateItemInformation(number, forKey: itemToPost.key)
             
         } else {
-            itemInformation.updateValue(text, forKey: itemToPost.key)
+            multipartFormDataStorage.updateItemInformation(text, forKey: itemToPost.key)
         }
     }
 }
@@ -384,7 +625,7 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
         guard let selectedImage: UIImage = info[.originalImage] as? UIImage else { return }
         
         ImageCompressor.compress(image: selectedImage, maxByte: 300000) { image in
-            self.itemThumbnails.append(image ?? selectedImage)
+            self.multipartFormDataStorage.addImages([image ?? selectedImage])
             
             DispatchQueue.main.async {
                 self.thumbnailCollectionView.reloadData()
@@ -394,29 +635,36 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
     }
     
     @objc func didTapUploadPhoto(_ sender: UIButton) {
-        
-        if itemThumbnails.count < 5 {
-            let alertController = UIAlertController(title: "상품등록", message: nil, preferredStyle: .actionSheet)
-            let photoLibrary = UIAlertAction(title: "사진 앨범", style: .default) { action in
-                self.openLibrary()
-            }
-            let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
-            
-            alertController.addAction(photoLibrary)
-            alertController.addAction(cancel)
-            
-            present(alertController, animated: true, completion: nil)
+
+        if multipartFormDataStorage.accessItemImages().count < 5 {
+            alertUploadPhoto()
         } else {
-            let alertController = UIAlertController(title: "사진 제한", message: "사진은 총 5장으로 제한 됩니다.", preferredStyle: .alert)
-            let defaultAction = UIAlertAction(title: "OK", style: .destructive, handler: nil)
-            alertController.addAction(defaultAction)
-            
-            present(alertController, animated: true, completion: nil)
+            alertLimitNumberOfPhoto()
         }
-        
     }
     
-    private func openLibrary() {
+    private func alertUploadPhoto() {
+        let alertController = UIAlertController(title: "상품사진", message: nil, preferredStyle: .actionSheet)
+        let photoLibrary = UIAlertAction(title: "사진 앨범", style: .default) { action in
+            self.openPhotoLibrary()
+        }
+        let cancel = UIAlertAction(title: "Cancel", style: .cancel, handler: nil)
+        
+        alertController.addAction(photoLibrary)
+        alertController.addAction(cancel)
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    private func alertLimitNumberOfPhoto() {
+        let alertController = UIAlertController(title: "사진 제한", message: "사진은 총 5장으로 제한 됩니다.", preferredStyle: .alert)
+        let defaultAction = UIAlertAction(title: "OK", style: .destructive, handler: nil)
+        alertController.addAction(defaultAction)
+        
+        present(alertController, animated: true, completion: nil)
+    }
+    
+    private func openPhotoLibrary() {
         imagePicker.sourceType = .photoLibrary
         imagePicker.delegate = self
         present(imagePicker, animated: true, completion: nil)
@@ -427,7 +675,7 @@ extension OpenMarketItemViewController: UIImagePickerControllerDelegate, UINavig
 
 extension OpenMarketItemViewController: UICollectionViewDataSource {
     func collectionView(_ collectionView: UICollectionView, numberOfItemsInSection section: Int) -> Int {
-        return itemThumbnails.count
+        return multipartFormDataStorage.accessItemImages().count
     }
     
     func collectionView(_ collectionView: UICollectionView, cellForItemAt indexPath: IndexPath) -> UICollectionViewCell {
@@ -435,8 +683,7 @@ extension OpenMarketItemViewController: UICollectionViewDataSource {
             return UICollectionViewCell()
         }
         cell.indexPath = indexPath
-        cell.configureThumbnail(itemThumbnails)
-        cell.imagePickerDelegate = cell
+        cell.configureImage(multipartFormDataStorage.accessItemImages(), indexPath: indexPath)
         cell.removeCellDelegate = self
         return cell
     }
@@ -446,9 +693,21 @@ extension OpenMarketItemViewController: UICollectionViewDelegateFlowLayout {
     // MARK: - Cell Size
     
     func collectionView(_ collectionView: UICollectionView, layout collectionViewLayout: UICollectionViewLayout, sizeForItemAt indexPath: IndexPath) -> CGSize {
-        let cellWidth = collectionView.frame.width / 5
-        let cellHeight = collectionView.frame.height
-        return CGSize(width: cellWidth, height: cellHeight)
+        
+        guard let windowScene = UIApplication.shared.connectedScenes.first as? UIWindowScene,
+              windowScene.activationState == .foregroundActive else {
+            return CGSize(width: 0, height: 0)
+        }
+        
+        if windowScene.interfaceOrientation.isLandscape {
+            let cellWidth = collectionView.frame.width / 5
+            let cellHeight = collectionView.frame.height
+            return CGSize(width: cellWidth, height: cellHeight)
+        } else {
+            let cellWidth = collectionView.frame.width / 3
+            let cellHeight = collectionView.frame.height
+            return CGSize(width: cellWidth, height: cellHeight)
+        }
     }
 }
 
@@ -458,7 +717,7 @@ extension OpenMarketItemViewController: RemoveDelegate {
     func removeCell(_ indexPath : IndexPath) {
         self.thumbnailCollectionView.performBatchUpdates {
             self.thumbnailCollectionView.deleteItems(at: [indexPath])
-            self.itemThumbnails.remove(at: indexPath.row)
+            multipartFormDataStorage.removeImage(at: indexPath.item)
         } completion: { (_) in
             self.thumbnailCollectionView.reloadData()
         }
