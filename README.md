@@ -1,7 +1,5 @@
 # 오픈 마켓 프로젝트
-
----
-
+**목차**
 1. [프로젝트 개요](#1-프로젝트-개요)
    - [MVC](#mvc)
    - [기술 스택](#기술-스택)
@@ -75,7 +73,7 @@ MVC 패턴은 다음과 같은 장점이 있습니다
 
 이번 프로젝트는 스토리보드를 사용하지 않고 오직 코드만을 활용하여 UI를 구현하였습니다.
 
-#### [목차로 돌아가기](#오픈-마켓-프로젝트)
+#### [목차로 돌아가기](#목차)
 ---
 
 # 2. 주요기능
@@ -128,7 +126,7 @@ MVC 패턴은 다음과 같은 장점이 있습니다
 
 ![Simulator Screen Recording - iPhone 12 Pro - 2021-10-07 at 14.13.36](https://raw.githubusercontent.com/inwoodev/uploadedImages/uploadedFiles/20211007141358.gif)
 
-#### [목차로 돌아가기](#오픈-마켓-프로젝트)
+#### [목차로 돌아가기](#목차)
 ---
 
 # 3. 설계 및 상세구현
@@ -444,7 +442,7 @@ private func alertWhetherItemIsDeltedOrNot(check response: HTTPURLResponse, with
         }
     }
 ```
-#### [목차로 돌아가기](#오픈-마켓-프로젝트)
+#### [목차로 돌아가기](#목차)
 ---
 
 
@@ -507,7 +505,7 @@ sessionDataTask.resumeDidCall = {
   - 각 모듈의 프로퍼티를 프로토콜을 채택하게 하여 의존성 역전을 구현하였고 이를 통해 Test Double 객체들을 외부로부터 주입 받아 각 모듈의 기능을 독립적으로 테스트를 진행하였습니다.
   - 마지막으로 모듈을 총괄하는 OpenMarketDataManager와 CachedImagLoader의 메서드들을 테스트 하여 각 모듈이 필요한 기능을 수행하는지 테스트를 진행할 수 있었습니다.
 
-#### [목차로 돌아가기](#오픈-마켓-프로젝트)
+#### [목차로 돌아가기](#목차)
 ---
 
 # 5. 고민한 내용
@@ -867,7 +865,7 @@ final class OpenMarketDataManager {
 
 **위와 같은 리팩토링 과정을 통해 각 객체들은 테스트에 용이해지고, 재사용성이 올라가며, 결합도를 낮춰 유연성과 확장성이 향상될 수 있었습니다.**
 
-#### [목차로 돌아가기](#오픈-마켓-프로젝트)
+#### [목차로 돌아가기](#목차)
 ---
 
 # 6. Trouble Shooting
@@ -892,5 +890,5 @@ Trouble Shooting 만큼 개발자에게 있어서 짜릿한 경험은 없는 것
 
 [캐시처리가 안되는 문제 해결](https://velog.io/@inwoodev/Sept-26-2021-TIL-Today-I-Learned-Computed-Property-Extension-캐시처리가-안되는-문제-TroubleShooting)
 
-#### [목차로 돌아가기](#오픈-마켓-프로젝트)
+#### [목차로 돌아가기](#목차)
 ---
