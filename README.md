@@ -45,7 +45,7 @@
 
 # 1. 프로젝트 개요
 
-**REST API 연동을 통해 상품을 확인, 등록, 수정 및 삭제를 할 수 있는 마켓 앱입니다.**
+**[REST API](https://docs.google.com/spreadsheets/d/1_l6aPfEUchSF_ymIp0DjyH8Ic00GIoqvd8dO9f7_sx4/edit#gid=1153044612) 연동을 통해 상품을 확인, 등록, 수정 및 삭제를 할 수 있는 마켓 앱입니다.**
 
 ## MVC
 
